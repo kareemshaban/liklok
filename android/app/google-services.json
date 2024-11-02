@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "17338485793",
+    "project_id": "liklok-88d38",
+    "storage_bucket": "liklok-88d38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17338485793:android:cdeff308a5fd97166ce760",
+        "android_client_info": {
+          "package_name": "com.liklok.live.chat.liklok"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "17338485793-jbte3f3ipbn72nc1dpiuea3jq5k2ebd7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBN7cYBR3l0oXQGEvCyFrLIeZGpQQ7yQZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "17338485793-jbte3f3ipbn72nc1dpiuea3jq5k2ebd7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "17338485793-ml19j0qcuhrq5vncqqsuh7r3abv2144d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.liklok.live.chat.liklok"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
