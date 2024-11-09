@@ -351,6 +351,7 @@ const Map<String, String> hi = {
   'games': 'खेल',
   'chineese_lang':'चीनी भाषा',
   'indonisian_lang':'इन्डोनेशियाई',
+  'relations': 'संबंध'
 
 
 };

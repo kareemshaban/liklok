@@ -343,4 +343,16 @@ const Map<String, String> zhHans = {
   "point_count": "积分数",
   "agent_salary": "代理工资",
   "host_agent": "主持人工资",
+
+  'indian_lang': '印度語',
+  'phlpini_lang': '菲律賓語',
+  'pangladish_lang': '孟加拉語',
+  'barazil_lang': '巴西語（葡萄牙語）',
+  'france_lang': '法語',
+  'games': '遊戲',
+  'chineese_lang':'中文',
+  'indonisian_lang':'印尼',
+
+
+  'relations': '關係'
 };

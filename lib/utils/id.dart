@@ -343,4 +343,5 @@ const Map<String, String> id = {
   "point_count": "Jumlah Poin",
   "agent_salary": "Gaji Agen",
   "host_agent": "Gaji Host",
+  'relations': 'hubungan'
 };

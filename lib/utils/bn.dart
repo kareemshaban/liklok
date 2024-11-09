@@ -351,5 +351,6 @@ const Map<String, String> bn = {
   'games': 'গেমস',
   'chineese_lang':'চীনা ভাষা',
   'indonisian_lang':'ইন্দোনেশিয়ান',
+  'relations': 'সম্পর্ক'
 
 };

@@ -351,6 +351,7 @@ const Map<String, String> br = {
   'games': 'Jogos',
   'chineese_lang':'Língua chinesa',
   'indonisian_lang':'indonésio',
+  'relations': 'relações'
 
 
 

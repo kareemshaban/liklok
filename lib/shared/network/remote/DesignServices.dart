@@ -8,6 +8,7 @@ import 'package:LikLok/models/Category.dart';
 import 'package:LikLok/models/Design.dart';
 import 'package:LikLok/models/Mall.dart';
 import 'package:LikLok/models/Medal.dart';
+import 'package:LikLok/models/Relation.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -28,6 +29,7 @@ class DesignServices {
     print(response.body);
     List<Category> cats = [] ;
     List<Mall> designs = [] ;
+    List<RelationModel> relations = [] ;
     MallHelper helper  = MallHelper(categories: cats , designs: designs);
     if (response.statusCode == 200) {
       final Map jsonData = json.decode(response.body);
@@ -39,8 +41,14 @@ class DesignServices {
         Mall design = Mall.fromJson(jsonData['designs'][i]);
         designs.add(design);
       }
+      for( var i = 0 ; i < jsonData['relations'].length ; i ++ ){
+        RelationModel relation = RelationModel.fromJson(jsonData['relations'][i]);
+        relations.add(relation);
+      }
+
        helper.designs = designs ;
        helper.categories = cats ;
+       helper.relations = relations ;
       return helper ;
     } else {
       // If the server did not return a 200 OK response,

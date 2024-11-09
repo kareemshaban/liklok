@@ -351,4 +351,5 @@ const Map<String, String> ar = {
   'games': 'الألعاب',
   'chineese_lang':'اللغة الصينية',
   'indonisian_lang':'اللغة الإندونيسية',
+  'relations': 'العلاقات'
 };

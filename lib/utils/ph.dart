@@ -351,6 +351,7 @@ const Map<String, String> ph = {
   'games': 'Mga laro',
   'chineese_lang':'wikang Tsino',
   'indonisian_lang':'Indonesian',
+  'relations': 'relasyon'
 
 
 };

@@ -124,11 +124,16 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
     setState(() {
       user = AppUserServices().userGetter();
       selectedCategory = helper?.categories![0].id ;
-      tabsCount = helper!.categories!.length ;
+      tabsCount = helper!.categories!.length + 1 ;
       _tabController = new TabController(vsync: this, length: tabsCount);
       _tabController!.addListener((){
         setState(() {
-          selectedCategory = helper!.categories![_tabController!.index].id ;
+          if(_tabController!.index < helper!.categories!.length  ){
+            selectedCategory = helper!.categories![_tabController!.index].id ;
+          } else {
+            selectedCategory = 0 ;
+          }
+
         });
 
       });
@@ -222,10 +227,19 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
   getCats(){
     List<Widget> t = [] ;
     for(var i = 0 ; i < tabsCount ; i++){
-      Widget tab = Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 5.0),
-        child: Tab(text: helper!.categories![i].name),
-      );
+      Widget tab = Container();
+     if(i < helper!.categories!.length  ){
+        tab = Padding(
+         padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 5.0),
+         child: Tab(text:   helper!.categories![i].name ),
+       );
+     } else {
+        tab = Padding(
+         padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 5.0),
+         child: Tab(text: 'relations'.tr ),
+       );
+     }
+
       t.add(tab);
       setState(() {
         tabs = t ;
@@ -308,12 +322,69 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
     ),
   );
 
+
+  Widget relationListItem(design) => GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: () {
+      setState(() {
+        selectedDesign = design!.id ;
+      });
+      showModalBottomSheet(
+          context: context,
+          builder: (ctx) => DesignBottomSheet(design));
+    },
+    child: Container(
+      decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(15.0) ,
+          border: selectedDesign == design.id ? Border.all(color: MyColors.primaryColor , width: 3.0) : Border.all(color: Colors.transparent)),
+      margin: EdgeInsets.all(5.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(color: MyColors.secondaryColor,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(15.0) , topRight: Radius.circular(15.0))),
+              child: Center(
+                  child: Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'RelationsMotion/' + design.motion_icon))//Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Designs/' + design.icon),),
+                // child: SVGASimpleImage(
+                //     resUrl: "https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true"),
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(  borderRadius: BorderRadius.circular(15.0)),
+            child: Column(
+              children: [
+                Text(design.name , style: TextStyle(color: MyColors.primaryColor , fontSize: 15.0 , fontWeight: FontWeight.bold),),
+                SizedBox(height: 3.0,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(image: AssetImage('assets/images/gold.png') , width: 25.0,),
+                    SizedBox(width: 5.0,),
+                    Text(design.price , style: TextStyle(color: MyColors.primaryColor , fontSize: 13.0 , fontWeight: FontWeight.bold),)
+                  ],
+                ),
+                SizedBox(height: 3.0,),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
   getTabs() {
     print('my selectedCategory is '+ selectedCategory.toString());
     List<Widget> t = [] ;
     for(var i = 0 ; i < tabsCount ; i++){
-      Widget tab = getTab(helper!.categories![i].id);
-      t.add(tab);
+      if(i < helper!.categories!.length ){
+        Widget tab = getTab(helper!.categories![i].id);
+        t.add(tab);
+      } else {
+        Widget tab = getRelationTab();
+        t.add(tab);
+      }
+
     }
     setState(() {
       views = t ;
@@ -335,6 +406,25 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
       ),
     ],
   );
+
+  Widget getRelationTab() => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Expanded(
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          color: MyColors.primaryColor,
+          child: GridView.count(
+            crossAxisCount: 3,
+            childAspectRatio: .7,
+            children: helper!.relations!.toList().map((relation ) => relationListItem(relation)).toList() ,
+          ),
+        ),
+      ),
+    ],
+  );
+
+
 
   Widget DesignBottomSheet( design) => Container(
     height: 310.0,
