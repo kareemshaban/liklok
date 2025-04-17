@@ -351,6 +351,20 @@ const Map<String, String> bn = {
   'games': 'গেমস',
   'chineese_lang':'চীনা ভাষা',
   'indonisian_lang':'ইন্দোনেশিয়ান',
-  'relations': 'সম্পর্ক'
-
+  'relations': 'সম্পর্ক',
+  'accept_btn': 'গ্রহণ',
+  'cancel_btn': 'প্রত্যাখ্যান করতে',
+  'relation_dialog_title':'বন্ধুর সাথে সম্পর্ক গ্রহণ বা প্রত্যাখ্যান করুন',
+  'relation_dialog_msg': 'আপনার বন্ধুর পাঠানো সম্পর্ক গ্রহণ বা প্রত্যাখ্যান করুন',
+  'Wallet_Charged_successfully': 'আপনার ওয়ালেট সফলভাবে চার্জ করা হয়েছে৷',
+  'home_my_room': 'আমার',
+  "create_room": 'শত্রিম নেই',
+  'login_with_password': "নোবেল পাসওয়ার্ড লগইন",
+  'login_with_password_disable': "পাসওয়ার্ড লগইন অক্ষম করুন",
+  'change_password': 'পাসওয়ার্ড পরিবর্তন করুন',
+  'account_password': 'অ্যাকাউন্ট পাসওয়ার্ড',
+  'enter_password': 'অ্যাকাউন্ট পাসওয়ার্ড লিখুন',
+  're_enter_password': 'অ্যাকাউন্ট পাসওয়ার্ড পুনরায় লিখুন',
+  'id_login': 'আইডি ব্যবহার করে লগইন করুন',
+  'id_text': 'ID',
 };

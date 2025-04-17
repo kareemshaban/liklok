@@ -1,10 +1,12 @@
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/HostAgency.dart';
+import 'package:LikLok/modules/SetPassword/set_password_screen.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -82,6 +84,62 @@ class _Account_Management_ScreenState extends State<Account_Management_Screen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                GestureDetector(
+                  onTap:(){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(askForCurrentPassword: 0,)));
+                  } ,
+                  child: user!.loginWithPassword == 0 ?  Container(
+                    width: double.infinity,
+                    height: 50,
+                    margin: EdgeInsets.symmetric(horizontal: 20.0),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.secondaryColor),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('login_with_password'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                      ],
+                    ),
+                  ) : Column(
+                    children: [
+                        GestureDetector(
+                          onTap:(){
+                            disablePasswordLogin();
+                           },
+                          child: Container(
+                            width: double.infinity,
+                            height: 50,
+                            margin: EdgeInsets.symmetric(horizontal: 20.0),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.red),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('login_with_password_disable'.tr , style: TextStyle(color: Colors.white , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: 20.0,),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(askForCurrentPassword: 1,)));
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 50,
+                          margin: EdgeInsets.symmetric(horizontal: 20.0),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.yellow),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('change_password'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20.0,),
                 GestureDetector(
                   onTap:(){
                     FirebaseMessaging.instance.unsubscribeFromTopic('all');
@@ -204,4 +262,24 @@ class _Account_Management_ScreenState extends State<Account_Management_Screen> {
       },
     );
   }
+
+  disablePasswordLogin() async{
+      AppUser? res = await AppUserServices().updateUserPassword(user!.id, "", 0);
+      setState(() {
+        user = res ;
+      });
+      AppUserServices().userSetter(user!);
+      Fluttertoast.showToast(
+          msg: "Login With Password has been disabled" ,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black26,
+          textColor: Colors.orange,
+          fontSize: 16.0);
+          Navigator.pop(context);
+
+  }
+
+
 }

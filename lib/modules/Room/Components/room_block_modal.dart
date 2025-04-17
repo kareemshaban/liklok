@@ -163,7 +163,7 @@ class _RoomBlockModalState extends State<RoomBlockModal> {
   Widget itemSperatorBuilder() => SizedBox(height: 5.0,);
 
   unBlockMember(member_id) async{
-    ChatRoom? res = await ChatRoomService().unBlockRoomMember(member_id , room!.id);
+    ChatRoom? res = await ChatRoomService().unBlockRoomMember(member_id , room!.id , user!.id);
     ChatRoomService().roomSetter(res!);
     Navigator.pop(context);
   }

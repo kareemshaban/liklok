@@ -1,15 +1,19 @@
 import 'dart:io';
 
 import 'package:LikLok/firebase_options.dart';
+import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/AppUser.dart';
+import 'package:LikLok/models/Intro.dart';
 import 'package:LikLok/modules/BlockedScreen/blocked_screen.dart';
 import 'package:LikLok/modules/ErrorPage/error_screen.dart';
+import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/firebase_options.dart';
 import 'package:LikLok/layout/tabs_screen.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/modules/Login/LoginScreen.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
+import 'package:LikLok/shared/network/remote/IntroServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:LikLok/translation.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -118,12 +122,21 @@ class _MyAppState extends State<MyApp> {
    var token ;
   void initState() {
     super.initState();
-     getDeviceToken();
+      getAppSettings();
+      getRandomIntro();
+      getDeviceToken();
 
 
 
-
-
+  }
+  getRandomIntro() async{
+    Intro? res = await IntroServices().getRandomIntro();
+    IntroServices().introSetter(res!);
+  }
+  getAppSettings() async{
+    AppSettings? res = await AppSettingsServices().getAppSettings();
+    AppSettingsServices().appSettingSetter(res!);
+    IntroServices().setFirstShow(1);
 
   }
   getDeviceToken() async {

@@ -192,7 +192,7 @@ class _RoomAdminsModalState extends State<RoomAdminsModal> {
       setState(() {
         _isLoading = true ;
       });
-      ChatRoom? res = await ChatRoomService().removeChatRoomAdmin(user_id, room!.id);
+      ChatRoom? res = await ChatRoomService().removeChatRoomAdmin(user_id, room!.id , user!.id);
       setState(() {
         _isLoading = false ;
         room = res ;

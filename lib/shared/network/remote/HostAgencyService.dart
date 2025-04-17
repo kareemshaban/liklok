@@ -83,25 +83,16 @@ class HostAgencyService {
   Future<AgencyMemberIncomeHelper?> getMemberStatics(user_id) async {
     final response = await http.get(Uri.parse('${BASEURL}hostAgency/getAgencyMemberStatics/${user_id}'));
     AgencyMember? member ;
-    List<AgencyMemberStatics> statics  = [];
-    List<AgencyMemberPoints> points = [] ;
     AgencyTarget? currentTarget ;
     AgencyTarget? nextTarget ;
-    AgencyMemberIncomeHelper helper = new AgencyMemberIncomeHelper(member: member, statics: statics, points: points, currentTarget: currentTarget, nextTarget: nextTarget , totalDay: 0);
+    AgencyMemberIncomeHelper helper = new AgencyMemberIncomeHelper(member: member, points: 0, currentTarget: currentTarget, nextTarget: nextTarget , totalDay: 0);
 
     if (response.statusCode == 200) {
       final Map jsonData = json.decode(response.body);
       if( jsonData['member'] != null){
         member = AgencyMember.fromJson(jsonData['member'] );
       }
-      for(var i = 0 ; i <  jsonData['statics'].length ; i++ ){
-        AgencyMemberStatics st = AgencyMemberStatics.fromJson(jsonData['statics'][i]);
-        statics.add(st);
-      }
-      for(var i = 0 ; i <  jsonData['points'].length ; i++ ){
-        AgencyMemberPoints pt = AgencyMemberPoints.fromJson(jsonData['points'][i]);
-        points.add(pt);
-      }
+
       if(jsonData['currentTarget'] != null ){
         currentTarget = AgencyTarget.fromJson(jsonData['currentTarget'] );
       }
@@ -109,10 +100,9 @@ class HostAgencyService {
       nextTarget = AgencyTarget.fromJson(jsonData['nextTarget'] );
 
       helper.member = member ;
-      helper.points = points ;
+      helper.points = int.parse(jsonData['points'].toString()) ;
       helper.nextTarget  = nextTarget ;
       helper.currentTarget = currentTarget ;
-      helper.statics = statics ;
       helper.totalDay = double.parse(jsonData['totalDay'].toString()) ;
 
       return helper ;

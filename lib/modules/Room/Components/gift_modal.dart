@@ -48,6 +48,7 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
       room = ChatRoomService().roomGetter();
       RoomBasicDataHelper? helper = ChatRoomService().roomBasicDataHelperGetter();
       categories = helper!.categories ;
+      categories.sort((a, b) => a.order.compareTo(b.order));
       gifts = helper.gifts ;
       selectedGift = gifts.where((element) => element.gift_category_id == categories[0].id).toList()[0].id ;
       _tabController = new TabController(vsync: this, length: categories.length);
@@ -202,114 +203,144 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
       giftViews = t ;
     });
   }
-  Widget getGiftViewTab(id) =>    Column(
-    children: [
-      Expanded(
-        child: GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 4,
-          childAspectRatio: .8,
-          children:
-          gifts.where((element) => element.gift_category_id == id).map((gift) => giftListItem(gift)).toList(),
-          mainAxisSpacing: 3.0,
-          crossAxisSpacing: 3.0,
-        ),
-      ),
-      Container(
-        color: Colors.white.withAlpha(50),
-        padding: EdgeInsets.symmetric(horizontal: 20.0),
-        height: 50.0,
-        child: Row(
-          children: [
-            Column(
+  Widget getGiftViewTab(id) {
+    List<Gift> _gifts = gifts.where((element) => element.gift_category_id == id).toList();
+    if(id == 7){
+      _gifts.sort((a, b) => a.id.compareTo(b.id));
+    }
+
+
+    return
+      Column(
+        children: [
+          Expanded(
+            child: GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 4,
+              childAspectRatio: .8,
+              children: _gifts.map((gift) => giftListItem(gift)).toList() ,
+              mainAxisSpacing: 3.0,
+              crossAxisSpacing: 3.0,
+            ),
+          ),
+          Container(
+            color: Colors.white.withAlpha(50),
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            height: 50.0,
+            child: Row(
               children: [
-                 Row(
+                Column(
                   children: [
-                    Image(image: AssetImage('assets/images/gold.png') , width: 25.0,),
-                    SizedBox(width: 5.0,),
-                    Text(  double.parse(user!.gold).floor().toString()  , style: TextStyle(color: MyColors.primaryColor , fontSize: 13.0 , fontWeight: FontWeight.bold),),
-                    IconButton(onPressed: (){}, icon: Icon(Icons.arrow_forward_ios_outlined , color: MyColors.primaryColor, size: 20.0,)  )
+                    Row(
+                      children: [
+                        Image(image: AssetImage('assets/images/gold.png'),
+                          width: 25.0,),
+                        SizedBox(width: 5.0,),
+                        Text(double.parse(user!.gold).floor().toString(),
+                          style: TextStyle(color: MyColors.primaryColor,
+                              fontSize: 13.0,
+                              fontWeight: FontWeight.bold),),
+                        IconButton(onPressed: () {},
+                            icon: Icon(Icons.arrow_forward_ios_outlined,
+                              color: MyColors.primaryColor, size: 20.0,))
+                      ],
+                    ),
                   ],
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        width: 160.0,
+                        height: 40.0,
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(22.0),
+                            border: Border.all(
+                                color: MyColors.primaryColor, width: 2.0)),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 96.0,
+                              child: Row(
+                                children: [
+                                  PopupMenuButton(
+                                    position: PopupMenuPosition.over,
+                                    shadowColor: MyColors.unSelectedColor,
+                                    elevation: 4.0,
+
+                                    color: Colors.white,
+                                    icon: Icon(Icons.arrow_drop_down,
+                                      color: MyColors.whiteColor,),
+                                    onSelected: (int result) {
+                                      setState(() {
+                                        sendGiftCount = result;
+                                        getGiftViewTabs();
+                                      });
+                                    },
+                                    itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<int>>[
+                                      PopupMenuItem<int>(
+                                        value: 1,
+                                        child: Text('X 1', style: TextStyle(
+                                            color: Colors.black),),
+                                      ),
+                                      PopupMenuItem<int>(
+                                        value: 7,
+                                        child: Text('X 7', style: TextStyle(
+                                            color: Colors.black),),
+                                      ),
+                                      PopupMenuItem<int>(
+                                        value: 17,
+                                        child: Text('X 17', style: TextStyle(
+                                            color: Colors.black),),
+
+                                      ),
+                                      PopupMenuItem<int>(
+                                        value: 77,
+                                        child: Text('X 77', style: TextStyle(
+                                            color: Colors.black),),
+
+                                      )
+                                    ],
+                                  ),
+                                  Container(child: Text(
+                                    sendGiftCount.toString(), style: TextStyle(
+                                      color: Colors.black, fontSize: 12.0),))
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                sendGift();
+                              },
+                              child: Container(
+                                width: 60.0,
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                    color: MyColors.primaryColor,
+                                    borderRadius: BorderRadiusDirectional.only(
+                                        topEnd: Radius.circular(20.0),
+                                        bottomEnd: Radius.circular(20.0))),
+                                child: Center(child: Text("gift_send".tr,
+                                  style: TextStyle(color: MyColors.darkColor,
+                                      fontSize: 15.0),)),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
-            Expanded(
-              child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    width: 160.0,
-                    height: 40.0,
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    decoration: BoxDecoration(borderRadius:BorderRadius.circular(22.0) , border: Border.all(color: MyColors.primaryColor , width: 2.0)),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 96.0,
-                          child: Row(
-                            children: [
-                              PopupMenuButton(
-                                position: PopupMenuPosition.over,
-                                shadowColor: MyColors.unSelectedColor,
-                                elevation: 4.0,
-
-                                color: Colors.white,
-                                icon: Icon(Icons.arrow_drop_down , color: MyColors.whiteColor,),
-                                onSelected: (int result) {
-                                  setState(() {
-                                    sendGiftCount = result ;
-                                    getGiftViewTabs ();
-                                  });
-                                },
-                                itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-                                  PopupMenuItem<int>(
-                                    value: 1,
-                                    child: Text('X 1' , style: TextStyle(color: Colors.black),),
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 7,
-                                    child: Text('X 7' , style: TextStyle(color: Colors.black),),
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 17,
-                                    child: Text('X 17' , style: TextStyle(color: Colors.black),),
-
-                                  ),
-                                  PopupMenuItem<int>(
-                                    value: 77,
-                                    child: Text('X 77' , style: TextStyle(color: Colors.black),),
-
-                                  )
-                                ],
-                              ),
-                              Container( child: Text(sendGiftCount.toString() , style: TextStyle(color: Colors.black , fontSize: 12.0),))
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            sendGift();
-                          },
-                          child: Container(
-                            width: 60.0,
-                            height:40.0,
-                            decoration: BoxDecoration(color: MyColors.primaryColor ,
-                                borderRadius:BorderRadiusDirectional.only(topEnd: Radius.circular(20.0) , bottomEnd: Radius.circular(20.0))),
-                            child: Center(child: Text("gift_send".tr , style: TextStyle(color: MyColors.darkColor , fontSize: 15.0),)),
-                          ),
-                        ),
-
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      )
-    ],
-  );
+          )
+        ],
+      ) ;
+  }
 
   Widget giftListItem (gift) => GestureDetector(
     onTap: (){

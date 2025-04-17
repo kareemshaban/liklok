@@ -351,5 +351,21 @@ const Map<String, String> ar = {
   'games': 'الألعاب',
   'chineese_lang':'اللغة الصينية',
   'indonisian_lang':'اللغة الإندونيسية',
-  'relations': 'العلاقات'
+  'relations': 'العلاقات',
+  'accept_btn': 'قبول',
+  'cancel_btn': 'رفض',
+  'relation_dialog_title':'قبول او رفض علاقة مع صديق',
+  'relation_dialog_msg': 'برجاء قبول او رفض العلاقة المرسلة من صديقك',
+  'Wallet_Charged_successfully': 'تم شحن رصيدك بنجاح',
+  'home_my_room': 'خاصتي',
+  "create_room": 'غرفة جديدة',
+  'login_with_password': "تفعيل الدخول بكلمة سر",
+  'login_with_password_disable': 'تعطيل الدخول بكلمة سر',
+  'change_password': 'تغيير كلمة السر',
+  'account_password': 'كلمة المرور',
+  'enter_password': 'أدخل كلمة المرور',
+  're_enter_password': 'أعد كتابة كلمة المرور',
+  'id_login': 'الدخول بمعرف المستخدم',
+  'id_text': 'معرف المستخدم',
+
 };

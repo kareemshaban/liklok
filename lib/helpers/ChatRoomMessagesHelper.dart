@@ -9,12 +9,15 @@ class ChatRoomMessagesHelper {
   ChatRoomMessagesHelper({required this.room_id , required this.user_id , required this.message  , required this.type});
 
   handleSendRoomMessage() async{
+    print('handleSendRoomMessage1');
     await FirebaseFirestore.instance.collection("RoomMessages").add({
       'room_id': room_id,
       'user_id': user_id,
       'message': message,
       'type': type
     });
+
+    print('handleSendRoomMessage2');
   }
 
 }

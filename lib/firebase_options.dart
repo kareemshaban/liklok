@@ -41,51 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDfl7eZMCicJY8EPZzZNUp-27qmTtnovRU',
-    appId: '1:17338485793:web:2247b8dc8b63f14c6ce760',
-    messagingSenderId: '17338485793',
-    projectId: 'liklok-88d38',
-    authDomain: 'liklok-88d38.firebaseapp.com',
-    storageBucket: 'liklok-88d38.appspot.com',
-    measurementId: 'G-8XN3FR5SQN',
+    apiKey: 'AIzaSyAKLX3wO09ayV7W5vUELtIuhK6NMC4qscc',
+    appId: '1:672957384118:web:58836e30b304ad6b6fed17',
+    messagingSenderId: '672957384118',
+    projectId: 'liklok-4286b',
+    authDomain: 'liklok-4286b.firebaseapp.com',
+    storageBucket: 'liklok-4286b.firebasestorage.app',
+    measurementId: 'G-5Z2R5K3MT2',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBN7cYBR3l0oXQGEvCyFrLIeZGpQQ7yQZs',
-    appId: '1:17338485793:android:cdeff308a5fd97166ce760',
-    messagingSenderId: '17338485793',
-    projectId: 'liklok-88d38',
-    storageBucket: 'liklok-88d38.appspot.com',
+    apiKey: 'AIzaSyC_t_y5AjJEJW35CvQefNOdoKV5FZBU_iY',
+    appId: '1:672957384118:android:d8c7a76bcb75e5276fed17',
+    messagingSenderId: '672957384118',
+    projectId: 'liklok-4286b',
+    storageBucket: 'liklok-4286b.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDjHPzLeAKPd4pyAxd0FeSiwsPjSoZybQ0',
-    appId: '1:17338485793:ios:91fd85b193099a436ce760',
-    messagingSenderId: '17338485793',
-    projectId: 'liklok-88d38',
-    storageBucket: 'liklok-88d38.appspot.com',
-    iosClientId: '17338485793-ml19j0qcuhrq5vncqqsuh7r3abv2144d.apps.googleusercontent.com',
+    apiKey: 'AIzaSyD8ePJjKNvoU2cRsWTCw12AtPHGrKlOyRo',
+    appId: '1:672957384118:ios:9ea188c4e11098e36fed17',
+    messagingSenderId: '672957384118',
+    projectId: 'liklok-4286b',
+    storageBucket: 'liklok-4286b.firebasestorage.app',
+    iosClientId: '672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com',
     iosBundleId: 'com.liklok.live.chat.liklok',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDjHPzLeAKPd4pyAxd0FeSiwsPjSoZybQ0',
-    appId: '1:17338485793:ios:91fd85b193099a436ce760',
-    messagingSenderId: '17338485793',
-    projectId: 'liklok-88d38',
-    storageBucket: 'liklok-88d38.appspot.com',
-    iosClientId: '17338485793-ml19j0qcuhrq5vncqqsuh7r3abv2144d.apps.googleusercontent.com',
+    apiKey: 'AIzaSyD8ePJjKNvoU2cRsWTCw12AtPHGrKlOyRo',
+    appId: '1:672957384118:ios:9ea188c4e11098e36fed17',
+    messagingSenderId: '672957384118',
+    projectId: 'liklok-4286b',
+    storageBucket: 'liklok-4286b.firebasestorage.app',
+    iosClientId: '672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com',
     iosBundleId: 'com.liklok.live.chat.liklok',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDfl7eZMCicJY8EPZzZNUp-27qmTtnovRU',
-    appId: '1:17338485793:web:233e789da818ae176ce760',
-    messagingSenderId: '17338485793',
-    projectId: 'liklok-88d38',
-    authDomain: 'liklok-88d38.firebaseapp.com',
-    storageBucket: 'liklok-88d38.appspot.com',
-    measurementId: 'G-T4QLT5P210',
+    apiKey: 'AIzaSyAKLX3wO09ayV7W5vUELtIuhK6NMC4qscc',
+    appId: '1:672957384118:web:5687954bce242d466fed17',
+    messagingSenderId: '672957384118',
+    projectId: 'liklok-4286b',
+    authDomain: 'liklok-4286b.firebaseapp.com',
+    storageBucket: 'liklok-4286b.firebasestorage.app',
+    measurementId: 'G-TBK8EC1C0E',
   );
 
 }

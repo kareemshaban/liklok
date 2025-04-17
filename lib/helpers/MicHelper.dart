@@ -1,3 +1,4 @@
+import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 
@@ -5,10 +6,11 @@ class MicHelper {
   final int user_id ;
   final int room_id ;
   final int mic ;
+
   MicHelper({required this.user_id , required this.room_id , required this.mic});
 
   lockMic() async{
-    await ChatRoomService().lockMic(user_id, room_id, mic);
+    await ChatRoomService().lockMic(user_id, room_id, mic , AppUserServices().userGetter()!.id);
     await FirebaseFirestore.instance.collection("mic-state").add({
       'room_id': room_id,
       'user_id': user_id,
@@ -17,7 +19,7 @@ class MicHelper {
     });
   }
   unlockMic() async{
-    await ChatRoomService().unlockMic(user_id, room_id, mic);
+    await ChatRoomService().unlockMic(user_id, room_id, mic , AppUserServices().userGetter()!.id);
     await FirebaseFirestore.instance.collection("mic-state").add({
       'room_id': room_id,
       'user_id': user_id,
@@ -36,7 +38,7 @@ class MicHelper {
     });
   }
   leaveMic() async{
-    await ChatRoomService().leaveMic(user_id, room_id, mic);
+    await ChatRoomService().leaveMic(user_id, room_id, mic  , 0);
     await FirebaseFirestore.instance.collection("mic-usage").add({
       'room_id': room_id,
       'user_id': user_id,
@@ -47,7 +49,7 @@ class MicHelper {
 
 
   removeFromMic(admin_id) async{
-    await ChatRoomService().leaveMic(user_id, room_id, mic);
+    await ChatRoomService().leaveMic(user_id, room_id, mic ,admin_id );
     await FirebaseFirestore.instance.collection("mic-remove").add({
       'room_id': room_id,
       'admin_id': admin_id,
@@ -58,7 +60,7 @@ class MicHelper {
   }
 
   kickOut(block_type) async{
-    await ChatRoomService().blockRoomMember(user_id , room_id , block_type);
+    await ChatRoomService().blockRoomMember(user_id , room_id , block_type , AppUserServices().userGetter()!.id);
     await FirebaseFirestore.instance.collection("room-block").add({
       'room_id': room_id,
       'block_type': block_type,

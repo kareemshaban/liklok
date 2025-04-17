@@ -2,9 +2,19 @@ import 'dart:convert';
 
 import 'package:LikLok/models/Banner.dart';
 import 'package:LikLok/shared/components/Constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class BannerServices {
+  static List<BannerData> banners = [] ;
+  bannerSetter( List<BannerData> u){
+    banners = u ;
+  }
+  List<BannerData> bannerGetter(){
+    return banners ;
+  }
+
+
   Future<List<BannerData>> getAllBanners() async {
     final response = await http.get(Uri.parse('${BASEURL}Banners/getAll'));
     print(response.body);

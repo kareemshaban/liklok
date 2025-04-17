@@ -352,7 +352,22 @@ const Map<String,String> en ={
   'games': 'Games',
   'chineese_lang':'Chinese language',
   'indonisian_lang':'Indonesian',
-  'relations': 'Relations'
+  'relations': 'Relations',
+  'accept_btn': 'Accept',
+  'cancel_btn': 'Reject',
+  'relation_dialog_title':'Accept or reject a relationship with a friend',
+  'relation_dialog_msg': 'Please accept or reject the relationship sent by your friend.',
+  'Wallet_Charged_successfully': 'Your Wallet Charged Successfully',
+  'home_my_room': 'Mine',
+  "create_room": 'New ChatRoom',
+  'login_with_password': "Enable password login",
+  'login_with_password_disable': 'Disable password login',
+  'change_password': 'Change Password',
+  'account_password': 'Account Password',
+  'enter_password': 'Enter Account Password',
+  're_enter_password': 'Re-Enter Account Password',
+  'id_login': 'Login using ID',
+  'id_text': 'ID',
 
 
 

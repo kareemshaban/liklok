@@ -8,7 +8,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class GameModal extends StatefulWidget {
   final int id ;
-  const GameModal({super.key , required this.id});
+  final double height_ratio ;
+  const GameModal({super.key , required this.id , required this.height_ratio});
 
   @override
   State<GameModal> createState() => _GameModalState();
@@ -27,8 +28,7 @@ class _GameModalState extends State<GameModal> {
       user = AppUserServices().userGetter();
       url = '${GAMETESTSERVER}?mimi=0&showMiniExitBtn=1&appKey=${GAMEAPPKEY}&token=${user!.token}&gameId=${widget.id}';
     });
-    print('tokentoken');
-    print(user!.token);
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -56,7 +56,7 @@ class _GameModalState extends State<GameModal> {
 
   Widget build(BuildContext context) {
     return  Container(
-        height: MediaQuery.sizeOf(context).height ,
+        height: MediaQuery.sizeOf(context).height * widget.height_ratio,
         decoration: BoxDecoration(color: Colors.white.withAlpha(200),
             borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
             border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),

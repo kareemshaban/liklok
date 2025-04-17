@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Settings.dart';
 import 'package:LikLok/modules/ChargingOperation/Charging_Operation_Screen.dart';
 import 'package:LikLok/modules/GoogleProductsScreen/google_products_screen.dart';
 import 'package:LikLok/modules/Loading/loadig_screen.dart';
 import 'package:LikLok/shared/constants/Contants.dart';
+import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/WalletServices.dart';
 import 'package:LikLok/utils/en.dart';
@@ -11,8 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_ip_address/get_ip_address.dart';
-import 'package:pay/pay.dart';
-
+import 'package:root_checker_plus/root_checker_plus.dart';
 
 import '../../shared/styles/colors.dart';
 
@@ -28,18 +30,80 @@ class _WalletScreenState extends State<WalletScreen> {
   AppSettings? setting ;
   var diamondTxt = TextEditingController()  ;
   bool isLoading = false ;
+  bool showGoogleBtn = false  ;
+  bool rootedCheck = false;
 
+  //Initial iOS jailbreak detection in set false value
+  bool jailbreak = false;
+
+  //Initial Android Developer mode checker in set false value
+  bool devMode = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    if (Platform.isAndroid) {
+      androidRootChecker();
+      developerMode();
+    }
+
+    //Android initState check status on jailbreak detection checking
+    if (Platform.isIOS) {
+      iosJailbreak();
+    }
+    print('rooted');
+    print(rootedCheck);
+
+    print('devMode');
+    print(devMode);
+
     getSettings();
     setState(() {
       user = AppUserServices().userGetter();
+      print('AppSettingsServices');
+      print(AppSettingsServices().appSettingGetter()!.enableGooglePayments);
+
+      if(AppSettingsServices().appSettingGetter()!.enableGooglePayments == 0){
+        showGoogleBtn = false ;
+      } else {
+        showGoogleBtn = true ;
+      }
     });
   }
-
+  Future<void> androidRootChecker() async {
+    try {
+      rootedCheck = (await RootCheckerPlus.isRootChecker())!; // return rootcheck status is true or false
+    } catch(PlatformException)  {
+      rootedCheck = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      rootedCheck = rootedCheck;
+    });
+  }
+  Future<void> developerMode() async {
+    try {
+      devMode = (await RootCheckerPlus.isDeveloperMode())!; // return Android developer mode status is true or false
+    } catch(PlatformException)  {
+      devMode = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      devMode = devMode;
+    });
+  }
+  Future<void> iosJailbreak() async {
+    try {
+      jailbreak = (await RootCheckerPlus.isJailbreak())!;  // return iOS jailbreak status is true or false
+    } catch(PlatformException){
+      jailbreak = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      jailbreak = jailbreak;
+    });
+  }
   getSettings() async {
     AppSettings? res = await WalletServices().getAppSettings();
     setState(() {
@@ -148,7 +212,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       ],
                     ),
                   ),
-                  Expanded(
+                 !(rootedCheck) ? Expanded(
                     child: Transform.translate(
                         offset: Offset(0, -20.0), child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 15.0 , vertical: 20.0),
@@ -176,7 +240,17 @@ class _WalletScreenState extends State<WalletScreen> {
 
 
                     )),
-                  )
+                  ) : Container(
+                   child: Expanded(
+                     child: Column(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                       children: [
+                         Text("Sorry Google Payment not allowed on this device" , style: TextStyle(fontSize: 15.0 , color: Colors.red , fontWeight: FontWeight.bold),),
+                       ],
+                     ),
+
+                   ),
+                 )
                 ],
               ),
               Column(
@@ -357,9 +431,9 @@ class _WalletScreenState extends State<WalletScreen> {
   }
   Widget googleProvider() => GestureDetector(
      onTap: (){
-       //Navigator.push(context, MaterialPageRoute(builder: (context) => const GoogleProductsScreen(),));
+       Navigator.push(context, MaterialPageRoute(builder: (context) => const GoogleProductsScreen(),));
      },
-    child: Container(
+    child: showGoogleBtn ? Container(
       width: double.infinity,
       padding: EdgeInsets.all(15.0),
       decoration: BoxDecoration(color: Colors.white , borderRadius: BorderRadius.circular(15.0)),
@@ -393,7 +467,7 @@ class _WalletScreenState extends State<WalletScreen> {
           )
         ],
       ),
-    ),
+    ) : Container(),
   );
   Widget appleProvider() => Container(
     width: double.infinity,

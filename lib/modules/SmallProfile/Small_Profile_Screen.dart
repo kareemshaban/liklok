@@ -6,6 +6,7 @@ import 'package:LikLok/models/ChatRoom.dart';
 import 'package:LikLok/models/Design.dart';
 import 'package:LikLok/models/Mall.dart';
 import 'package:LikLok/models/Medal.dart';
+import 'package:LikLok/models/Relation.dart';
 import 'package:LikLok/modules/InnerProfile/Inner_Profile_Screen.dart';
 import 'package:LikLok/modules/Room/Components/gift_modal.dart';
 import 'package:LikLok/modules/Room/Room_Screen.dart';
@@ -216,6 +217,13 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
                           children:  user!.medals!.map((medal) =>  getMedalItem(medal)).toList()
 
                       ),
+                      Row(
+                          children:  user!.relations!.map((medal) =>  getRelationItem(medal)).toList()
+
+                      ),
+
+
+
                     ],
                   ),
 
@@ -587,6 +595,18 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
       child: Column(
           children:[
             Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Badges/${medal.icon}') , width: 50, height: 50,),
+
+          ]
+
+      ),
+    );
+  }
+  Widget getRelationItem(RelationModel relation){
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0),
+      child: Column(
+          children:[
+            Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Relations/${relation.icon}') , width: 40,),
 
           ]
 

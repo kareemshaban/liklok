@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:LikLok/helpers/MallHelper.dart';
 import 'package:LikLok/models/AppUser.dart';
+import 'package:LikLok/modules/Mall/Components/friends_modal_screen.dart';
 import 'package:LikLok/modules/MyDesigns/My_Designs_Screen.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
@@ -15,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:svgaplayer_flutter/parser.dart';
 import 'package:svgaplayer_flutter/player.dart';
 import 'package:path/path.dart' as path;
+import '../../models/Category.dart';
 import '../Loading/loadig_screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,7 +40,7 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
   String preview_img = "" ;
   SVGAAnimationController? animationController;
   bool loading = false ;
-
+  List<Category>?   categories  = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -121,15 +123,18 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
     // FUNCTION FILL LIST<FILE> FROM CASH
     helper = await DesignServices().getAllCatsAndDesigns();
     DesignServices().helperSetter(helper!);
+
     setState(() {
+      categories = helper!.categories ;
+      categories!.sort((a, b) => a.order.compareTo(b.order));
       user = AppUserServices().userGetter();
-      selectedCategory = helper?.categories![0].id ;
-      tabsCount = helper!.categories!.length + 1 ;
+      selectedCategory = categories![0].id ;
+      tabsCount = categories!.length + 1 ;
       _tabController = new TabController(vsync: this, length: tabsCount);
       _tabController!.addListener((){
         setState(() {
-          if(_tabController!.index < helper!.categories!.length  ){
-            selectedCategory = helper!.categories![_tabController!.index].id ;
+          if(_tabController!.index < categories!.length  ){
+            selectedCategory = categories![_tabController!.index].id ;
           } else {
             selectedCategory = 0 ;
           }
@@ -137,6 +142,7 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
         });
 
       });
+
       getCats();
       getTabs();
 
@@ -226,20 +232,20 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
   }
   getCats(){
     List<Widget> t = [] ;
-    for(var i = 0 ; i < tabsCount ; i++){
-      Widget tab = Container();
-     if(i < helper!.categories!.length  ){
+    Widget tab = Container();
+    tab = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 5.0),
+      child: Tab(text: 'relations'.tr ),
+    );
+    t.add(tab);
+    setState(() {
+      tabs = t ;
+    });
+    for(var i = 0 ; i < categories!.length -1 ; i++){
         tab = Padding(
          padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 5.0),
-         child: Tab(text:   helper!.categories![i].name ),
+         child: Tab(text: categories![i].name ),
        );
-     } else {
-        tab = Padding(
-         padding: const EdgeInsets.symmetric(horizontal: 20.0 , vertical: 5.0),
-         child: Tab(text: 'relations'.tr ),
-       );
-     }
-
       t.add(tab);
       setState(() {
         tabs = t ;
@@ -249,23 +255,23 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
   }
   Widget countryListSpacer() => SizedBox(width: 10.0,);
 
-  Widget catListItem(index) => helper!.categories!.isNotEmpty ?  GestureDetector(
+  Widget catListItem(index) => categories!.isNotEmpty ?  GestureDetector(
     onTap: (){
       setState(() {
-        selectedCategory = helper!.categories![index].id;
+        selectedCategory = categories![index].id;
         print(selectedCategory);
       });
     },
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 15.0 , vertical: 10),
       decoration: BoxDecoration( borderRadius: BorderRadius.circular(25.0) ,
-          color: helper!.categories![index].id == selectedCategory ? MyColors.primaryColor : MyColors.lightUnSelectedColor),
+          color: categories![index].id == selectedCategory ? MyColors.primaryColor : MyColors.lightUnSelectedColor),
       child:  Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text(helper!.categories![index].name , style:
-          TextStyle(color: helper!.categories![index].id == selectedCategory ? MyColors.darkColor :MyColors.whiteColor ,
+          Text(categories![index].name , style:
+          TextStyle(color: categories![index].id == selectedCategory ? MyColors.darkColor :MyColors.whiteColor ,
               fontSize: 13.0 , fontWeight: FontWeight.bold),)
         ],),
     ),
@@ -331,7 +337,7 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
       });
       showModalBottomSheet(
           context: context,
-          builder: (ctx) => DesignBottomSheet(design));
+          builder: (ctx) => RelationBottomSheet(design));
     },
     child: Container(
       decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(15.0) ,
@@ -376,14 +382,16 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
   getTabs() {
     print('my selectedCategory is '+ selectedCategory.toString());
     List<Widget> t = [] ;
-    for(var i = 0 ; i < tabsCount ; i++){
-      if(i < helper!.categories!.length ){
-        Widget tab = getTab(helper!.categories![i].id);
+      Widget tab = getRelationTab();
+      t.add(tab);
+    for(var i = 0 ; i < categories!.length - 1 ; i++){
+      // if(i < categories!.length ){
+        Widget tab = getTab(categories![i].id);
         t.add(tab);
-      } else {
-        Widget tab = getRelationTab();
-        t.add(tab);
-      }
+      // } else {
+      //   Widget tab = getRelationTab();
+      //   t.add(tab);
+      // }
 
     }
     setState(() {
@@ -564,6 +572,111 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
 
   );
 
+
+  Widget RelationBottomSheet( design) => Container(
+      height: 310.0,
+      decoration: BoxDecoration(color: MyColors.solidDarkColor, borderRadius: BorderRadius.only(topRight: Radius.circular(15.0) , topLeft: Radius.circular(15.0))),
+      padding: EdgeInsets.all(10.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Container(
+                  color: MyColors.solidDarkColor,
+                  child: Center(
+                      child: Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Relations/' + design.icon))
+             
+
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+          SizedBox(height: 5.0,),
+
+          Container(
+            color: MyColors.solidDarkColor,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.only(start: 15.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(design.name , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.only(end: 15.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Image(image: AssetImage('assets/images/gold.png') , width: 25.0,),
+                            Text(design!.price , style: TextStyle(color: MyColors.primaryColor , fontSize: 15.0 , fontWeight: FontWeight.bold),)                      ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.0,),
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 5.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsetsDirectional.only(start: 3.0),
+                        decoration: BoxDecoration(color: Colors.black12 , borderRadius: BorderRadius.circular(20.0)),
+                        child: Row(
+                          children: [
+                            Image(image: AssetImage('assets/images/gold.png') , width: 25.0,),
+                            SizedBox(width: 5.0,),
+                            Text(user!.gold.toString() , style: TextStyle(color: MyColors.primaryColor , fontSize: 13.0 , fontWeight: FontWeight.bold),),
+                            IconButton(onPressed: (){}, icon: Icon(Icons.arrow_forward_ios_outlined , color: MyColors.primaryColor, size: 20.0,)  )
+                          ],
+                        ),
+                      ),
+                      Expanded(child:
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: (){
+                                purchaseRelation(design);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 15.0 , vertical: 8.0),
+                                decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(20.0)),
+                                child: Text("gift_send".tr , style: TextStyle(color:  MyColors.darkColor , fontSize: 16.0),),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      )
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      )
+
+  );
+
   preview(img , design) async{
     Navigator.pop(context);
       setState(() {
@@ -616,6 +729,25 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
       );
     }
 
+  }
+  purchaseRelation(design){
+    if( NumberFormat().parse(user!.gold) >= NumberFormat().parse(design.price) ){
+      Navigator.pop(context);
+      showModalBottomSheet(
+          isScrollControlled: true ,
+          context: context,
+          builder: (ctx) => FriendsModalScreen(relation_id: design.id , relation_name: design.name,));
+    } else {
+      Fluttertoast.showToast(
+          msg: "mall_msg".tr,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black26,
+          textColor: Colors.orange,
+          fontSize: 16.0
+      );
+    }
   }
 
 

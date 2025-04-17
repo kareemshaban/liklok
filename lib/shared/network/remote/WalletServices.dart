@@ -6,6 +6,7 @@ import 'package:LikLok/models/Settings.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class WalletServices {
@@ -104,11 +105,9 @@ class WalletServices {
         'source': source.toString()
       }),
     );
-    print('exchangeDiamond');
-    print(response.body);
     if (response.statusCode == 200) {
       Fluttertoast.showToast(
-          msg: 'Wallet Charged successfully',
+          msg: 'Wallet_Charged_successfully'.tr,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,

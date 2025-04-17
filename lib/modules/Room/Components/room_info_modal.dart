@@ -26,16 +26,30 @@ class _RoomInfoModalState extends State<RoomInfoModal> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     setState(() {
       room = ChatRoomService().roomGetter();
       user = AppUserServices().userGetter();
-      isAdmin = room!.userId == user!.id ;
+     checkAdmin();
       if (room!.img == room!.admin_img) {
         room_img = '${ASSETSBASEURL}AppUsers/${room?.img}';
       } else {
         room_img = '${ASSETSBASEURL}Rooms/${room?.img}';
       }
     });
+  }
+  checkAdmin() async {
+    ChatRoom? res = await ChatRoomService().openRoomById(room!.id) ;
+    ChatRoomService().roomSetter(res!);
+    AppUser? res2 = await AppUserServices().getUser(user!.id);
+    AppUserServices().userSetter(res2!);
+    setState(() {
+      room = ChatRoomService().roomGetter();
+      user = AppUserServices().userGetter();
+      isAdmin = room!.userId == user!.id ;
+    });
+    print('isAdmin');
+    print(isAdmin);
   }
 
   @override

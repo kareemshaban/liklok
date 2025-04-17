@@ -433,7 +433,7 @@ class _RoomSettingsModalState extends State<RoomSettingsModal> {
       setState(() {
         _isLoading1 = true ;
       });
-      ChatRoom? res = await ChatRoomService().updateRoomName(room!.id , roomTitleController.text );
+      ChatRoom? res = await ChatRoomService().updateRoomName(room!.id , roomTitleController.text , user!.id );
       setState(() {
         room = res ;
         ChatRoomService().roomSetter(room!);
@@ -447,7 +447,7 @@ class _RoomSettingsModalState extends State<RoomSettingsModal> {
     setState(() {
       _isLoading2 = true ;
     });
-      ChatRoom? res = await ChatRoomService().updateRoomHello(room!.id , roomHelloController.text);
+      ChatRoom? res = await ChatRoomService().updateRoomHello(room!.id , roomHelloController.text , user!.id);
     setState(() {
       room = res ;
       ChatRoomService().roomSetter(room!);
@@ -462,7 +462,7 @@ class _RoomSettingsModalState extends State<RoomSettingsModal> {
       _isLoading3 = true ;
     });
 
-    ChatRoom? res = await ChatRoomService().updateRoomPassword(room!.id , roomPasswordController.text);
+    ChatRoom? res = await ChatRoomService().updateRoomPassword(room!.id , roomPasswordController.text , user!.id);
     setState(() {
       room = res ;
       ChatRoomService().roomSetter(room!);
@@ -474,7 +474,7 @@ class _RoomSettingsModalState extends State<RoomSettingsModal> {
   }
 
   void updateRoomCategory(subject) async {
-    ChatRoom? res = await ChatRoomService().updateRoomCategory(room!.id , subject );
+    ChatRoom? res = await ChatRoomService().updateRoomCategory(room!.id , subject , user!.id);
     setState(() {
       room = res ;
       ChatRoomService().roomSetter(room!);
@@ -571,7 +571,7 @@ class _RoomSettingsModalState extends State<RoomSettingsModal> {
     setState(() {
       _isLoading4 = true ;
     });
-    await ChatRoomService().updateRoomImg(room!.id, _image);
+    await ChatRoomService().updateRoomImg(room!.id, _image , user!.id);
 
     setState(() {
       _isLoading4 = false

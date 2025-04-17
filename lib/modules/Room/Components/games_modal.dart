@@ -1,6 +1,8 @@
+import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/modules/Room/Components/game_modal.dart';
 import 'package:LikLok/shared/components/Constants.dart';
+import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +18,7 @@ class GamesModal extends StatefulWidget {
 
 class _GamesModalState extends State<GamesModal> {
   AppUser? user ;
+  AppSettings? appSettings ;
 
   @override
   void initState() {
@@ -24,6 +27,7 @@ class _GamesModalState extends State<GamesModal> {
 
     setState(() {
       user = AppUserServices().userGetter();
+      appSettings = AppSettingsServices().appSettingGetter();
     });
   }
 
@@ -43,15 +47,15 @@ class _GamesModalState extends State<GamesModal> {
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                    Expanded(
-                    child: GestureDetector(
+                  appSettings!.game25 == 1 ? Expanded(
+                   child: GestureDetector(
                       onTap: (){
 
                         Navigator.pop(context);
                         showModalBottomSheet(
                             isScrollControlled: true ,
                             context: context,
-                            builder: (ctx) => openGame(25));
+                            builder: (ctx) => openGame(25 , 1.0));
                       },
                       child: Column(
                         children: [
@@ -59,71 +63,34 @@ class _GamesModalState extends State<GamesModal> {
         
                         ],
                       ),
-                    ),
-                  ) ,
-                    Expanded(
+                    ) ,
+                  ) : Container(),
+                  appSettings!.game10 == 1 ? Expanded(
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: (){
                         Navigator.pop(context);
                         showModalBottomSheet(
+                            isScrollControlled: true ,
                             context: context,
-                            builder: (ctx) => openGame(14));
-                      },
-                      child: Column(
-                        children: [
-                          Image(image: AssetImage('assets/images/game14.png') , width: 100.0,),
-        
-                        ],
-                      ),
-                    ),
-                  ),
-                    Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-                        Navigator.pop(context);
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (ctx) => openGame(2));
-                      },
-                      child: Column(
-                        children: [
-                          Image(image: AssetImage('assets/images/game2.png') , width: 100.0,),
-
-                        ],
-                      ),
-                    ),
-                  ),
-        
-                ],
-              ),
-              SizedBox(height: 15.0,),
-              Row(
-                children: [
-
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-                        Navigator.pop(context);
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (ctx) => openGame(10));
+                            builder: (ctx) => openGame(10 , .7));
                       },
                       child: Column(
                         children: [
                           Image(image: AssetImage('assets/images/game10.png') , width: 100.0,),
-        
+
                         ],
                       ),
                     ),
-                  ),
-                  Expanded(
+                  ) : Container(),
+                  appSettings!.game1 == 1 ?  Expanded(
                     child: GestureDetector(
                       onTap: (){
                         Navigator.pop(context);
                         showModalBottomSheet(
+                            isScrollControlled: true ,
                             context: context,
-                            builder: (ctx) => openGame(1));
+                            builder: (ctx) => openGame(1 , .7));
                       },
                       child: Column(
                         children: [
@@ -132,36 +99,56 @@ class _GamesModalState extends State<GamesModal> {
                         ],
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-                        Navigator.pop(context);
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (ctx) => openGame(26));
-                      },
-                      child: Column(
-                        children: [
-                          Image(image: AssetImage('assets/images/game26.png') , width: 100.0,),
-
-                        ],
-                      ),
-                    ),
-                  ),
+                  ) : Container(),
+        
                 ],
               ),
               SizedBox(height: 15.0,),
               Row(
                 children: [
 
-                  Expanded(
+                  appSettings!.game26 == 1 ?  Expanded(
                     child: GestureDetector(
                       onTap: (){
                         Navigator.pop(context);
                         showModalBottomSheet(
+                            isScrollControlled: true ,
                             context: context,
-                            builder: (ctx) => openGame(20));
+                            builder: (ctx) => openGame(26 , .7));
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/game26.png') , width: 100.0,),
+        
+                        ],
+                      ),
+                    ),
+                  ) : Container(),
+                  appSettings!.game7 == 1 ? Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                        showModalBottomSheet(
+                            isScrollControlled: true ,
+                            context: context,
+                            builder: (ctx) => openGame(7 , .7));
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/game7.png') , width: 100.0,),
+
+                        ],
+                      ),
+                    ),
+                  ) : Container(),
+                  appSettings!.game20 == 1 ? Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                        showModalBottomSheet(
+                            isScrollControlled: true ,
+                            context: context,
+                            builder: (ctx) => openGame(20 , .7));
                       },
                       child: Column(
                         children: [
@@ -170,14 +157,21 @@ class _GamesModalState extends State<GamesModal> {
                         ],
                       ),
                     ),
-                  ),
-                  Expanded(
+                  ) : Container(),
+                ],
+              ),
+              SizedBox(height: 15.0,),
+              Row(
+                children: [
+
+                  appSettings!.game15 == 1 ? Expanded(
                     child: GestureDetector(
                       onTap: (){
                         Navigator.pop(context);
                         showModalBottomSheet(
+                            isScrollControlled: true ,
                             context: context,
-                            builder: (ctx) => openGame(15));
+                            builder: (ctx) => openGame(15 , .7));
                       },
                       child: Column(
                         children: [
@@ -186,14 +180,15 @@ class _GamesModalState extends State<GamesModal> {
                         ],
                       ),
                     ),
-                  ),
-                  Expanded(
+                  ) : Container(),
+                  appSettings!.game8 == 1 ? Expanded(
                     child: GestureDetector(
                       onTap: (){
                         Navigator.pop(context);
                         showModalBottomSheet(
+                            isScrollControlled: true ,
                             context: context,
-                            builder: (ctx) => openGame(8));
+                            builder: (ctx) => openGame(8 , .7));
                       },
                       child: Column(
                         children: [
@@ -202,7 +197,8 @@ class _GamesModalState extends State<GamesModal> {
                         ],
                       ),
                     ),
-                  ),
+                  ) : Container(),
+                  Expanded(child: Container())
                 ],
               ),
 
@@ -214,5 +210,5 @@ class _GamesModalState extends State<GamesModal> {
   }
 
 
-  Widget openGame(id) =>  GameModal(id: id,);
+  Widget openGame(id , ratio) =>  GameModal(id: id, height_ratio: ratio,);
 }

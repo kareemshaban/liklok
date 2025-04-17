@@ -208,5 +208,6 @@ class _AgencyChargeState extends State<AgencyCharge> {
   }
   chargeAction() async {
       await ChargingAgencyServices().addBalanceToUser(agency!.id, user!.id, chargingValueController.text);
+      Navigator.pop(context);
   }
 }

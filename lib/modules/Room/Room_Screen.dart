@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 import 'package:LikLok/helpers/GiftHelper.dart';
 import 'package:LikLok/models/Badge.dart';
+import 'package:LikLok/models/Settings.dart';
+import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -57,7 +59,10 @@ import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 import 'package:flutter/services.dart';
 
 
-const appId = "f26e793582cb48359a4cb36dba3a9d3f";
+//const appId = "f26e793582cb48359a4cb36dba3a9d3f";
+//const appId = "36fdda9bf58b40caa90d34b1893909f0";
+
+
 
 class RoomScreen extends StatefulWidget {
   const RoomScreen({super.key});
@@ -67,6 +72,7 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
+  String appId = "" ;
   AppUser? user;
   List<Design> designs = [];
   String frame = "";
@@ -125,12 +131,17 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
   int luckyGiftId = 0 ;
   int luckyGiftCount = 0 ;
   int luckyGiftReciver = 0 ;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
   if(mounted){
+    setState(() {
+       appId = AppSettingsServices().appSettingGetter()!.agora_id ;
+    });
+
     setState(() {
       isNewCommer = false ;
       sendGiftReceiverType = "select_one_ore_more";
@@ -159,7 +170,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
     checkRoomBlock();
     getRoomImage();
     EnterRoomHelper(user!.id , room!.id);
+
     geAdminDesigns();
+
     //listeners//
     RolletCreatListner();
     enterRoomListener();
@@ -661,6 +674,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
           int user_id = data['user_id'];
           String msg = data['message'];
           String type = data['type'];
+
+          print('room_idroom_idroom_id');
           ChatRoom? res = await ChatRoomService().openRoomById(room!.id);
           if (mounted) {
             setState(() {
@@ -749,23 +764,48 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
             refreshRoom(0);
           }
           if (gift_img.toLowerCase().endsWith('.svga')) {
-            svgaImagesListener(
-                room_id,
-                gift_img,
-                gift_name,
-                receiver_name,
-                sender_name,
-                sender_share_level,
-                sender_img,
-                sender_id,
-                gift_audio,
-                small_gift,
-                sender,
-                gift_category_id,
-                reward,
-                gift_id,
-                receiver_id,
-                count);
+            if(giftImg == ''){
+              svgaImagesListener(
+                  room_id,
+                  gift_img,
+                  gift_name,
+                  receiver_name,
+                  sender_name,
+                  sender_share_level,
+                  sender_img,
+                  sender_id,
+                  gift_audio,
+                  small_gift,
+                  sender,
+                  gift_category_id,
+                  reward,
+                  gift_id,
+                  receiver_id,
+                  count);
+            } else {
+              await Future.delayed(Duration(seconds: gift_category_id != 5 ? 5 : 8)).then((value) => {
+                          svgaImagesListener(
+                          room_id,
+                          gift_img,
+                          gift_name,
+                          receiver_name,
+                          sender_name,
+                          sender_share_level,
+                          sender_img,
+                          sender_id,
+                          gift_audio,
+                          small_gift,
+                          sender,
+                          gift_category_id,
+                          reward,
+                          gift_id,
+                          receiver_id,
+                          count)
+
+              });
+
+            }
+
           }
         }
       }
@@ -794,30 +834,21 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
         });
       }
 
-
-
-
      await Future.delayed(Duration(seconds: 1));
       if(gift_audio != ""){
         final duration = await player.setUrl(gift_audio);
         player.play();
       }
-
       if(gift_category_id != 5){
-        await Future.delayed(Duration(seconds: 10)).then((value) => {
+        Future.delayed(Duration(seconds: 8)).then((value) => {
           if(mounted){
-
             setState(() {
               giftImg = '';
             })
           }
-
         });
-
         await player.stop();
       }
-
-
 
       // show on tetx
       String pubble = "" ;
@@ -863,8 +894,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
 
      });
    }
-    print('showBannerSmallWin1');
-    print(showBannerSmallWin);
     await Future.delayed(Duration(seconds: 5)).then((value) => {
       if(mounted){
         setState(() {
@@ -876,11 +905,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
 
 
     } );
-    print('showBannerSmallWin2');
-    print(showBannerSmallWin);
+
 
     //show banner in all rooms
-    await Future.delayed(Duration(seconds: 10)).then((value) => {
+    await Future.delayed(Duration(seconds: 5)).then((value) => {
       if(mounted){
         setState(() {
           showBanner = false ;
@@ -889,8 +917,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
           bannerMsg = "";
           giftImgSmall = "" ;
           showBannerBigWin = false ;
-
-
         })
       }
 
@@ -1123,11 +1149,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
 
   Future<void> initAgora() async {
     //create the engine
+    print('initAgora');
+    print(AppSettingsServices().appSettingGetter()!.agora_id);
     _engine = createAgoraRtcEngine();
-    await _engine.initialize(const RtcEngineContext(
+    await _engine.initialize( RtcEngineContext(
       appId: appId,
       channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
     ));
+    print('_engine.initialize end');
     //audio indicator
     await _engine.enableAudioVolumeIndication(interval: 1000, smooth: 5, reportVad: false);
 
@@ -1142,6 +1171,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
             setState(() {
               _localUserJoined = true;
             });
+            print('_localUserJoined');
+            print(_localUserJoined);
           }
 
             ChatRoomMessage message = ChatRoomMessage(message: 'room_msg'.tr, user_name: 'APP', user_share_level_img: '', user_img: '', user_id: 0 , type: "TEXT");
@@ -1156,10 +1187,11 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                 messages = old;
               });
             }
+// remove await from refreshRoom
+             ChatRoomMessagesHelper(room_id: room!.id , user_id: user!.id , message: 'user_enter_message' , type: 'TEXT').handleSendRoomMessage();
 
-            await ChatRoomMessagesHelper(room_id: room!.id , user_id: user!.id , message: 'user_enter_message' , type: 'TEXT').handleSendRoomMessage();
-
-          await refreshRoom(connection.localUid);
+             // remove await from refreshRoom
+            refreshRoom(connection.localUid);
 
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {

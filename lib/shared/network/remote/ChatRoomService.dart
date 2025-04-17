@@ -61,8 +61,42 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     return roomBasicDataHelper ;
   }
 
+  static List<ChatRoom> rooms = [] ;
+  roomsSetter( List<ChatRoom> u){
+    rooms = u ;
+  }
+  List<ChatRoom> roomsGetter(){
+    return rooms ;
+  }
+
+  static List<ChatRoom>  userRoom = [] ;
+  userRoomSetter(List<ChatRoom> u){
+    userRoom = u ;
+  }
+  List<ChatRoom> userRoomGetter(){
+    return userRoom ;
+  }
+
   Future<List<ChatRoom>> getAllChatRooms() async {
     final response = await http.get(Uri.parse('${BASEURL}chatRooms/getAll'));
+    List<ChatRoom> rooms = [];
+    print(response.body);
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = json.decode(response.body);
+      for (var i = 0; i < jsonData.length; i ++) {
+        ChatRoom room = ChatRoom.fromJson(jsonData[i]);
+        rooms.add(room);
+      }
+      return rooms;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load chatroom');
+    }
+  }
+
+  Future<List<ChatRoom>> getAdminChatRooms(id) async {
+    final response = await http.get(Uri.parse('${BASEURL}chatRooms/getAdminRoom/${id}'));
     List<ChatRoom> rooms = [];
     print(response.body);
     if (response.statusCode == 200) {
@@ -308,7 +342,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     }
   }
 
-  Future<ChatRoom?> updateRoomName(id , name) async {
+  Future<ChatRoom?> updateRoomName(id , name , user_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/updateName'),
       headers: <String, String>{
@@ -317,6 +351,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'id': id.toString(),
         'name': name.toString(),
+        'user_id': user_id.toString()
       }),
     );
     if (response.statusCode == 200) {
@@ -324,12 +359,21 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       if (jsonData['state'] == "success") {
         return mapRoom(jsonData);
       } else {
+        Fluttertoast.showToast(
+            msg: jsonData['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black26,
+            textColor: Colors.orange,
+            fontSize: 16.0
+        );
         throw Exception('Failed to load album');
       }
     }
   }
 
-  Future<ChatRoom?> updateRoomHello(id , hello_message) async {
+  Future<ChatRoom?> updateRoomHello(id , hello_message , user_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/updateHello'),
       headers: <String, String>{
@@ -338,6 +382,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'id': id.toString(),
         'hello_message': hello_message.toString(),
+        'user_id': user_id.toString()
       }),
     );
     print(response.body);
@@ -362,7 +407,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     }
   }
 
-  Future<ChatRoom?> updateRoomPassword(id , password) async {
+  Future<ChatRoom?> updateRoomPassword(id , password , user_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/updatePassword'),
       headers: <String, String>{
@@ -371,6 +416,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'id': id.toString(),
         'password': password.toString(),
+        'user_id': user_id.toString()
       }),
     );
     print(response);
@@ -380,7 +426,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
         return mapRoom(jsonData);
       } else {
         Fluttertoast.showToast(
-            msg: 'remote_chat_msg_failed'.tr,
+            msg: jsonData['message'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -489,7 +535,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
 
 
 
-  Future<ChatRoom?> lockMic(user_id , room_id , mic) async {
+  Future<ChatRoom?> lockMic(user_id , room_id , mic , admin_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/lockMic'),
       headers: <String, String>{
@@ -498,7 +544,8 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
-        'mic': mic.toString()
+        'mic': mic.toString(),
+        'admin_id': admin_id.toString()
       }),
     );
     print(response.body);
@@ -507,22 +554,22 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       if (jsonData['state'] == "success") {
         return mapRoom(jsonData);
       } else {
-        // Fluttertoast.showToast(
-        //     msg: 'remote_chat_msg_failed'.tr,
-        //     toastLength: Toast.LENGTH_SHORT,
-        //     gravity: ToastGravity.CENTER,
-        //     timeInSecForIosWeb: 1,
-        //     backgroundColor: Colors.black26,
-        //     textColor: Colors.orange,
-        //     fontSize: 16.0
-        // );
+        Fluttertoast.showToast(
+            msg: jsonData['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black26,
+            textColor: Colors.orange,
+            fontSize: 16.0
+        );
       }
 
     } else {
       throw Exception('Failed to load album');
     }
   }
-  Future<ChatRoom?> unlockMic(user_id , room_id , mic) async {
+  Future<ChatRoom?> unlockMic(user_id , room_id , mic , admin_id) async {
 
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/unlockMic'),
@@ -532,7 +579,8 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
-        'mic': mic.toString()
+        'mic': mic.toString(),
+        'admin_id': admin_id.toString()
       }),
     );
     print(response.body);
@@ -541,15 +589,15 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       if (jsonData['state'] == "success") {
         return mapRoom(jsonData);
       } else {
-        // Fluttertoast.showToast(
-        //     msg: 'remote_chat_msg_failed'.tr,
-        //     toastLength: Toast.LENGTH_SHORT,
-        //     gravity: ToastGravity.CENTER,
-        //     timeInSecForIosWeb: 1,
-        //     backgroundColor: Colors.black26,
-        //     textColor: Colors.orange,
-        //     fontSize: 16.0
-        // );
+        Fluttertoast.showToast(
+            msg: jsonData['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black26,
+            textColor: Colors.orange,
+            fontSize: 16.0
+        );
       }
 
     } else {
@@ -569,7 +617,10 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
         'mic': mic.toString()
       }),
     );
-    print(response.body);
+    print('useMic' );
+    print(user_id );
+    print(room_id);
+    print(mic);
     if (response.statusCode == 200) {
       final Map jsonData = json.decode(response.body);
       if (jsonData['state'] == "success") {
@@ -592,7 +643,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
   }
 
 
-  Future<ChatRoom?> leaveMic(user_id , room_id , mic) async {
+  Future<ChatRoom?> leaveMic(user_id , room_id , mic , admin_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/leaveMic'),
       headers: <String, String>{
@@ -601,7 +652,8 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
-        'mic': mic.toString()
+        'mic': mic.toString(),
+         'admin_id': admin_id.toString()
       }),
     );
     print(response.body);
@@ -837,7 +889,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
   }
 
 
-  Future<ChatRoom?> updateRoomCategory(id , subject) async {
+  Future<ChatRoom?> updateRoomCategory(id , subject , user_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/updateRoomCategory'),
       headers: <String, String>{
@@ -846,6 +898,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'id': id.toString(),
         'subject': subject.toString(),
+        'user_id': user_id.toString()
       }),
     );
     if (response.statusCode == 200) {
@@ -854,7 +907,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
         return mapRoom(jsonData);
       } else {
         Fluttertoast.showToast(
-            msg: 'remote_chat_msg_failed'.tr,
+            msg: jsonData['message'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -869,7 +922,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     }
   }
 
-  Future<AppUser?> updateRoomImg(id , File? imageFile   ) async {
+  Future<AppUser?> updateRoomImg(id , File? imageFile , user_id  ) async {
 
     var stream = new http.ByteStream(DelegatingStream.typed(imageFile!.openRead()));
     var length = await imageFile.length();
@@ -884,6 +937,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     request.files.add(multipartFile);
     request.fields.addAll(<String, String>{
       'id': id.toString() ,
+      'user_id': user_id.toString()
     });
     var response = await request.send();
     print('upload image');
@@ -894,7 +948,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
 
   }
 
-  Future<ChatRoom?> addChatRoomAdmin(user_id , room_id) async {
+  Future<ChatRoom?> addChatRoomAdmin(user_id , room_id , admin_id) async {
     ChatRoom room;
     List<Mic> mics = [] ;
     List<RoomMember> members = [] ;
@@ -909,6 +963,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
+        'admin_id': admin_id.toString()
       }),
     );
     if (response.statusCode == 200) {
@@ -917,7 +972,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
         return mapRoom(jsonData);
       } else {
         Fluttertoast.showToast(
-            msg: 'remote_chat_msg_failed'.tr,
+            msg: jsonData['message'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -932,7 +987,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     }
   }
 
-  Future<ChatRoom?> removeChatRoomAdmin(user_id , room_id) async {
+  Future<ChatRoom?> removeChatRoomAdmin(user_id , room_id , admin_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/removeAdmin'),
       headers: <String, String>{
@@ -941,6 +996,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
+        'admin_id': admin_id.toString()
       }),
     );
     if (response.statusCode == 200) {
@@ -949,7 +1005,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
         return mapRoom(jsonData);
       } else {
         Fluttertoast.showToast(
-            msg: 'remote_chat_msg_failed'.tr,
+            msg: jsonData['message'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -985,7 +1041,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
   }
 
 
-  Future<ChatRoom?> blockRoomMember(user_id , room_id , block_type) async {
+  Future<ChatRoom?> blockRoomMember(user_id , room_id , block_type , admin_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/blockRoomMember'),
       headers: <String, String>{
@@ -995,6 +1051,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
         'block_type': block_type.toString(),
+        'admin_id': admin_id.toString()
       }),
     );
     print(response.body);
@@ -1003,7 +1060,15 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       if (jsonData['state'] == "success") {
         return mapRoom(jsonData);
       } else {
-        print(jsonData['message']);
+        Fluttertoast.showToast(
+            msg: jsonData['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black26,
+            textColor: Colors.orange,
+            fontSize: 16.0
+        );
 
         return null ;
       }
@@ -1014,7 +1079,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     }
   }
 
-  Future<ChatRoom?> unBlockRoomMember(user_id , room_id ) async {
+  Future<ChatRoom?> unBlockRoomMember(user_id , room_id , admin_id) async {
     var response = await http.post(
       Uri.parse('${BASEURL}chatRooms/unBlockRoomMember'),
       headers: <String, String>{
@@ -1023,6 +1088,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       body: jsonEncode(<String, String>{
         'user_id': user_id.toString(),
         'room_id': room_id.toString(),
+        'admin_id': admin_id.toString()
       }),
     );
     print(response.body);
@@ -1031,7 +1097,15 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       if (jsonData['state'] == "success") {
         return mapRoom(jsonData);
       } else {
-        print(jsonData['message']);
+        Fluttertoast.showToast(
+            msg: jsonData['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black26,
+            textColor: Colors.orange,
+            fontSize: 16.0
+        );
 
         return null ;
       }

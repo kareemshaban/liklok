@@ -3,12 +3,14 @@ import 'package:LikLok/helpers/MallHelper.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Category.dart';
 import 'package:LikLok/models/Design.dart';
+import 'package:LikLok/modules/MyVip/my_vip_screen.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/DesignServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 import '../Loading/loadig_screen.dart';
@@ -121,6 +123,12 @@ class _MyDesignScreenState extends State<MyDesignScreen> with TickerProviderStat
               ),
             ],
           ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton( onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MyVipScreen(),)),  icon: Icon(FontAwesomeIcons.store , size: 27.0, color: MyColors.primaryColor,)),
+            )
+          ],
 
         ),
       ),
@@ -208,6 +216,12 @@ class _MyDesignScreenState extends State<MyDesignScreen> with TickerProviderStat
   );
 
   useDesign(design) async{
+    print('user_id');
+    print(user!.id);
+    print('design_cat');
+    print(design.category_id);
+    print('design_id');
+    print(design.id);
     DesignGiftHelper res = await DesignServices().useDesign(user!.id , design.category_id , design.id);
     setState(() {
       designs = res.designs! ;
@@ -234,7 +248,7 @@ class _MyDesignScreenState extends State<MyDesignScreen> with TickerProviderStat
             child: Stack(
               alignment: AlignmentDirectional.topStart,
               children: [
-                design.vip_id > 0 ?    Banner(
+                design.vip_id > 0  ?    Banner(
                   message: 'VIP' ,
                   location: BannerLocation.topEnd,
                   color:  MyColors.primaryColor ,
@@ -247,7 +261,22 @@ class _MyDesignScreenState extends State<MyDesignScreen> with TickerProviderStat
                       //     resUrl: "https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true"),
                     ),
                   ),
-                ) : Container(
+                ) :   design.relation_id > 0 ?
+                Banner(
+                  message: 'RELATION' ,
+                  location: BannerLocation.topEnd,
+                  color:  MyColors.primaryColor ,
+                  child: Container(
+                    decoration: BoxDecoration(color: MyColors.lightUnSelectedColor ,
+                        borderRadius: BorderRadius.only(topLeft: Radius.circular(15.0) , topRight: Radius.circular(15.0))),
+                    child: Center(
+                      child: Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Designs/' + design.icon),),
+                      // child: SVGASimpleImage(
+                      //     resUrl: "https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true"),
+                    ),
+                  ),
+                )
+                    :   Container(
                   decoration: BoxDecoration(color: MyColors.lightUnSelectedColor ,
                       borderRadius: BorderRadius.only(topLeft: Radius.circular(15.0) , topRight: Radius.circular(15.0))),
                   child: Center(
@@ -256,11 +285,11 @@ class _MyDesignScreenState extends State<MyDesignScreen> with TickerProviderStat
                     //     resUrl: "https://github.com/yyued/SVGA-Samples/blob/master/angel.svga?raw=true"),
                   ),
                 ),
-                Container(
+                design.relation_id == 0 ?   Container(
                   padding: EdgeInsets.all(5.0),
                   decoration: BoxDecoration(color: Colors.black45 , borderRadius: BorderRadius.circular(15.0)),
                   child: Text("my_designs_days".tr + getRemainDays(design) , style: TextStyle(color: MyColors.primaryColor , fontSize: 13.0),),
-                )
+                ): Container()
               ],
             ),
           ),

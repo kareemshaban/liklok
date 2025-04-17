@@ -2,6 +2,7 @@ import 'package:LikLok/models/Block.dart';
 import 'package:LikLok/models/Follower.dart';
 import 'package:LikLok/models/Friends.dart';
 import 'package:LikLok/models/Medal.dart';
+import 'package:LikLok/models/Relation.dart';
 import 'package:LikLok/models/UserHoppy.dart';
 import 'package:LikLok/models/Vip.dart';
 import 'package:LikLok/models/Visitor.dart';
@@ -56,14 +57,16 @@ class AppUser {
    final String token ;
    final int banDevice ;
    List<Vip>? vips  = [];
-
+   List<RelationModel>? relations  = [];
+   final int loginWithPassword ;
 
    AppUser({ required this.id, required this.tag, required this.name, required this.img, required this.share_level_id,required this.karizma_level_id, required this.charging_level_id,required  this.phone,
      required this.email, required this.password, required this.isChargingAgent, required this.isHostingAgent, required this.registered_at,
      required this.last_login, required this.birth_date, required this.enable, required this.ipAddress,required  this.macAddress, required this.deviceId, required this.isOnline, required this.isInRoom, required this.country,
      required this.register_with , required this.gender , required this.gold , required this.diamond , required this.share_level_order , required this.share_level_points ,required this.share_level_icon ,
      required  this.karizma_level_order , required this.karizma_level_points , required this.karizma_level_icon ,required this.charging_level_order , required this.charging_level_points , required this.charging_level_icon ,
-     this.followers , this.followings , this.visitors , this.friends , this.blocks , this.hoppies , this.medals , this.vips , required this.cover , required this.status , required this.country_name , required this.country_flag , required this.token , required this.banDevice});
+     this.followers , this.followings , this.visitors , this.friends , this.blocks , this.hoppies , this.medals , this.vips , required this.cover , required this.status , required this.country_name , required this.country_flag ,
+      required this.token , required this.banDevice , required this.loginWithPassword});
 
    factory AppUser.fromJson(Map<String, dynamic> json) {
       return switch (json) {
@@ -108,7 +111,8 @@ class AppUser {
          'country_name': String country_name,
          'country_flag': String country_flag,
          'token': String token,
-         'banDevice': int banDevice
+         'banDevice': int banDevice,
+         'loginWithPassword': int loginWithPassword
 
 
          } =>
@@ -153,7 +157,8 @@ class AppUser {
                country_name: country_name,
                country_flag: country_flag,
                  token: token,
-                 banDevice: banDevice
+                 banDevice: banDevice,
+                 loginWithPassword: loginWithPassword
 
 
              ),

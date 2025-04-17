@@ -352,7 +352,20 @@ const Map<String, String> zhHans = {
   'games': '遊戲',
   'chineese_lang':'中文',
   'indonisian_lang':'印尼',
-
-
-  'relations': '關係'
+  'relations': '關係',
+  'accept_btn': '验收',
+  'cancel_btn': '拒绝',
+  'relation_dialog_title':'接受或拒绝与朋友的关系',
+  'relation_dialog_msg': '请接受或拒绝您朋友发送的关系',
+  'Wallet_Charged_successfully': '您的钱包已成功充值',
+  'home_my_room': '矿',
+  "create_room": '不，我不好',
+  'login_with_password': "启用密码登录",
+  'login_with_password_disable': "禁用密码登录",
+  'change_password': '更改密码',
+  'account_password': '账户密码',
+  'enter_password': '输入账户密码',
+  're_enter_password': '重新输入账户密码',
+  'id_login': "使用ID登录",
+  'id_text': 'ID',
 };

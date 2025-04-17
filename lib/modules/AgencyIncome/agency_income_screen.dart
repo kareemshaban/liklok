@@ -45,19 +45,17 @@ class _AgencyIncomeState extends State<AgencyIncome> {
       helper = res ;
     });
     getUserAgency();
-    int ps = 0 ;
-    for(int i = 0 ; i < helper!.points.length ; i++ ){
-      ps += helper!.points[i].points ;
-    }
-    for(int i = 0 ; i < helper!.statics.length ; i++ ){
-      totalMinues += double.parse( helper!.statics[i].net_hours).floor() ;
-    }
+    int? ps = 0 ;
+    // for(int i = 0 ; i < helper!.points.length ; i++ ){
+    //   ps += helper!.points[i].points ;
+    // }
 
 
 
     setState(() {
-      totalPoints = ps ;
-      needTotalPoints = double.parse(helper!.nextTarget!.gold).floor()   - ps ;
+      ps = helper!.points  ;
+      totalPoints = ps ??  0;
+      needTotalPoints = double.parse(helper!.nextTarget!.gold).floor()   -  int.parse(helper!.points.toString())    ;
     });
   }
   getUserAgency() async {
@@ -178,29 +176,7 @@ class _AgencyIncomeState extends State<AgencyIncome> {
                   children: [
                     Row(
                       children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('total_work_hours'.tr,style: TextStyle(fontSize: 14.0,color: Colors.black) , textAlign: TextAlign.center),
-                              SizedBox(height: 40.0,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(totalMinues > 0 ?   (totalMinues / 60).toStringAsFixed(1) : "0",style: TextStyle(fontSize: 20.0,color: Colors.black),),
-                                ],
-                              ),
-                              SizedBox(height: 20.0,),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 10.0,),
-                        Container(
-                          width: 1.0 ,
-                          height: MediaQuery.of(context).size.width / 2.5 ,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(width: 10.0,),
+
                         Expanded(
                           child: Column(
                             children: [

@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:LikLok/helpers/RoomBasicDataHelper.dart';
 import 'package:LikLok/models/Mall.dart';
 import 'package:LikLok/modules/BlockedScreen/blocked_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:LikLok/helpers/ExitRoomHelper.dart';
 import 'package:LikLok/helpers/MicHelper.dart';
-import 'package:LikLok/layout/tabs_screen.dart';
 import 'package:LikLok/models/AppTrend.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Banner.dart';
@@ -28,17 +25,14 @@ import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 import 'package:LikLok/shared/network/remote/CountryService.dart';
 import 'package:LikLok/shared/network/remote/FestivalBannerServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wakelock/wakelock.dart';
-
 import '../../helpers/MallHelper.dart';
 import '../../shared/network/remote/DesignServices.dart';
 import 'package:path/path.dart' as path;
@@ -51,13 +45,15 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
+class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver , SingleTickerProviderStateMixin{
   //vars
   AppLifecycleState? _lastLifecycleState;
 
   List<BannerData> banners = [];
   List<Country> countries = [];
   List<ChatRoom> rooms = [];
+  List<ChatRoom> rooms_mine = [] ;
+
   List<FestivalBanner> festivalBanners = [];
   List<String> chatRoomCats = [
     'CHAT',
@@ -78,7 +74,7 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
   int? selectedCategory;
 
   int tabsCount = 0;
-
+  AppUser? user;
   List<File> imageFile  = [] ;
 
   TabController? _tabController;
@@ -86,41 +82,68 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
   HomeScreenState() {}
 
   getBanners() async {
-    setState(() {
-      loading = true;
-    });
-    List<BannerData> res = await BannerServices().getAllBanners();
-    setState(() {
-      banners = res;
-    });
-    List<Country> res2 = await CountryService().getAllCountries();
-    setState(() {
-      countries = res2;
-      CountryService().countrySetter(countries);
-    });
-    List<ChatRoom> res3 = await ChatRoomService().getAllChatRooms();
-    setState(() {
-      rooms = res3;
-      rooms.sort((b, a) => a.isTrend.compareTo(b.isTrend));
 
-      loaded = true;
-    });
-    List<FestivalBanner> res4 = await FestivalBannerService().getAllBanners();
-    setState(() {
-      festivalBanners = res4;
-      print('FestivalBanner');
-    });
-    setState(() {
-      loading = false;
-    });
+    if(BannerServices().bannerGetter().length > 0 ){
+      if(mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+      rooms = ChatRoomService().roomsGetter();
+      rooms.sort((b, a) => a.isTrend.compareTo(b.isTrend));
+      banners = BannerServices().bannerGetter() ;
+      countries = CountryService().countryGetter();
+      rooms_mine = ChatRoomService().userRoomGetter();
+      festivalBanners = FestivalBannerService().festivalBannersGetter();
+    }
+    else {
+      List<BannerData> res = await BannerServices().getAllBanners();
+      BannerServices().bannerSetter(BannerServices.banners);
+      if (mounted) {
+        setState(() {
+          banners = res;
+        });
+      }
+      List<Country> res2 = await CountryService().getAllCountries();
+      if (mounted) {
+        setState(() {
+          countries = res2;
+          CountryService().countrySetter(countries);
+        });
+      }
+      List<ChatRoom> res3 = await ChatRoomService().getAllChatRooms();
+      List<ChatRoom> res5 = await ChatRoomService().getAdminChatRooms(user!.id);
+      ChatRoomService().roomsSetter(res3);
+      ChatRoomService().userRoomSetter(res5);
+      if (mounted) {
+        setState(() {
+          rooms = res3;
+          rooms_mine = res5;
+          rooms.sort((b, a) => a.isTrend.compareTo(b.isTrend));
+
+          loaded = true;
+        });
+      }
+
+      List<FestivalBanner> res4 = await FestivalBannerService().getAllBanners();
+      FestivalBannerService().festivalBannersSetter(res4);
+      if (mounted) {
+        setState(() {
+          festivalBanners = res4;
+        });
+        setState(() {
+          loading = false;
+        });
+      }
+    }
   }
 
   //var
-  AppUser? user;
+
 
   Future<void> _refresh() async {
     await getBanners();
-    await getAppCup();
+   // await getAppCup();
   }
 
   @override
@@ -128,15 +151,16 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    setState(() {
-      user = AppUserServices().userGetter();
-    });
+    _tabController = new TabController(vsync: this, length: 3);
+    if(mounted) {
+      setState(() {
+        user = AppUserServices().userGetter();
+      });
+    }
     Wakelock.enable();
-    getMicPermission();
-    getNotificationsPermissions();
+    getAppPermission();
     getBanners();
-    getAppCup();
-   // cashData();
+   // getAppCup();
   }
 
   @override
@@ -149,9 +173,11 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
 
     bool res = await AppUserServices().checkDeviceBan(token);
     AppUser? resUser = await AppUserServices().getUser(user!.id);
-    setState(() {
-      user = resUser! ;
-    });
+    if(mounted) {
+      setState(() {
+        user = resUser!;
+      });
+    }
     if(!res ){
       Navigator.pushAndRemoveUntil(
           context,
@@ -174,137 +200,43 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('app state');
-    print(state);
     if(state == AppLifecycleState.resumed){
       checkDeviceBanOrAccountDisable(user!.token);
     }
-
-    // setState(() {
-    //   _lastLifecycleState = state;
-    //
-    // });
-    // print('lastState');
-    // print(_lastLifecycleState);
-    // if(_lastLifecycleState == AppLifecycleState.paused){
-    //   Future.delayed(Duration(seconds: 120)).then((value) async {
-    //     if(_lastLifecycleState == AppLifecycleState.paused){
-    //       //still in active =>  remove from rooms
-    //       RoomBasicDataHelper? res = await ChatRoomService().getRoomBasicData() ;
-    //       print(res);
-    //       // if(res){
-    //       //   await FirebaseFirestore.instance.collection("exitRoom").add({
-    //       //     'room_id': 0,
-    //       //     'user_id': user!.id,
-    //       //   });
-    //       //   SystemNavigator.pop();
-    //       // }
-    //     } else {
-    //       print('AppStateToKeep');
-    //       print(_lastLifecycleState);
-    //     }
-    //
-    //   }
-    //
-    //   );
-    // }
-
   }
 
-
-
-
-
-  cashData() async {
-    helper = await DesignServices().getAllCatsAndDesigns();
-    setState(() {
-      designs = helper!.designs;
-    });
-    loadImage();
-  }
-  Future<void> loadImage() async {
-    for(var i =0 ; i < helper!.designs!.length ; i++){
-      final directory = await getApplicationDocumentsDirectory();
-      final filePath = path.join(directory.path, helper!.designs![i].motion_icon);
-      final file = File(filePath);
-
-      if (await file.exists()){
-        List<File> temp = [];
-        temp = imageFile ;
-        temp.add(file);
-        setState((){
-          imageFile = temp ;
-        });
-        updateImage(file,helper!);
-      } else {
-        await downloadImage(file , helper!);
-        setState(() {
-          imageFile.add(file);
-        });
-      }
-    }
-  }
-  Future<void> downloadImage(File file , MallHelper helper) async {
-    for(var i = 0 ; i < helper.designs!.length  ; i++){
-      final response = await http.get(Uri.parse('${ASSETSBASEURL + 'Designs/' + helper.designs![i].motion_icon}'));
-      if (response.statusCode == 200) {
-        await file.writeAsBytes(response.bodyBytes);
-        List<File> temp = [];
-        temp = imageFile ;
-        temp.add(file);
-        setState((){
-          imageFile = temp ;
-        });
-      }
-    }
-    print('Download imageFile');
-    print(imageFile);
-  }
-  Future<void> updateImage(File file , MallHelper helper) async {
-    for(var i = 0 ; i < helper.designs!.length  ; i++){
-      final response = await http.get(Uri.parse('${ASSETSBASEURL + 'Designs/' + helper.designs![i].motion_icon}'));
-      if (response.statusCode == 200) {
-        await file.writeAsBytes(response.bodyBytes);
-        List<File> temp = [];
-        temp = imageFile ;
-        temp.add(file);
-        setState((){
-          imageFile = temp ;
-        });
-      }
-    }
-    print('Update Image');
-    print(imageFile);
-  }
 
 
   getAppCup() async {
     AppTrend? res = await AppTrendService().getAppTrend();
-    setState(() {
-      trend = res;
-    });
+    if(mounted) {
+      setState(() {
+        trend = res;
+      });
+    }
   }
 
-  getMicPermission() async {
-    await [Permission.microphone].request();
+  getAppPermission() async {
+    await [Permission.microphone , Permission.notification].request();
   }
-  getNotificationsPermissions() async{
-    await Permission.notification.isDenied.then((value) {
-      if (value) {
-        Permission.notification.request();
-      }
-    });
-  }
+  // getNotificationsPermissions() async{
+  //   await Permission.notification.isDenied.then((value) {
+  //     if (value) {
+  //       Permission.notification.request();
+  //     }
+  //   });
+  // }
 
   connectToWs() {}
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
+    return   DefaultTabController(
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: MyColors.solidDarkColor,
           title: TabBar(
+            controller: _tabController ,
             dividerColor: Colors.transparent,
             tabAlignment: TabAlignment.start,
             isScrollable: true,
@@ -314,9 +246,12 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
             labelStyle:
                 const TextStyle(fontSize: 17.0, fontWeight: FontWeight.w900),
             tabs: [
-              Tab(text: "home_party".tr),
-              Tab(
+              new Tab(text: "home_party".tr ,) ,
+              new Tab(
                 text: "home_discover".tr,
+              ),
+              new Tab(
+                text: "home_my_room".tr,
               ),
             ],
           ),
@@ -346,7 +281,8 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
                   height: 30.0,
                 ),
                 onTap: () {
-                  openMyRoom();
+             //     openMyRoom();
+                  showMyRoomOnly();
                 }),
             const SizedBox(
               width: 20.0,
@@ -371,6 +307,7 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
           child: loading
               ? Loading()
               : TabBarView(
+                controller: _tabController,
                   children: [
                     // home
                     Column(
@@ -440,7 +377,6 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
                       ],
                     ),
                     //discover.
-
                     Column(
                       children: [
                         festivalBanners.length > 0
@@ -521,19 +457,89 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
                         ),
                       ],
                     ),
+                    //mine
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 121.0,
+                          width: MediaQuery.sizeOf(context).width * .95,
+                          child: CarouselSlider(
+                              items: banners
+                                  .map((banner) => GestureDetector(
+                                onTap: () {
+                                  bannerAction(banner);
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0, vertical: 10.0),
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                      BorderRadius.circular(10.0),
+                                      image: DecorationImage(
+                                          image: CachedNetworkImageProvider(
+                                              '${ASSETSBASEURL}Banners/${banner.img}'),
+                                          fit: BoxFit.cover)),
+                                  clipBehavior:
+                                  Clip.antiAliasWithSaveLayer,
+                                ),
+                              ))
+                                  .toList(),
+                              options: CarouselOptions(
+                                  aspectRatio: 3,
+                                  autoPlay: true,
+                                  viewportFraction: 1.0)),
+                        ),
+
+                        SizedBox(height: 10.0,),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          height: 40.0,
+                          child: ListView.separated(
+                            itemBuilder: (ctx, index) => countryListItem(index),
+                            separatorBuilder: (ctx, index) =>
+                                countryListSpacer(),
+                            itemCount: countries.length,
+                            scrollDirection: Axis.horizontal,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        Expanded(
+                          child: RefreshIndicator(
+                            color: MyColors.primaryColor,
+                            onRefresh: _refresh,
+                            child: GridView.count(
+                              crossAxisCount: 2,
+                              childAspectRatio: .85 ,
+                              children: rooms_mine
+                                  .where((element) =>
+                              element.country_id == selectedCountry ||
+                                  selectedCountry == 0)
+                                  .map((room) => chatRoomListItem(room))
+                                  .toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
         ),
       ),
-    );
+    ) ;
   }
+
 
   Widget countryListItem(index) => countries.isNotEmpty
       ? GestureDetector(
           onTap: () {
-            setState(() {
-              selectedCountry = countries[index].id;
-            });
+            if(mounted) {
+              setState(() {
+                selectedCountry = countries[index].id;
+              });
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(10.0),
@@ -576,6 +582,120 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
         width: 5.0,
       );
 
+  Widget chatRoomEmptyListItem() => GestureDetector(
+    onTap: () {
+      openMyRoom();
+    },
+    child: Container(
+      width: MediaQuery.of(context).size.width / 2,
+      margin: const EdgeInsets.all(5.0),
+
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width / 2,
+                height: (MediaQuery.of(context).size.width / 2) * 1.15 ,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15.0),
+                    image: DecorationImage(
+                        image: CachedNetworkImageProvider('${ASSETSBASEURL}Defaults/room_default.png'),
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                            Colors.grey.withOpacity(.7),
+                            BlendMode.darken))),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                    start: 15.0, bottom: 20.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text("create_room".tr,
+                            textAlign: TextAlign.end,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                            )),
+                        Row(
+                          children: [
+                            Icon(Icons.location_pin , color: Colors.white, size: 18,),
+                            Text("---",
+                                textAlign: TextAlign.end,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.0,
+                                  fontWeight: FontWeight.bold,
+                                )),
+
+
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  width: ((MediaQuery.of(context).size.width / 2) - 50),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            color: MyColors.lightgrey.withOpacity(.7),
+                            borderRadius: BorderRadiusDirectional.only(
+                                topStart: Radius.circular(15.0))),
+                        width: MediaQuery.sizeOf(context).width / 4,
+                        height: 32.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                flex: 7,
+                                child: Image(image: AssetImage('assets/images/rank.webp') , height: 20,)),
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.only(start: 5.0),
+                                child: Text(
+                                  "0",
+                                  style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    ),
+  );
+
   Widget chatRoomListItem(room) => GestureDetector(
         onTap: () {
           openRoom(room.id);
@@ -608,33 +728,35 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(room.name,
-                                textAlign: TextAlign.end,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            Row(
-                              children: [
-                                Icon(Icons.location_pin , color: Colors.white, size: 18,),
-                                Text(room.country_name,
-                                    textAlign: TextAlign.end,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11.0,
-                                      fontWeight: FontWeight.bold,
-                                    )),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(room.name,
+                                  textAlign: TextAlign.end,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              Row(
+                                children: [
+                                  Icon(Icons.location_pin , color: Colors.white, size: 18,),
+                                  Text(room.country_name,
+                                      textAlign: TextAlign.end,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11.0,
+                                        fontWeight: FontWeight.bold,
+                                      )),
 
 
-                              ],
-                            )
-                          ],
+                                ],
+                              )
+                            ],
+                          ),
                         )
                       ],
                     ),
@@ -682,13 +804,6 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
                         ],
                       ),
                     ),
-                    // Container(
-                    //     margin: EdgeInsets.all(5.0),
-                    //     child: Image(
-                    //       image: CachedNetworkImageProvider(
-                    //           ASSETSBASEURL + 'Countries/' + room.flag),
-                    //       width: 30.0,
-                    //     )),
                   ],
                 ),
               )
@@ -700,9 +815,11 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
   Widget chatRoomCategoryListItem(index) => chatRoomCats.isNotEmpty
       ? GestureDetector(
           onTap: () {
-            setState(() {
-              selectedChatRoomCategory = chatRoomCats[index];
-            });
+              if(mounted) {
+                setState(() {
+                  selectedChatRoomCategory = chatRoomCats[index];
+                });
+              }
           },
           child: Container(
             padding: const EdgeInsets.all(10.0),
@@ -754,6 +871,9 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
     ChatRoomService().roomSetter(room);
     Navigator.push(
         context, MaterialPageRoute(builder: (ctx) => const RoomScreen()));
+  }
+  void showMyRoomOnly()  {
+    _tabController!.animateTo(2);
   }
 
   void openSearch() {
@@ -926,7 +1046,6 @@ class HomeScreenState extends State<HomeScreen>   with WidgetsBindingObserver {
   }
 
   bannerFestivalAction(banner) {
-    print(banner.room_id);
     if (banner.room_id > 0) {
       openRoom(banner.room_id);
     }

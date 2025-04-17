@@ -16,8 +16,8 @@ const LOCALPATH ='/data/user/0/com.liklok.live.chat.liklok/app_flutter';
 
 
 const GAMEAPPKEY = 'cwr3456cd6nkr2lbg7nt';
-const GAMETESTSERVER = 'https://test.joysdk.com' ;
-const GAMESERVER = 'https://joysdk.com' ;
+const GAMETESTSERVER = 'https://joysdk.com/00hall' ;
+const GAMESERVER = 'https://joysdk.com/00hall' ;
 
 
 

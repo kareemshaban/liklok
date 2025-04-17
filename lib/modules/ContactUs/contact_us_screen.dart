@@ -48,16 +48,16 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 SizedBox(height: 20.0,),
                 GestureDetector(
                   onTap: () async{
-                    await launch('https://wa.me/+66947678815?text=Hello"');
+                    await launch('https://t.me/llklok');
                   },
                   child: Row(
                     children: [
                     CircleAvatar(
                     radius: 28.0,
-                    child: Image(image: AssetImage('assets/images/whatsapplogo.png') , width: 57.0, height: 57.0,),
+                    child: Image(image: AssetImage('assets/images/telegram.png') , width: 57.0, height: 57.0,),
                   ),
                   SizedBox(width: 14.0,),
-                  Text("0066947678815",style: TextStyle(fontSize: 17.0,color: Colors.black),),
+                  Text("TELEGRAM",style: TextStyle(fontSize: 17.0,color: Colors.black),),
                                 ],
                               ),
                 ),
@@ -81,7 +81,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   children: [
                     GestureDetector(
                       onTap: () async{
-                        await launch('https://wa.me/+66947678815?text=Hello"');
+                        await launch('https://t.me/Iiklok');
                       },
                       child: CircleAvatar(
                         radius: 29.0,
@@ -91,7 +91,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                     SizedBox(width: 20.0,),
                     GestureDetector(
                       onTap: () async{
-                        await launch('https://wa.me/+66947678815?text=Hello"');
+                        await launch('https://t.me/Iiklok');
                       },
                       child: CircleAvatar(
                         radius: 35.0,backgroundColor: MyColors.darkColor,
@@ -101,7 +101,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                     SizedBox(width: 20.0,),
                     GestureDetector(
                       onTap: () async{
-                        await launch('https://wa.me/+66947678815?text=Hello"');
+                        await launch('https://t.me/Iiklok');
                       },
                       child: CircleAvatar(
                         radius: 35.0,backgroundColor: MyColors.darkColor,

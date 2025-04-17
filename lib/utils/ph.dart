@@ -351,7 +351,22 @@ const Map<String, String> ph = {
   'games': 'Mga laro',
   'chineese_lang':'wikang Tsino',
   'indonisian_lang':'Indonesian',
-  'relations': 'relasyon'
+  'relations': 'relasyon',
+  'accept_btn': 'pagtanggap',
+  'cancel_btn': 'upang tanggihan',
+  'relation_dialog_title':'Tanggapin o tanggihan ang isang relasyon sa isang kaibigan',
+  'relation_dialog_msg': 'Mangyaring tanggapin o tanggihan ang relasyon na ipinadala ng iyong kaibigan',
+  'Wallet_Charged_successfully': 'Matagumpay na Na-charge ang Iyong Wallet',
+  'home_my_room': 'sa akin',
+  "create_room": 'Hindi, hindi ako magaling',
+  'login_with_password': "Paganahin ang Password Login",
+  'login_with_password_disable': "Huwag paganahin ang pag-login ng password",
+  'change_password': 'Baguhin ang Password',
+  'account_password': 'Password ng Account',
+  'enter_password': "Ipasok ang Password ng Account" ,
+  're_enter_password': 'Muling Ipasok ang Password ng Account',
+  'id_login': "Mag-login gamit ang ID",
+  'id_text': 'ID',
 
 
 };

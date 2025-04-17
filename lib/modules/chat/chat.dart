@@ -59,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
-          widget.receiverUserID, _messageController.text);
+          widget.receiverUserID, _messageController.text , 0);
     }
     //clear the text controller after sending the message
     _messageController.clear();
@@ -323,10 +323,13 @@ class _ChatScreenState extends State<ChatScreen> {
               ? MainAxisAlignment.start
               : MainAxisAlignment.end,
           children: [
-            (data['senderId'] == user!.id) ? Row(
+            (data['senderId'] == user!.id ) ? Row(
               children: [
                 ChatBubble1(
                   message: data['message'],
+                  sender_id: data['receiverId'],
+                  current_user_id: user!.id,
+                  reciver_id: data['senderId'],
                 ),
                 SizedBox(width: 5.0,),
                 showImg ?   CircleAvatar(
@@ -353,6 +356,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 SizedBox(width: 5.0,),
                 ChatBubble(
                   message: data['message'],
+                  sender_id: data['receiverId'],
+                  current_user_id: user!.id,
+                  reciver_id: data['senderId'],
                 ),
               ],
             ),

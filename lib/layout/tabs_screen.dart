@@ -2,6 +2,7 @@ import 'package:LikLok/helpers/ExitRoomHelper.dart';
 import 'package:LikLok/helpers/MicHelper.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/ChatRoom.dart';
+import 'package:LikLok/models/Intro.dart';
 import 'package:LikLok/modules/Chats/Chats_Screen.dart';
 import 'package:LikLok/modules/Home/Home_Screen.dart';
 import 'package:LikLok/modules/Moments/Moments_Screen.dart';
@@ -10,7 +11,9 @@ import 'package:LikLok/modules/Room/Room_Screen.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
+import 'package:LikLok/shared/network/remote/IntroServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -33,7 +36,7 @@ class TabsScreenState extends State<TabsScreen> {
      bool showDelete = false ;
      ChatRoom? savedRoom ;
       AlertDialog? alert  ;
-
+     late Intro? intro ;
 
 
      @override
@@ -42,13 +45,19 @@ class TabsScreenState extends State<TabsScreen> {
     super.initState();
     setState(() {
       savedRoom = ChatRoomService().savedRoomGetter();
+      intro = IntroServices().introGetter() ;
+    });
+    Future.delayed(const Duration(milliseconds: 5000), () {
+      setState(() {
+        IntroServices().introSetter(null);
+        intro = null ;
+      });
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Stack(
-
-
+    return (intro == null ) ? Stack(
       children: [
         Stack(
           alignment: Alignment.bottomCenter,
@@ -148,7 +157,13 @@ class TabsScreenState extends State<TabsScreen> {
         ) : Container(),
 
       ],
-    );
+    ) : Container(
+      width: MediaQuery.sizeOf(context).width,
+      height: MediaQuery.sizeOf(context).height,
+      decoration: BoxDecoration(image: DecorationImage(
+          image: CachedNetworkImageProvider( '${ASSETSBASEURL}Intros/${intro!.img}'),
+          fit: BoxFit.cover) ),
+    ) ;
   }
 
 

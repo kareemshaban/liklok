@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:LikLok/modules/IdLogin/ID_Login_Screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:LikLok/firebase_options.dart';
 import 'package:LikLok/layout/tabs_screen.dart';
@@ -145,6 +146,7 @@ class LoginScreenState extends State<LoginScreen> {
      }
 
     } catch (error) {
+      print('firebase error');
       print(error);
     }
   }
@@ -274,6 +276,24 @@ class LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 20.0,),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => IdLoginScreen()));
+                    },
+                    child: Container(
+                      width: MediaQuery.sizeOf(context).width * .8 ,
+                      height: 40,
+                      margin: EdgeInsets.symmetric(horizontal: 20.0),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.yellow),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('id_login'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20.0,),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20.0),
                     child: Wrap(
@@ -395,7 +415,8 @@ class LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (context) {
         return Container(
-          child: AlertDialog(
+          child:
+          AlertDialog(
             backgroundColor: MyColors.darkColor,
             title: Text(
               'login_phone_title'.tr,

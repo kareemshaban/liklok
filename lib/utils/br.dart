@@ -351,7 +351,22 @@ const Map<String, String> br = {
   'games': 'Jogos',
   'chineese_lang':'Língua chinesa',
   'indonisian_lang':'indonésio',
-  'relations': 'relações'
+  'relations': 'relações',
+  'accept_btn': 'aceitação',
+  'cancel_btn': 'rejeitar',
+  'relation_dialog_title':'Aceite ou rejeite um relacionamento com um amigo',
+  'relation_dialog_msg': 'Por favor, aceite ou rejeite o relacionamento enviado pelo seu amigo',
+  'Wallet_Charged_successfully': 'Sua carteira foi cobrada com sucesso',
+  'home_my_room': 'Minha',
+  "create_room": 'Não, eu não sou bom',
+  'login_with_password': "Habilitar login com senha",
+  'login_with_password_disable': "Desativar login com senha",
+  'change_password': 'Alterar a senha',
+  'account_password': 'Senha da conta',
+  'enter_password': 'Digite a senha da conta',
+  're_enter_password': 'Digite novamente a senha da conta',
+  'id_login': 'Entrar usando ID',
+  'id_text': 'ID',
 
 
 

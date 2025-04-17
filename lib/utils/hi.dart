@@ -351,7 +351,22 @@ const Map<String, String> hi = {
   'games': 'खेल',
   'chineese_lang':'चीनी भाषा',
   'indonisian_lang':'इन्डोनेशियाई',
-  'relations': 'संबंध'
+  'relations': 'संबंध',
+  'accept_btn': 'स्वीकार',
+  'cancel_btn': 'अस्वीकार करना',
+  'relation_dialog_title':'किसी मित्र के साथ रिश्ते को स्वीकार या अस्वीकार करें',
+  'relation_dialog_msg': 'कृपया अपने मित्र द्वारा भेजे गए रिश्ते को स्वीकार या अस्वीकार करें',
+  'Wallet_Charged_successfully': 'आपका वॉलेट सफलतापूर्वक चार्ज हो गया',
+  'home_my_room': 'मेरा',
+  "create_room": 'नहीं, मैं अच्छा नहीं हूं.',
+  'login_with_password': "पासवर्ड लॉगिन सक्षम करें",
+  'login_with_password_disable': "पासवर्ड लॉगिन अक्षम करें",
+  'change_password': 'पासवर्ड बदलें',
+  'account_password': 'खाते का पासवर्ड',
+  'enter_password': "खाता पासवर्ड दर्ज करें" ,
+  're_enter_password': 'खाता पासवर्ड पुनः दर्ज करें',
+  'id_login': "आईडी का उपयोग करके लॉगिन करें",
+  'id_text': 'ID',
 
 
 };

@@ -79,7 +79,7 @@ class SearchScreenState extends State<SearchScreen> {
                       child: TextField( controller: userTxt, decoration: InputDecoration(labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
                         onPressed: (){searchUsers();},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
                           borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                        style: const TextStyle(color: Colors.black , fontSize: 10.0), cursorColor: MyColors.primaryColor,),
+                        style: const TextStyle(color: Colors.black , fontSize: 15.0), cursorColor: MyColors.primaryColor,),
                     ),
                     const SizedBox(height: 20.0,),
 
@@ -98,10 +98,10 @@ class SearchScreenState extends State<SearchScreen> {
                     Container(
                       height: 45.0 ,
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
-                      child: TextField( controller: roomTxt, decoration: InputDecoration(labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
+                      child: TextField( controller: roomTxt, decoration: InputDecoration(  labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
                         onPressed: (){searchRooms();},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
                           borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                        style: const TextStyle(color: Colors.black , fontSize: 10.0), cursorColor: MyColors.primaryColor,),
+                        style: const TextStyle(color: Colors.black , fontSize: 15.0), cursorColor: MyColors.primaryColor,),
                     ),
                     const SizedBox(height: 20.0,),
                     CircularProgressIndicator(

@@ -179,7 +179,7 @@ class _AddAdminModalState extends State<AddAdminModal> {
     setState(() {
       _isLoading = true ;
     });
-    ChatRoom? res = await ChatRoomService().addChatRoomAdmin(user_id, room!.id);
+    ChatRoom? res = await ChatRoomService().addChatRoomAdmin(user_id, room!.id , user!.id);
     setState(() {
   _isLoading = false ;
   room = res ;

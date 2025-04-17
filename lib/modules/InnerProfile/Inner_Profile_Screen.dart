@@ -5,13 +5,17 @@ import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/ChatRoom.dart';
 import 'package:LikLok/models/Design.dart';
 import 'package:LikLok/models/Medal.dart';
+import 'package:LikLok/models/ProfileRelation.dart';
+import 'package:LikLok/models/Relation.dart';
 import 'package:LikLok/modules/EditProfile/Edit_Profile_Screen.dart';
+import 'package:LikLok/modules/Mall/Mall_Screen.dart';
 import 'package:LikLok/modules/MyGifts/My_Gifts_Screen.dart';
 import 'package:LikLok/modules/Room/Room_Screen.dart';
 import 'package:LikLok/modules/chat/chat.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
+import 'package:LikLok/shared/network/remote/RelationsServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -39,6 +43,7 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
   bool isVisitor  = false;
   List<Design> designs = [] ;
   List<Design> gifts = [] ;
+  List<ProfileRelation> relations = [] ;
   String frame = "" ;
   Widget followBtn = Container();
   var passwordController = TextEditingController();
@@ -62,12 +67,14 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
         user = res;
       });
       getDesigns();
+      getRelations();
     } else {
       AppUser? res = AppUserServices().userGetter();
       setState(() {
         user = res;
       });
       getDesigns();
+      getRelations();
     }
 
   }
@@ -102,6 +109,15 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
         print(frame);
       });
     }
+  }
+
+  getRelations() async {
+    List<ProfileRelation> res = await RelationsServices().getProfileRelations(user!.id);
+    setState(() {
+      relations = res ;
+    });
+    print('relations');
+    print(relations);
   }
   @override
   Widget build(BuildContext context) {
@@ -224,7 +240,20 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
                           child: Column(
                             children: [
                               SizedBox(height: 40.0,),
-                              Text(user!.name , style: TextStyle(color: Colors.black , fontSize: 18.0),),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(user!.name , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),),
+                                  const SizedBox(width: 10.0,),
+                                  CircleAvatar(
+                                    backgroundColor: user!.gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
+                                    radius: 12.0,
+                                    child: user!.gender == 0 ?  const Icon(Icons.male , color: Colors.white, size: 15.0,) :  const Icon(Icons.female , color: Colors.white, size: 15.0,),
+                                  ),
+                                  const SizedBox(width: 10.0,),
+                                  Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Countries/' + user!.country_flag) , width: 30.0,),
+                                ],
+                              ),
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () async{
@@ -272,6 +301,11 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
                                     children:  user!.medals!.map((medal) =>  getMedalItem(medal)).toList()
 
                                   ),
+                                  Row(
+
+                                      children:  user!.relations!.map((relation) =>  getRelationItem(relation)).toList()
+
+                                  )
                                 ],
                               ),
                               Text(user!.status !="" ? user!.status  : (isVisitor ? "inner_nothing".tr : "inner_nothing_update".tr)  , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 16.0),),
@@ -299,165 +333,121 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
                         ),
                       ],
                     ),
+
                     Container(
                       width: double.infinity,
                       height: 6.0,
                       color: MyColors.solidDarkColor,
                       margin: EdgeInsetsDirectional.only(top: 20.0),
                     ),
+
                     Container(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-                              ),
-                              SizedBox(width: 10.0,),
-                              Text("inner_basic_information".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                          SizedBox(height: 5.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              children: [
-                                Text("ID" , style: TextStyle(fontSize: 14.0 , color: MyColors.unSelectedColor , fontWeight: FontWeight.bold),),
-                                Expanded(child:
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(user!.tag , style: TextStyle(fontSize: 14.0 , color: MyColors.whiteColor),),
-                                        SizedBox(width: 5.0,),
-                                        IconButton(onPressed: (){}, icon: Icon(FontAwesomeIcons.idBadge , color: Colors.black , size: 20.0,) ,)
-                                      ],
-                                    )                          ],
-                                )
+                       width: MediaQuery.sizeOf(context).width * .85,
+                       height: MediaQuery.sizeOf(context).width * .5,
+                       decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/CP.png') , fit: BoxFit.cover)),
+                       child: relations.where((element) => element.id == 2).toList().length > 0 ? Row(
+                         children: [
+                           Expanded(child: getRelationUserImage(relations.where((element) => element.id == 2).toList()[0] , 0),),
+                           Expanded(child: getRelationUserImage2(relations.where((element) => element.id == 2).toList()[0] , 0),),
 
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 5.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              children: [
-                                Text("edit_profile_user_name".tr , style: TextStyle(fontSize: 14.0 , color: MyColors.unSelectedColor , fontWeight: FontWeight.bold),),
-                                Expanded(child:
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                         ],
+                       ) : Container(
+                         child: Column(
+                           mainAxisAlignment: MainAxisAlignment.end,
+                           children: [
+                             GestureDetector(
+                                 behavior: HitTestBehavior.opaque,
+                                 onTap: (){
+                                   Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                 },
+                                 child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 60.0 , height: 60.0,)),
+
+                           ],
+                         ),
+                       ),
+
+                    ),
+                    SizedBox(height: 10.0,),
+                    Container(
+                      width: MediaQuery.sizeOf(context).width * .9,
+                      child: Center(
+                        child: Row(
+                          children: [
+                             Container(
+                               width: (MediaQuery.sizeOf(context).width * .85) / 3,
+                               height:  MediaQuery.sizeOf(context).width * .5,
+                               decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/CF.png'))),
+                               child: relations.where((element) => element.id == 3).toList().length > 0 ?
+                               getRelationUserImage3(relations.where((element) => element.id == 3).toList()[0] ) :
+                               Container(
+                                 child: Column(
+                                   mainAxisAlignment: MainAxisAlignment.center,
+                                   children: [
+                                     GestureDetector(
+                                         behavior: HitTestBehavior.opaque,
+                                         onTap: (){
+                                           Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                         },
+                                         child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
+
+                                   ],
+                                 ),
+                               ),
+                             ),
+                            SizedBox(width: 5.0,),
+                            Container(
+                                width:(MediaQuery.sizeOf(context).width * .85) / 3,
+                                height:  MediaQuery.sizeOf(context).width * .5,
+                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/TF.png'))),
+                              child: relations.where((element) => element.id == 5).toList().length > 0 ?
+                              getRelationUserImage3(relations.where((element) => element.id == 5).toList()[0] ) : Container(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(user!.name , style: TextStyle(fontSize: 14.0 , color: Colors.black),),
-                                        SizedBox(width: 5.0,),
-                                        IconButton(onPressed: (){}, icon: Icon(FontAwesomeIcons.faceGrinWide , color: Colors.black , size: 20.0))
-                                      ],
-                                    )
+                                    GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                        },
+                                        child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
 
                                   ],
-                                )
-
-                                )
-                              ],
+                                ),
+                              ) ,
                             ),
-                          ),
-                          SizedBox(height: 5.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              children: [
-                                Text("edit_profile_gender".tr , style: TextStyle(fontSize: 14.0 , color: MyColors.unSelectedColor , fontWeight: FontWeight.bold),),
-                                Expanded(child:
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(user!.gender == 0 ? "edit_profile_male".tr : "edit_profile_female".tr , style: TextStyle(fontSize: 14.0 , color: Colors.black),),
-                                        SizedBox(width: 5.0,),
-                                        IconButton(onPressed: (){}, icon: Icon(user!.gender == 0 ?  FontAwesomeIcons.male : FontAwesomeIcons.female , color: Colors.black , size: 20.0))
-                                      ],
-                                    )
+                            SizedBox(width: 5.0,),
+                            Container(
+                                width: (MediaQuery.sizeOf(context).width * .85) / 3,
+                                height:  MediaQuery.sizeOf(context).width * .5,
+                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/BF.png'))),
+                                child: relations.where((element) => element.id == 4).toList().length > 0 ?
+                                getRelationUserImage3(relations.where((element) => element.id == 4).toList()[0] ) : Container(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                          },
+                                          child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
 
-                                  ],
-                                )
-
-                                )
-                              ],
+                                    ],
+                                  ),
+                                ) ,
                             ),
-                          ),
-                          SizedBox(height: 5.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              children: [
-                                Text("edit_profile_date_of_birth".tr , style: TextStyle(fontSize: 14.0 , color: MyColors.unSelectedColor , fontWeight: FontWeight.bold),),
-                                Expanded(child:
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(formattedDate(user!.birth_date ).toString(), style: TextStyle(fontSize: 14.0 , color: Colors.black),),
-                                        SizedBox(width: 5.0,),
-                                        IconButton(onPressed: (){}, icon: Icon(FontAwesomeIcons.birthdayCake  , color: Colors.black , size: 20.0))
-                                      ],
-                                    )
-
-                                  ],
-                                )
-
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 5.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              children: [
-                                Text("edit_profile_country".tr , style: TextStyle(fontSize: 14.0 , color: MyColors.unSelectedColor , fontWeight: FontWeight.bold),),
-                                Expanded(child:
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Countries/' + user!.country_flag) , width: 30.0,),
-                                        SizedBox(width: 5.0,),
-                                        IconButton(onPressed: (){}, icon: Icon(FontAwesomeIcons.flag  , color: Colors.black , size: 20.0))
-
-                                      ],
-                                    )
-
-                                  ],
-                                )
-
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
+
                     Container(
                       width: double.infinity,
                       height: 6.0,
                       color: MyColors.solidDarkColor,
                       margin: EdgeInsetsDirectional.only(top: 20.0),
                     ),
+
                    Container(
                       padding: EdgeInsets.all(15.0),
                       child: Column(
@@ -973,7 +963,7 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
 
   Widget getMedalItem(Medal medal){
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0),
+      margin: EdgeInsets.symmetric(horizontal: 5.0 , vertical: 5.0),
       child: Column(
         children:[
           Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Badges/${medal.icon}') , width: 40,),
@@ -983,4 +973,97 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
       ),
     );
   }
+
+  Widget getRelationItem(RelationModel relation){
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5.0 , vertical: 5.0),
+      child: Column(
+          children:[
+            Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Relations/${relation.icon}') , width: 40,),
+
+          ]
+
+      ),
+    );
+  }
+  Widget relationItemBuilder( relation) => Container(
+    decoration: BoxDecoration(color: Colors.black26 , borderRadius: BorderRadius.circular(15.0) ),
+    margin: EdgeInsets.all(5.0),
+    child: Column(
+      children: [
+        Center(
+        //  child: Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'RelationsMotion/' + relation.motion_icon),),
+
+        ),
+
+      ],
+    ),
+  );
+
+  getRelationbackground(id){
+    if(id == 3){
+      //CF.png
+    } else if(id == 4){
+       //BF.png
+    } else if(id == 5){
+      //TF.png
+    }
+  }
+
+ Widget getRelationUserImage(relation , small) => Column(
+   mainAxisAlignment: MainAxisAlignment.center,
+   children: [
+     Stack(
+       alignment: Alignment.center,
+       children: [
+         CircleAvatar(
+           backgroundColor:  MyColors.blueColor ,
+           backgroundImage: relation.sender_img != "" ?  CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${relation.sender_img}') : null,
+           radius: small == 1 ? 22 : 30,
+           child: relation.sender_img == "" ?
+           Text(relation.sender_name.toUpperCase().substring(0 , 1) +
+               (relation.sender_name.contains(" ") ? relation.sender_name.substring(relation.sender_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
+             style:  TextStyle(color: Colors.white , fontSize: small == 1 ? 18.0 : 24.0 , fontWeight: FontWeight.bold),) : null,
+         ),
+         Container(  height:  small == 1 ? 70 :  100.0, width: small == 1 ? 70 :  100.0, child: relation.frame != "" ? SVGASimpleImage(   resUrl: '${ASSETSBASEURL}Designs/Motion/${relation.frame}?raw=true') : null),
+       ],
+
+     ),
+     SizedBox(height: 5,),
+     Text(relation.sender_name , style: TextStyle(fontSize: small == 1 ? 12 : 14 , fontWeight: FontWeight.bold , color: Colors.white),)
+   ],
+ );
+
+  Widget getRelationUserImage2(relation , small) => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Stack(
+        alignment: Alignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor:  MyColors.blueColor ,
+            backgroundImage: relation.recivier_img != "" ?  CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${relation.recivier_img}') : null,
+            radius: small == 1 ? 22 : 30,
+            child: relation.recivier_img == "" ?
+            Text(relation.recivier_name.toUpperCase().substring(0 , 1) +
+                (relation.recivier_name.contains(" ") ? relation.recivier_name.substring(relation.recivier_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
+              style:  TextStyle(color: Colors.white , fontSize: small == 1 ? 18.0 : 24.0 ,  fontWeight: FontWeight.bold),) : null,
+          ),
+          Container(  height:  small == 1 ? 70 :  100.0, width: small == 1 ? 70 :  100.0, child: relation.frame != "" ? SVGASimpleImage(   resUrl: '${ASSETSBASEURL}Designs/Motion/${relation.frame}?raw=true') : null),
+        ],
+      ),
+      SizedBox(height: 5,),
+      Text(relation.recivier_name , style: TextStyle(fontSize: small == 1 ? 12 : 14 , fontWeight: FontWeight.bold , color: Colors.white),)
+    ],
+  );
+
+
+  Widget getRelationUserImage3(relation ) {
+    if(relation.sender_id == user!.id){
+      return getRelationUserImage2(relation , 1) ;
+    } else {
+      return getRelationUserImage(relation , 1) ;
+    }
+  }
+
 }

@@ -53,7 +53,7 @@ class _HelpScreenState extends State<HelpScreen> {
                     SizedBox(height: 5.0,),
                     Text("LikLok Help Center",style: TextStyle(color: MyColors.whiteColor,fontSize: 18.0)),
                     SizedBox(height: 3.0,),
-                    Text("about_us_version".tr + "1.0.9",style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
+                    Text("about_us_version".tr + "1.8.0",style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
 
                   ],
                 ),
@@ -64,7 +64,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 margin: EdgeInsetsDirectional.only(bottom: 10.0),
                 child: GestureDetector(
                   onTap: () async{
-                    await launch('https://wa.me/+66947678815?text=Hello"');
+                    await launch('https://t.me/Iiklok');
                   },
                   child: Row(
                     children: [

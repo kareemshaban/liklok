@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.9+10
+version: 1.8.0+18
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -47,7 +47,7 @@ dependencies:
   flutter_native_splash: ^2.3.9
   svgaplayer_flutter: ^2.2.0
   font_awesome_flutter: ^10.6.0
-  carousel_slider: ^4.2.1
+  carousel_slider: ^4.2.0
   flutter_launcher_icons: ^0.13.1
   loading_indicator: ^3.1.1
   skeletonizer: ^1.0.1
@@ -58,7 +58,7 @@ dependencies:
   percent_indicator: ^4.2.3
   url_launcher: ^6.2.4
   firebase_auth: ^4.16.0
-  flutter_facebook_auth: ^6.0.4
+#  flutter_facebook_auth: ^6.0.4
   firebase_messaging: ^14.7.10
   emoji_picker_flutter: ^1.6.4
   cloud_firestore: ^4.14.0
@@ -78,14 +78,16 @@ dependencies:
   change_app_package_name: ^1.1.0
   webview_flutter: ^4.5.0
   roulette: ^0.1.5
-  flutter_local_notifications: ^17.0.0
+#  flutter_local_notifications: ^17.0.0
   awesome_notifications: ^0.7.4+1
   cached_network_image: ^3.3.1
   dio: ^5.4.3+1
-  pay: ^2.0.0
+#  pay: ^2.0.0
   circular_countdown_timer: ^0.2.3
   audio_duration: ^0.0.3
-
+  in_app_purchase: ^3.1.13
+  in_app_purchase_storekit: ^0.3.8+1
+  root_checker_plus: ^0.0.4
 
 
 

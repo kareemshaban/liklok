@@ -12,6 +12,7 @@ import 'package:LikLok/models/HostAgency.dart';
 import 'package:LikLok/models/LevelStats.dart';
 import 'package:LikLok/models/Mall.dart';
 import 'package:LikLok/models/Medal.dart';
+import 'package:LikLok/models/Relation.dart';
 import 'package:LikLok/models/Tag.dart';
 import 'package:LikLok/models/UserHoppy.dart';
 import 'package:LikLok/models/Vip.dart';
@@ -135,6 +136,7 @@ class AppUserServices {
     List<UserHoppy> hoppies = [] ;
     List<Vip> vips = [] ;
     List<Mall> designs = [] ;
+    List<RelationModel> relations = [] ;
 
     List<Medal> medals = [];
     for (var j = 0; j < jsonData['medals'].length; j ++) {
@@ -184,6 +186,11 @@ class AppUserServices {
       vips.add(vip);
     }
 
+    for (var j = 0; j < jsonData['relations'].length; j ++) {
+      RelationModel relation = RelationModel.fromJson(jsonData['relations'][j]);
+      relations.add(relation);
+    }
+
     user.friends = friends ;
     user.visitors = visitors ;
     user.followings = followings ;
@@ -192,6 +199,7 @@ class AppUserServices {
     user.blocks = blocks ;
     user.medals = medals ;
     user.vips = vips ;
+    user.relations = relations ;
     return  user;
   }
   Future<AppUser?> getUser(id) async {
@@ -735,6 +743,62 @@ class AppUserServices {
     return false;
 
   }
+
+  Future<AppUser?> updateUserPassword(user_id , password , loginWithPassword)async {
+    var response = await http.post(
+      Uri.parse('${BASEURL}Account/SetPassword'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'user_id': user_id.toString(),
+        'password': password.toString(),
+        'loginWithPassword': loginWithPassword.toString(),
+      }),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      final Map jsonData = json.decode(response.body);
+      if(jsonData['state'] == "success"){
+        return mapUserData(jsonData);
+      } else {
+        return null ;
+      }
+
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
+  Future<AppUser?> LoginWithIdAndPassword(id , password )async {
+    var response = await http.post(
+      Uri.parse('${BASEURL}Account/LoginWithIdAndPassword'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'id': id.toString(),
+        'password': password.toString()
+      }),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+      final Map jsonData = json.decode(response.body);
+      if(jsonData['state'] == "success"){
+        return mapUserData(jsonData);
+      } else {
+        return null ;
+      }
+
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
 
 
 }
