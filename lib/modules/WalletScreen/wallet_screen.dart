@@ -159,63 +159,155 @@ class _WalletScreenState extends State<WalletScreen> {
             )
           ],
         ),
-        body:  Container(
-          color: MyColors.darkColor,
-          width: double.infinity,
-          child: setting != null  || isLoading ? TabBarView(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    height: 150.0,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/Gold-bag.png'),
-                        colorFilter: new ColorFilter.mode(
-                            Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                        fit: BoxFit.cover,
+        body:  SafeArea(
+          child: Container(
+            color: MyColors.darkColor,
+            width: double.infinity,
+            child: setting != null  || isLoading ? TabBarView(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      height: 150.0,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/Gold-bag.png'),
+                          colorFilter: new ColorFilter.mode(
+                              Colors.black.withOpacity(0.6), BlendMode.dstATop),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Current Gold',
+                            style: TextStyle(
+                                color: MyColors.primaryColor,
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(
+                                image: AssetImage('assets/images/gold.png'),
+                                width: 40.0,
+                                height: 40.0,
+                              ),
+                              SizedBox(width: 10.0,),
+                              Text(
+                                double.parse(user!.gold).floor().toString(),
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 25.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Current Gold',
-                          style: TextStyle(
-                              color: MyColors.primaryColor,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image(
-                              image: AssetImage('assets/images/gold.png'),
-                              width: 40.0,
-                              height: 40.0,
+                   !(rootedCheck) ? Expanded(
+                      child: Transform.translate(
+                          offset: Offset(0, -20.0), child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0 , vertical: 20.0),
+                          decoration: BoxDecoration(color: MyColors.darkColor , borderRadius: BorderRadius.circular(15.0)),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 8.0,
+                                      height: 30.0,
+                                      decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(3.0)),
+                                    ),
+                                    SizedBox(width: 10.0,),
+                                    Text("recharge_gold".tr , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
+                                  ],
+                                ),
+                                SizedBox(height: 15.0,),
+                                getChargeProvider()
+          
+                              ],
                             ),
-                            SizedBox(width: 10.0,),
-                            Text(
-                              double.parse(user!.gold).floor().toString(),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 25.0,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )
-                      ],
+                          ),
+          
+          
+                      )),
+                    ) : Container(
+                     child: Expanded(
+                       child: Column(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           Text("Sorry Google Payment not allowed on this device" , style: TextStyle(fontSize: 15.0 , color: Colors.red , fontWeight: FontWeight.bold),),
+                         ],
+                       ),
+          
+                     ),
+                   )
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      height: 150.0,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/diamond-bag.png'),
+                          colorFilter: new ColorFilter.mode(
+                              Colors.black.withOpacity(0.6), BlendMode.dstATop),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Current Diamond',
+                            style: TextStyle(
+                                color: Colors.lightBlueAccent,
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(
+                                image: AssetImage('assets/images/diamond.png'),
+                                width: 40.0,
+                                height: 40.0,
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Text(
+                                double.parse(user!.diamond).floor().toString(),
+                                style: TextStyle(
+                                    color: MyColors.whiteColor,
+                                    fontSize: 25.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                 !(rootedCheck) ? Expanded(
-                    child: Transform.translate(
-                        offset: Offset(0, -20.0), child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15.0 , vertical: 20.0),
+                    Expanded(
+                      child: Transform.translate(
+                          offset: Offset(0, -20.0), child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0 , vertical: 20.0),
                         decoration: BoxDecoration(color: MyColors.darkColor , borderRadius: BorderRadius.circular(15.0)),
                         child: SingleChildScrollView(
                           child: Column(
@@ -228,203 +320,113 @@ class _WalletScreenState extends State<WalletScreen> {
                                     decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(3.0)),
                                   ),
                                   SizedBox(width: 10.0,),
-                                  Text("recharge_gold".tr , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
+                                  Text("diamond_exchange".tr , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                              SizedBox(height: 8.0,),
+                              Row(
+                                children: [
+                                  SizedBox(width: 20.0,),
+                                  Text('diamond_exchange_note'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 14.0),)
                                 ],
                               ),
                               SizedBox(height: 15.0,),
-                              getChargeProvider()
-
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 45.0,
+                                    width: MediaQuery.sizeOf(context).width - 40.0,
+                                    child: TextField( controller: diamondTxt, decoration: InputDecoration(labelText: "diamond_exchange_inp_hint".tr ,
+                                      suffixIcon: GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            diamondTxt.text =double.parse(user!.diamond).floor().toString()  ;
+                                          });
+                                        },
+                                        child: Container(width: 80.0, height: 45.0,
+                                          decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(25.0) , topEnd: Radius.circular(25.0))),
+                                          child: Center(child: Text('All' , style: TextStyle(color: MyColors.darkColor , fontSize: 18.0),)),
+                                        ),
+                                      ),
+                                      fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
+                                        borderSide: BorderSide(color: MyColors.whiteColor) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
+                                      style: const TextStyle(color: Colors.black , fontSize: 18.0), textAlign: TextAlign.center, cursorColor: MyColors.primaryColor ,  keyboardType: TextInputType.number,),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 25.0,),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8.0,
+                                    height: 30.0,
+                                    decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(3.0)),
+                                  ),
+                                  SizedBox(width: 10.0,),
+                                  Text("diamond_exchange_rules".tr , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                              SizedBox(height: 15.0,),
+                              Column(
+          
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.star , color: MyColors.primaryColor, size: 20.0,),
+                                      SizedBox(width: 5.0,),
+                                      Container(
+                                          width: MediaQuery.sizeOf(context).width - 70,
+                                          child: Text('wallet_diamond_rule1'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 18.0),))
+                                    ],
+                                  ),
+                                  SizedBox(height: 10.0,),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.star , color: MyColors.primaryColor, size: 20.0,),
+                                      SizedBox(width: 5.0,),
+                                      Container(
+                                          width: MediaQuery.sizeOf(context).width - 70,  child: Text('wallet_diamond_rule2'.tr + setting!.diamond_to_gold_ratio , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 18.0),))
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                color: MyColors.unSelectedColor,
+                                height: 1.0,
+                                width: double.infinity,
+                                margin: EdgeInsets.symmetric(vertical: 20.0),
+                              ),
+                              Row(
+                                children: [
+                                  Text('exchanged_gold'.tr , style: TextStyle(color: MyColors.secondaryColor , fontSize: 20.0 , fontWeight: FontWeight.bold),),
+                                  SizedBox(width: 15.0,),
+                                  Image(image: AssetImage('assets/images/gold.png') , width: 25.0 , height: 25.0,),
+                                  SizedBox(width: 15.0,),
+                                  Text(diamondTxt.text, style: TextStyle(color: Colors.red , fontSize: 25.0 , fontWeight: FontWeight.bold),),
+                                ],
+                              ),
+                              SizedBox(height:20.0),
+                              Container(
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.primaryColor ),
+                                child: MaterialButton(onPressed: (){
+                                  convertDiamondToGold();
+                                } , child: Text('exchange_btn'.tr , style: TextStyle(color: Colors.white),),),
+                              )
+          
                             ],
                           ),
                         ),
-
-
-                    )),
-                  ) : Container(
-                   child: Expanded(
-                     child: Column(
-                       mainAxisAlignment: MainAxisAlignment.center,
-                       children: [
-                         Text("Sorry Google Payment not allowed on this device" , style: TextStyle(fontSize: 15.0 , color: Colors.red , fontWeight: FontWeight.bold),),
-                       ],
-                     ),
-
-                   ),
-                 )
-                ],
-              ),
-              Column(
-                children: [
-                  Container(
-                    height: 150.0,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/diamond-bag.png'),
-                        colorFilter: new ColorFilter.mode(
-                            Colors.black.withOpacity(0.6), BlendMode.dstATop),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Current Diamond',
-                          style: TextStyle(
-                              color: Colors.lightBlueAccent,
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image(
-                              image: AssetImage('assets/images/diamond.png'),
-                              width: 40.0,
-                              height: 40.0,
-                            ),
-                            SizedBox(
-                              width: 10.0,
-                            ),
-                            Text(
-                              double.parse(user!.diamond).floor().toString(),
-                              style: TextStyle(
-                                  color: MyColors.whiteColor,
-                                  fontSize: 25.0,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Transform.translate(
-                        offset: Offset(0, -20.0), child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15.0 , vertical: 20.0),
-                      decoration: BoxDecoration(color: MyColors.darkColor , borderRadius: BorderRadius.circular(15.0)),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8.0,
-                                  height: 30.0,
-                                  decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(3.0)),
-                                ),
-                                SizedBox(width: 10.0,),
-                                Text("diamond_exchange".tr , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
-                              ],
-                            ),
-                            SizedBox(height: 8.0,),
-                            Row(
-                              children: [
-                                SizedBox(width: 20.0,),
-                                Text('diamond_exchange_note'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 14.0),)
-                              ],
-                            ),
-                            SizedBox(height: 15.0,),
-                            Row(
-                              children: [
-                                Container(
-                                  height: 45.0,
-                                  width: MediaQuery.sizeOf(context).width - 40.0,
-                                  child: TextField( controller: diamondTxt, decoration: InputDecoration(labelText: "diamond_exchange_inp_hint".tr ,
-                                    suffixIcon: GestureDetector(
-                                      onTap: (){
-                                        setState(() {
-                                          diamondTxt.text =double.parse(user!.diamond).floor().toString()  ;
-                                        });
-                                      },
-                                      child: Container(width: 80.0, height: 45.0,
-                                        decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(25.0) , topEnd: Radius.circular(25.0))),
-                                        child: Center(child: Text('All' , style: TextStyle(color: MyColors.darkColor , fontSize: 18.0),)),
-                                      ),
-                                    ),
-                                    fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
-                                      borderSide: BorderSide(color: MyColors.whiteColor) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                                    style: const TextStyle(color: Colors.black , fontSize: 18.0), textAlign: TextAlign.center, cursorColor: MyColors.primaryColor ,  keyboardType: TextInputType.number,),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 25.0,),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 8.0,
-                                  height: 30.0,
-                                  decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(3.0)),
-                                ),
-                                SizedBox(width: 10.0,),
-                                Text("diamond_exchange_rules".tr , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),)
-                              ],
-                            ),
-                            SizedBox(height: 15.0,),
-                            Column(
-
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(Icons.star , color: MyColors.primaryColor, size: 20.0,),
-                                    SizedBox(width: 5.0,),
-                                    Container(
-                                        width: MediaQuery.sizeOf(context).width - 70,
-                                        child: Text('wallet_diamond_rule1'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 18.0),))
-                                  ],
-                                ),
-                                SizedBox(height: 10.0,),
-                                Row(
-                                  children: [
-                                    Icon(Icons.star , color: MyColors.primaryColor, size: 20.0,),
-                                    SizedBox(width: 5.0,),
-                                    Container(
-                                        width: MediaQuery.sizeOf(context).width - 70,  child: Text('wallet_diamond_rule2'.tr + setting!.diamond_to_gold_ratio , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 18.0),))
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Container(
-                              color: MyColors.unSelectedColor,
-                              height: 1.0,
-                              width: double.infinity,
-                              margin: EdgeInsets.symmetric(vertical: 20.0),
-                            ),
-                            Row(
-                              children: [
-                                Text('exchanged_gold'.tr , style: TextStyle(color: MyColors.secondaryColor , fontSize: 20.0 , fontWeight: FontWeight.bold),),
-                                SizedBox(width: 15.0,),
-                                Image(image: AssetImage('assets/images/gold.png') , width: 25.0 , height: 25.0,),
-                                SizedBox(width: 15.0,),
-                                Text(diamondTxt.text, style: TextStyle(color: Colors.red , fontSize: 25.0 , fontWeight: FontWeight.bold),),
-                              ],
-                            ),
-                            SizedBox(height:20.0),
-                            Container(
-                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.primaryColor ),
-                              child: MaterialButton(onPressed: (){
-                                convertDiamondToGold();
-                              } , child: Text('exchange_btn'.tr , style: TextStyle(color: Colors.white),),),
-                            )
-
-                          ],
-                        ),
-                      ),
-
-
-                    )),
-                  )
-                ],
-              ),
-
-            ],
-          ) : Loading(),
+          
+          
+                      )),
+                    )
+                  ],
+                ),
+          
+              ],
+            ) : Loading(),
+          ),
         ) ,
       ),
     );

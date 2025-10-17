@@ -54,132 +54,134 @@ class _Account_Management_ScreenState extends State<Account_Management_Screen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("account_management_title".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(15.0),
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(color: Colors.white , borderRadius: BorderRadius.circular(15.0) , border: Border.all(color: MyColors.secondaryColor ,
-              width: 2.0)),
-              padding: EdgeInsets.all(15.0),
-              child: Row(
-                children: [
-                  Image(image: AssetImage(getProviderImage()) , width: 60.0,),
-                  SizedBox(width: 20.0,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(getProviderName() , style: TextStyle(color: Colors.black , fontSize: 18.0),),
-                      SizedBox(height: 10.0,),
-                      Text(getProviderValue() , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 12.0),),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Expanded(child:
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap:(){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(askForCurrentPassword: 0,)));
-                  } ,
-                  child: user!.loginWithPassword == 0 ?  Container(
-                    width: double.infinity,
-                    height: 50,
-                    margin: EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.secondaryColor),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(color: Colors.white , borderRadius: BorderRadius.circular(15.0) , border: Border.all(color: MyColors.secondaryColor ,
+                width: 2.0)),
+                padding: EdgeInsets.all(15.0),
+                child: Row(
+                  children: [
+                    Image(image: AssetImage(getProviderImage()) , width: 60.0,),
+                    SizedBox(width: 20.0,),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('login_with_password'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                        Text(getProviderName() , style: TextStyle(color: Colors.black , fontSize: 18.0),),
+                        SizedBox(height: 10.0,),
+                        Text(getProviderValue() , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 12.0),),
                       ],
-                    ),
-                  ) : Column(
-                    children: [
+                    )
+                  ],
+                ),
+              ),
+              Expanded(child:
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap:(){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(askForCurrentPassword: 0,)));
+                    } ,
+                    child: user!.loginWithPassword == 0 ?  Container(
+                      width: double.infinity,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 20.0),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.secondaryColor),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('login_with_password'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                        ],
+                      ),
+                    ) : Column(
+                      children: [
+                          GestureDetector(
+                            onTap:(){
+                              disablePasswordLogin();
+                             },
+                            child: Container(
+                              width: double.infinity,
+                              height: 50,
+                              margin: EdgeInsets.symmetric(horizontal: 20.0),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.red),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('login_with_password_disable'.tr , style: TextStyle(color: Colors.white , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                            ),
+                          ),
+                        SizedBox(height: 20.0,),
                         GestureDetector(
-                          onTap:(){
-                            disablePasswordLogin();
-                           },
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(askForCurrentPassword: 1,)));
+                          },
                           child: Container(
                             width: double.infinity,
                             height: 50,
                             margin: EdgeInsets.symmetric(horizontal: 20.0),
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.red),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.yellow),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('login_with_password_disable'.tr , style: TextStyle(color: Colors.white , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                                Text('change_password'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
                               ],
                             ),
                           ),
                         ),
-                      SizedBox(height: 20.0,),
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => SetPasswordScreen(askForCurrentPassword: 1,)));
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 50,
-                          margin: EdgeInsets.symmetric(horizontal: 20.0),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.yellow),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('change_password'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20.0,),
+                  GestureDetector(
+                    onTap:(){
+                      FirebaseMessaging.instance.unsubscribeFromTopic('all');
+                      showAlertDialog(context);
+                    } ,
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 20.0),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.white),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('log_out'.tr , style: TextStyle(color: Colors.red , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20.0,),
-                GestureDetector(
-                  onTap:(){
-                    FirebaseMessaging.instance.unsubscribeFromTopic('all');
-                    showAlertDialog(context);
-                  } ,
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    margin: EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.white),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('log_out'.tr , style: TextStyle(color: Colors.red , fontSize: 20.0 , fontWeight: FontWeight.bold),)
-                      ],
                     ),
                   ),
-                ),
-                SizedBox(height: 20.0,),
-                GestureDetector(
-                  onTap:(){
-                    showAlertDialog2(context);
-                  } ,
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    margin: EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.primaryColor),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('delete_account'.tr , style: TextStyle(color: MyColors.secondaryColor , fontSize: 20.0 , fontWeight: FontWeight.bold),)
-                      ],
+                  SizedBox(height: 20.0,),
+                  GestureDetector(
+                    onTap:(){
+                      showAlertDialog2(context);
+                    } ,
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 20.0),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.primaryColor),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('delete_account'.tr , style: TextStyle(color: MyColors.secondaryColor , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            )
-            )
-          ],
+                ],
+              )
+              )
+            ],
+          ),
         ),
       ),
     );

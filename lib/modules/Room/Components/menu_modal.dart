@@ -47,112 +47,181 @@ class _MenuModalState extends State<MenuModal> {
   }
   @override
   Widget build(BuildContext context) {
-    return  Container(
-        height: 300,
-        padding: EdgeInsets.symmetric(vertical: 20.0),
-        decoration: BoxDecoration(color: Colors.white.withAlpha(180),
-            borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
-            border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
-        child:  Column(
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                user!.id == room!.userId  ?  Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      Navigator.pop(context);
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (ctx) => ThemesBottomSheet());
-                    },
-                    child: Column(
-                      children: [
-                        Image(image: AssetImage('assets/images/theme.png') , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text('menu_theme'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
-                      ],
-                    ),
-                  ),
-                ) : Container(),
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: (){
-                      if(room!.mics!.where((element) => element.user_id == user!.id).toList().length > 0){
+    return  SafeArea(
+      child: Container(
+          height: 300,
+          padding: EdgeInsets.symmetric(vertical: 20.0),
+          decoration: BoxDecoration(color: Colors.white.withAlpha(180),
+              borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
+              border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
+          child:  Column(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  user!.id == room!.userId  ?  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
                         Navigator.pop(context);
                         showModalBottomSheet(
                             context: context,
-                            builder: (ctx) => MusicBottomSheet());
-                      }else {
-                        Fluttertoast.showToast(
-                            msg: 'should_be_on_mic'.tr,
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black26,
-                            textColor: Colors.orange,
-                            fontSize: 16.0);
-                      }
-
-                    },
-                    child: Column(
-                      children: [
-                        Image(image: AssetImage('assets/images/music.png') , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text('menu_music'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
-                      ],
+                            builder: (ctx) => ThemesBottomSheet());
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/theme.png') , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text('menu_theme'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
+                    ),
+                  ) : Container(),
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: (){
+                        if(room!.mics!.where((element) => element.user_id == user!.id).toList().length > 0){
+                          Navigator.pop(context);
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (ctx) => MusicBottomSheet());
+                        }else {
+                          Fluttertoast.showToast(
+                              msg: 'should_be_on_mic'.tr,
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black26,
+                              textColor: Colors.orange,
+                              fontSize: 16.0);
+                        }
+      
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/music.png') , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text('menu_music'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      numberGame();
-                    },
-                    child: Column(
-                      children: [
-                        Image(image: AssetImage('assets/images/numbers.png') , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text('menu_lucky_number'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
-                      ],
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        numberGame();
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/numbers.png') , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text('menu_lucky_number'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      nurdGame();
-                    },
-                    child: Column(
-                      children: [
-                        Image(image: AssetImage('assets/images/3d-dice.png') , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text('menu_dice'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
-                      ],
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        nurdGame();
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/3d-dice.png') , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text('menu_dice'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 15.0,),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
+                ],
+              ),
+              SizedBox(height: 15.0,),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (ctx) =>   LuckyCaseBottomSheet());
+      
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/luckyCaseIcon.png') , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text('menu_lucky_bag'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                        showModalBottomSheet(
+                            isScrollControlled: true ,
+                            context: context,
+                            builder: (ctx) => roomSettingsBottomSheet());
+                      },
+                      child: Column(
+                        children: [
+                          Image(image: AssetImage('assets/images/settings.png') , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text('menu_settings'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
+                    ),
+                  ),
+                  user!.id == room!.userId  ? Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        toggleRoomCounter();
+                      },
+                      child: Column(
+                        children: [
+                          Image(image:  AssetImage('assets/images/counter.png')  , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text( room!.isCounter == 0 ? 'counter_off'.tr : 'counter_on'.tr  , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
+                    ),
+                  ):Container(),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        paperGame();
+                      },
+                      child: Column(
+                        children: [
+                          Image(image:  AssetImage('assets/images/game.png')  , width: 40.0,),
+                          SizedBox(height: 8.0,),
+                          Text( 'game1'.tr  ,  overflow: TextOverflow.ellipsis,  style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        ],
+                      ),
+                    ),
+                  ),
+      
+                ],
+              ),
+              SizedBox(height: 15.0,),
+              Row(children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: (){
                       Navigator.pop(context);
                       showModalBottomSheet(
                           context: context,
-                          builder: (ctx) =>   LuckyCaseBottomSheet());
-
+                          builder: (ctx) => GamesBottomSheet());
                     },
                     child: Column(
                       children: [
-                        Image(image: AssetImage('assets/images/luckyCaseIcon.png') , width: 40.0,),
+                        Image(image:  AssetImage('assets/images/game_icon.png')  , width: 40.0,),
                         SizedBox(height: 8.0,),
-                        Text('menu_lucky_bag'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+                        Text( 'games'.tr  ,  overflow: TextOverflow.ellipsis,  style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
                       ],
                     ),
                   ),
@@ -160,114 +229,47 @@ class _MenuModalState extends State<MenuModal> {
                 Expanded(
                   child: GestureDetector(
                     onTap: (){
-                      Navigator.pop(context);
-                      showModalBottomSheet(
-                          isScrollControlled: true ,
-                          context: context,
-                          builder: (ctx) => roomSettingsBottomSheet());
+      
                     },
                     child: Column(
                       children: [
-                        Image(image: AssetImage('assets/images/settings.png') , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text('menu_settings'.tr , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+      
                       ],
                     ),
                   ),
                 ),
-                user!.id == room!.userId  ? Expanded(
-                  child: GestureDetector(
-                    onTap: (){
-                      toggleRoomCounter();
-                    },
-                    child: Column(
-                      children: [
-                        Image(image:  AssetImage('assets/images/counter.png')  , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text( room!.isCounter == 0 ? 'counter_off'.tr : 'counter_on'.tr  , style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
-                      ],
-                    ),
-                  ),
-                ):Container(),
                 Expanded(
                   child: GestureDetector(
                     onTap: (){
-                      paperGame();
+      
                     },
                     child: Column(
                       children: [
-                        Image(image:  AssetImage('assets/images/game.png')  , width: 40.0,),
-                        SizedBox(height: 8.0,),
-                        Text( 'game1'.tr  ,  overflow: TextOverflow.ellipsis,  style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
+      
                       ],
                     ),
                   ),
                 ),
-
-              ],
-            ),
-            SizedBox(height: 15.0,),
-            Row(children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: (){
-                    Navigator.pop(context);
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (ctx) => GamesBottomSheet());
-                  },
-                  child: Column(
-                    children: [
-                      Image(image:  AssetImage('assets/images/game_icon.png')  , width: 40.0,),
-                      SizedBox(height: 8.0,),
-                      Text( 'games'.tr  ,  overflow: TextOverflow.ellipsis,  style: TextStyle(color: Colors.black , fontSize: 12.0 , fontWeight:FontWeight.w500),)
-                    ],
+                Expanded(
+                  child: GestureDetector(
+                    onTap: (){
+      
+                    },
+                    child: Column(
+                      children: [
+      
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: (){
-
-                  },
-                  child: Column(
-                    children: [
-
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: (){
-
-                  },
-                  child: Column(
-                    children: [
-
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: (){
-
-                  },
-                  child: Column(
-                    children: [
-
-                    ],
-                  ),
-                ),
-              ),
-
-
-            ],)
-
-          ],
-        )
-
+      
+      
+              ],)
+      
+            ],
+          )
+      
+      ),
     );
   }
   Widget ThemesBottomSheet() => ThemesModal();

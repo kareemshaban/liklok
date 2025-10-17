@@ -111,44 +111,46 @@ class AddPostScreenState extends State<AddPostScreen> {
 
            ],
          ),
-      body: Container(
-        color: MyColors.darkColor,
-        height: double.infinity ,
-        child: loading ? Loading(): SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: TextField(
-                  controller: contentController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                  cursorColor: MyColors.primaryColor,
-                  decoration: InputDecoration(border: InputBorder.none , labelText: "add_post_label".tr , labelStyle: TextStyle(color: Colors.grey , fontSize: 18.0)),
-                  style: TextStyle(color: MyColors.whiteColor ),
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          height: double.infinity ,
+          child: loading ? Loading(): SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: TextField(
+                    controller: contentController,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                    cursorColor: MyColors.primaryColor,
+                    decoration: InputDecoration(border: InputBorder.none , labelText: "add_post_label".tr , labelStyle: TextStyle(color: Colors.grey , fontSize: 18.0)),
+                    style: TextStyle(color: MyColors.whiteColor ),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: GestureDetector(child: _image == null ? Image(image: AssetImage('assets/images/select_img.png') , width: 90.0, ) : Image.file(_image! , width: 100,) ,  onTap: (){showPickImageOptions(); }),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 1.0,
-                  color: Colors.grey,
-                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: GestureDetector(child: _image == null ? Image(image: AssetImage('assets/images/select_img.png') , width: 90.0, ) : Image.file(_image! , width: 100,) ,  onTap: (){showPickImageOptions(); }),
                 ),
-              ),
-              Container(
-                  height: 40.0,
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child:
-               ListView.separated(itemBuilder:(ctx , index) => tagItemBuilder(index), separatorBuilder: (ctx , index) => seperatedItem(), itemCount: tags.length , scrollDirection: Axis.horizontal,)
-              )
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
+                    width: double.infinity,
+                    height: 1.0,
+                    color: Colors.grey,
+                  
+                  ),
+                ),
+                Container(
+                    height: 40.0,
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child:
+                 ListView.separated(itemBuilder:(ctx , index) => tagItemBuilder(index), separatorBuilder: (ctx , index) => seperatedItem(), itemCount: tags.length , scrollDirection: Axis.horizontal,)
+                )
+              ],
+            ),
           ),
         ),
       ),

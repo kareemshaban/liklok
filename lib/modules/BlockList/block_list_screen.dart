@@ -62,30 +62,32 @@ class _BlockListScreenState extends State<BlockListScreen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("setting_blocked_list".tr , style: TextStyle(color: Colors.black),),
       ),
-        body: Container(
-          color: MyColors.darkColor,
-          width: double.infinity,
-          height: double.infinity,
-          padding: EdgeInsets.all(10.0),
-          child: loading ? Loading() :  Column(
-            children: [
-              blocks!.length == 0 ? Center(child: Column(
-                children: [
-                  Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                  SizedBox(height: 30.0,),
-                  Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                ],), ) : SizedBox(),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refresh,
-                  child: ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
-                      separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: blocks!.length),
+        body: SafeArea(
+          child: Container(
+            color: MyColors.darkColor,
+            width: double.infinity,
+            height: double.infinity,
+            padding: EdgeInsets.all(10.0),
+            child: loading ? Loading() :  Column(
+              children: [
+                blocks!.length == 0 ? Center(child: Column(
+                  children: [
+                    Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                    SizedBox(height: 30.0,),
+                    Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                  ],), ) : SizedBox(),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _refresh,
+                    child: ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
+                        separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: blocks!.length),
+                  ),
                 ),
-              ),
-
-            ],
+          
+              ],
+            ),
           ),
         )
     );

@@ -1,6 +1,4 @@
 import 'package:LikLok/models/AgencyMember.dart';
-import 'package:LikLok/models/AgencyMemberPoints.dart';
-import 'package:LikLok/models/AgencyMemberStatics.dart';
 import 'package:LikLok/models/AgencyTarget.dart';
 
 class AgencyMemberIncomeHelper {

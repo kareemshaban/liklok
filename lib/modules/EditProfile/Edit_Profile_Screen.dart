@@ -107,493 +107,496 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           )
         ],
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        child: SingleChildScrollView(
-          child: (Column(
-            children: [
-              Container(
-                padding: EdgeInsets.only(top: 10.0),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    showPickImageOptions('PHOTO');
-                  },
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: user!.gender == 0
-                            ? MyColors.blueColor
-                            : MyColors.pinkColor,
-                        backgroundImage: _image == null
-                            ? (user!.img != ""
-                                ? CachedNetworkImageProvider(getUserImage()!)
-                                : null)
-                            : Image.file(
-                                _image!,
-                                width: 100,
-                              ).image,
-                        radius: 50,
-                        child: user?.img == "" && _image == null
-                            ? Text(
-                                user!.name.toUpperCase().substring(0, 1) +
-                                    (user!.name.contains(" ")
-                                        ? user!.name
-                                            .substring(user!.name.indexOf(" "))
-                                            .toUpperCase()
-                                            .substring(1, 2)
-                                        : ""),
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 28.0,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : null,
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          showPickImageOptions('PHOTO');
-                        },
-                        child: Transform.translate(
-                          offset: Offset(0, 10.0),
-                          child: CircleAvatar(
-                            radius: 20.0,
-                            backgroundColor: Colors.black54,
-                            child: Icon(
-                              Icons.camera_alt_outlined,
-                              color: Colors.white,
-                              size: 20,
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.only(bottom: 30.0),
+          child: SingleChildScrollView(
+            child: (Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      showPickImageOptions('PHOTO');
+                    },
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: user!.gender == 0
+                              ? MyColors.blueColor
+                              : MyColors.pinkColor,
+                          backgroundImage: _image == null
+                              ? (user!.img != ""
+                                  ? CachedNetworkImageProvider(getUserImage()!)
+                                  : null)
+                              : Image.file(
+                                  _image!,
+                                  width: 100,
+                                ).image,
+                          radius: 50,
+                          child: user?.img == "" && _image == null
+                              ? Text(
+                                  user!.name.toUpperCase().substring(0, 1) +
+                                      (user!.name.contains(" ")
+                                          ? user!.name
+                                              .substring(user!.name.indexOf(" "))
+                                              .toUpperCase()
+                                              .substring(1, 2)
+                                          : ""),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 28.0,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              : null,
+                        ),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            showPickImageOptions('PHOTO');
+                          },
+                          child: Transform.translate(
+                            offset: Offset(0, 10.0),
+                            child: CircleAvatar(
+                              radius: 20.0,
+                              backgroundColor: Colors.black54,
+                              child: Icon(
+                                Icons.camera_alt_outlined,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 6.0,
+                  color: MyColors.solidDarkColor,
+                  margin: EdgeInsetsDirectional.only(top: 20.0),
+                ),
+                Container(
+                  padding: EdgeInsets.all(15.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8.0,
+                            height: 30.0,
+                            decoration: BoxDecoration(
+                                color: MyColors.primaryColor,
+                                borderRadius: BorderRadius.circular(3.0)),
+                          ),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          Text(
+                            "edit_profile_Cover_photo".tr,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                showPickImageOptions('COVER');
+                              },
+                              child:  Image(image: _cover == null ? AssetImage('assets/images/select_img.png') :
+                              Image.file(
+                                _cover!,
+                                width: 100,
+                              ).image
+                                , width: 100,),
+                            ),
+                            Expanded(
+                                child: Column(
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: (){
+                                    uploadCoverPhoto();
+                                  },
+                                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16.0) , backgroundColor: MyColors.primaryColor ,
+                                  ),
+                                  icon: _isLoading
+                                      ? Container(
+                                    width: 24,
+                                    height: 24,
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.black,
+                                      strokeWidth: 3,
+                                    ),
+                                  )
+                                      :  Icon(Icons.upload , color: MyColors.darkColor),
+                                  label:  Text('edit_profile_upload'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 15.0), ),
+                                )
+                              ],
+                            ))
+                          ],
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 6.0,
+                  color: MyColors.solidDarkColor,
+                  margin: EdgeInsetsDirectional.only(top: 20.0),
+                ),
+                Container(
+                  padding: EdgeInsets.all(15.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8.0,
+                            height: 30.0,
+                            decoration: BoxDecoration(
+                                color: MyColors.primaryColor,
+                                borderRadius: BorderRadius.circular(3.0)),
+                          ),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          Text(
+                            "edit_profile_basic_information".tr,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "ID",
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: MyColors.unSelectedColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      user!.tag,
+                                      style: TextStyle(
+                                          fontSize: 16.0, color: Colors.black),
+                                    ),
+                                    SizedBox(
+                                      width: 5.0,
+                                    ),
+                                    IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.arrow_forward_ios_outlined,
+                                        color: Colors.black,
+                                        size: 20.0,
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "edit_profile_user_name".tr,
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: MyColors.unSelectedColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () async {
+                                    await _displayTextInputDialog(context);
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        user!.name,
+                                        style: TextStyle(
+                                            fontSize: 16.0, color: Colors.black),
+                                      ),
+                                      SizedBox(
+                                        width: 5.0,
+                                      ),
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(FontAwesomeIcons.pen,
+                                              color: Colors.black, size: 20.0))
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "edit_profile_gender".tr,
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: MyColors.unSelectedColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        items: getGenders(),
+                                        onChanged: (value) async {
+                                          print(value);
+                                          setState(() {
+                                            selectedGender = value;
+                                          //  updateUserCountry(value);
+                                            updateUserGender(value);
+                                          });
+                                        },
+                                        value: selectedGender,
+                                        dropdownColor: Colors.white,
+                                        menuMaxHeight: 200.0,
+                                      ),
+                                    ),
+        
+                                  ],
+                                )
+                              ],
+                            ))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "edit_profile_date_of_birth".tr,
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: MyColors.unSelectedColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    _selectDate(context);
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        formattedDate(selectedDate).toString(),
+                                        style: TextStyle(
+                                            fontSize: 16.0, color: Colors.black),
+                                      ),
+                                      SizedBox(
+                                        width: 5.0,
+                                      ),
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(FontAwesomeIcons.calendar,
+                                              color: Colors.black, size: 20.0))
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ))
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "edit_profile_country".tr,
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: MyColors.unSelectedColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Expanded(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        items: getItems(),
+                                        onChanged: (value) async {
+                                          print(value);
+                                          setState(() {
+                                            selectedCountry = value;
+                                            updateUserCountry(value);
+                                          });
+                                        },
+                                        value: selectedCountry,
+                                        dropdownColor: MyColors.darkColor,
+                                        menuMaxHeight: 200.0,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 5.0,
+                                    ),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(FontAwesomeIcons.flag,
+                                            color: Colors.black, size: 20.0))
+                                  ],
+                                )
+                              ],
+                            ))
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 6.0,
+                  color: MyColors.solidDarkColor,
+                  margin: EdgeInsetsDirectional.only(top: 20.0),
+                ),
+                Container(
+                  padding: EdgeInsets.all(15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8.0,
+                            height: 30.0,
+                            decoration: BoxDecoration(
+                                color: MyColors.primaryColor,
+                                borderRadius: BorderRadius.circular(3.0)),
+                          ),
+                          SizedBox(
+                            width: 10.0,
+                          ),
+                          Text(
+                            "edit_profile_my_tags".tr,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              hoppies!.map((e) => hoppyListItem(e)).toList(),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15.0,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (ctx) => TagsBottomSheet());
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 15.0, vertical: 8.0),
+                              decoration: BoxDecoration(
+                                  color: Colors.black45,
+                                  borderRadius: BorderRadius.circular(25.0)),
+                              child: Text(
+                                "edit_profile_update".tr,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 15.0),
+                              ),
+                            ),
+                          )
+                        ],
                       )
                     ],
                   ),
                 ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 6.0,
-                color: MyColors.solidDarkColor,
-                margin: EdgeInsetsDirectional.only(top: 20.0),
-              ),
-              Container(
-                padding: EdgeInsets.all(15.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8.0,
-                          height: 30.0,
-                          decoration: BoxDecoration(
-                              color: MyColors.primaryColor,
-                              borderRadius: BorderRadius.circular(3.0)),
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Text(
-                          "edit_profile_Cover_photo".tr,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showPickImageOptions('COVER');
-                            },
-                            child:  Image(image: _cover == null ? AssetImage('assets/images/select_img.png') :
-                            Image.file(
-                              _cover!,
-                              width: 100,
-                            ).image
-                              , width: 100,),
-                          ),
-                          Expanded(
-                              child: Column(
-                            children: [
-                              ElevatedButton.icon(
-                                onPressed: (){
-                                  uploadCoverPhoto();
-                                },
-                                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16.0) , backgroundColor: MyColors.primaryColor ,
-                                ),
-                                icon: _isLoading
-                                    ? Container(
-                                  width: 24,
-                                  height: 24,
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.black,
-                                    strokeWidth: 3,
-                                  ),
-                                )
-                                    :  Icon(Icons.upload , color: MyColors.darkColor),
-                                label:  Text('edit_profile_upload'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 15.0), ),
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 6.0,
-                color: MyColors.solidDarkColor,
-                margin: EdgeInsetsDirectional.only(top: 20.0),
-              ),
-              Container(
-                padding: EdgeInsets.all(15.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8.0,
-                          height: 30.0,
-                          decoration: BoxDecoration(
-                              color: MyColors.primaryColor,
-                              borderRadius: BorderRadius.circular(3.0)),
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Text(
-                          "edit_profile_basic_information".tr,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            "ID",
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: MyColors.unSelectedColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    user!.tag,
-                                    style: TextStyle(
-                                        fontSize: 16.0, color: Colors.black),
-                                  ),
-                                  SizedBox(
-                                    width: 5.0,
-                                  ),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.arrow_forward_ios_outlined,
-                                      color: Colors.black,
-                                      size: 20.0,
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            "edit_profile_user_name".tr,
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: MyColors.unSelectedColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () async {
-                                  await _displayTextInputDialog(context);
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      user!.name,
-                                      style: TextStyle(
-                                          fontSize: 16.0, color: Colors.black),
-                                    ),
-                                    SizedBox(
-                                      width: 5.0,
-                                    ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(FontAwesomeIcons.pen,
-                                            color: Colors.black, size: 20.0))
-                                  ],
-                                ),
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            "edit_profile_gender".tr,
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: MyColors.unSelectedColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  DropdownButtonHideUnderline(
-                                    child: DropdownButton(
-                                      items: getGenders(),
-                                      onChanged: (value) async {
-                                        print(value);
-                                        setState(() {
-                                          selectedGender = value;
-                                        //  updateUserCountry(value);
-                                          updateUserGender(value);
-                                        });
-                                      },
-                                      value: selectedGender,
-                                      dropdownColor: Colors.white,
-                                      menuMaxHeight: 200.0,
-                                    ),
-                                  ),
-
-                                ],
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            "edit_profile_date_of_birth".tr,
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: MyColors.unSelectedColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () {
-                                  _selectDate(context);
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      formattedDate(selectedDate).toString(),
-                                      style: TextStyle(
-                                          fontSize: 16.0, color: Colors.black),
-                                    ),
-                                    SizedBox(
-                                      width: 5.0,
-                                    ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(FontAwesomeIcons.calendar,
-                                            color: Colors.black, size: 20.0))
-                                  ],
-                                ),
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            "edit_profile_country".tr,
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                color: MyColors.unSelectedColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  DropdownButtonHideUnderline(
-                                    child: DropdownButton(
-                                      items: getItems(),
-                                      onChanged: (value) async {
-                                        print(value);
-                                        setState(() {
-                                          selectedCountry = value;
-                                          updateUserCountry(value);
-                                        });
-                                      },
-                                      value: selectedCountry,
-                                      dropdownColor: MyColors.darkColor,
-                                      menuMaxHeight: 200.0,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5.0,
-                                  ),
-                                  IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(FontAwesomeIcons.flag,
-                                          color: Colors.black, size: 20.0))
-                                ],
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 6.0,
-                color: MyColors.solidDarkColor,
-                margin: EdgeInsetsDirectional.only(top: 20.0),
-              ),
-              Container(
-                padding: EdgeInsets.all(15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8.0,
-                          height: 30.0,
-                          decoration: BoxDecoration(
-                              color: MyColors.primaryColor,
-                              borderRadius: BorderRadius.circular(3.0)),
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Text(
-                          "edit_profile_my_tags".tr,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children:
-                            hoppies!.map((e) => hoppyListItem(e)).toList(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (ctx) => TagsBottomSheet());
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 15.0, vertical: 8.0),
-                            decoration: BoxDecoration(
-                                color: Colors.black45,
-                                borderRadius: BorderRadius.circular(25.0)),
-                            child: Text(
-                              "edit_profile_update".tr,
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 15.0),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
-          )),
+              ],
+            )),
+          ),
         ),
       ),
     );
@@ -688,12 +691,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget hoppyListItem(tag) => Container(
         margin: EdgeInsets.symmetric(horizontal: 10.0),
         child: DottedBorder(
-          borderType: BorderType.RRect,
-          color: MyColors.primaryColor,
-          strokeWidth: 1,
-          dashPattern: [8, 4],
-          strokeCap: StrokeCap.round,
-          radius: Radius.circular(100.0),
+          options: RectDottedBorderOptions(
+           // borderType: BorderType.RRect,
+            color: MyColors.primaryColor,
+            strokeWidth: 1,
+            dashPattern: [8, 4],
+            strokeCap: StrokeCap.round,
+           // radius: Radius.circular(100.0),
+          ),
+
           child: Container(
             padding:
                 const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),

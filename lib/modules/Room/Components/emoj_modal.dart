@@ -33,19 +33,21 @@ class _EmojModalState extends State<EmojModal> {
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      decoration: BoxDecoration(color: Colors.white.withAlpha(180),
-          borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
-          border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
-      child:      GridView.count(
-        shrinkWrap: true,
-        crossAxisCount: 5,
-        children:
-        emossions.map((emoj) => emojListItem(emoj)).toList(),
-        mainAxisSpacing: 0.0,
+    return SafeArea(
+      child: Container(
+        height: 300,
+        decoration: BoxDecoration(color: Colors.white.withAlpha(180),
+            borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
+            border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
+        child:      GridView.count(
+          shrinkWrap: true,
+          crossAxisCount: 5,
+          children:
+          emossions.map((emoj) => emojListItem(emoj)).toList(),
+          mainAxisSpacing: 0.0,
+        ),
+      
       ),
-
     );
   }
 

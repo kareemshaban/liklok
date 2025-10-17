@@ -47,304 +47,306 @@ class _EditLanguageScreenState extends State<EditLanguageScreen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("edit_language".tr , style: TextStyle(color: Colors.black,fontSize: 18.0) ,),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        child: Column(
-          children: [
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0 , top: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("English" ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          child: Column(
+            children: [
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0 , top: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("English" ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Transform.scale(
+                              scale:1.3 ,
+                              child: Radio(activeColor: MyColors.primaryColor,value:'en' , groupValue:groupValue , onChanged: ( val){
+                                setState(() {
+                                  _SelectedLang= val.toString();
+                                  showAlertDialog(context );
+                                });
+                              }))
+                        ],
+                      )
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
+              ),
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("edit_arabic".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Transform.scale(
-                            scale:1.3 ,
-                            child: Radio(activeColor: MyColors.primaryColor,value:'en' , groupValue:groupValue , onChanged: ( val){
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'ar', groupValue:groupValue , onChanged: (val){
                               setState(() {
                                 _SelectedLang= val.toString();
+                                print(_SelectedLang);
                                 showAlertDialog(context );
                               });
                             }))
                       ],
                     )
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("edit_arabic".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'ar', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("chineese_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'zh', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("chineese_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'zh', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("indian_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'hi', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("phlpini_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'ph', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("indian_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'hi', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("pangladish_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'bn', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("barazil_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'br', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("phlpini_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'ph', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("france_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'fr', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 1.0,
-              color: Colors.black45,
-              margin: EdgeInsetsDirectional.only(start: 15.0),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.only(right: 15.0 , left: 15.0),
-              padding: EdgeInsets.all(15.0) ,
-              child: Row(
-                children: [
-                  Text("indonisian_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
-                  Expanded(child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Transform.scale(
-                          scale: 1.3,
-                          child:
-                          Radio( activeColor: MyColors.primaryColor,value: 'id', groupValue:groupValue , onChanged: (val){
-                            setState(() {
-                              _SelectedLang= val.toString();
-                              print(_SelectedLang);
-                              showAlertDialog(context );
-                            });
-                          }))
-                    ],
-                  )
-                  ),
-                ],
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("pangladish_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'bn', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-          )
-        ),
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
+              ),
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("barazil_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'br', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
+              ),
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("france_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'fr', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                height: 1.0,
+                color: Colors.black45,
+                margin: EdgeInsetsDirectional.only(start: 15.0),
+              ),
+              Container(
+                color: Colors.white,
+                margin: EdgeInsets.only(right: 15.0 , left: 15.0),
+                padding: EdgeInsets.all(15.0) ,
+                child: Row(
+                  children: [
+                    Text("indonisian_lang".tr ,style:TextStyle(color: Colors.black,fontSize: 15.0) ,),
+                    Expanded(child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Transform.scale(
+                            scale: 1.3,
+                            child:
+                            Radio( activeColor: MyColors.primaryColor,value: 'id', groupValue:groupValue , onChanged: (val){
+                              setState(() {
+                                _SelectedLang= val.toString();
+                                print(_SelectedLang);
+                                showAlertDialog(context );
+                              });
+                            }))
+                      ],
+                    )
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            )
+          ),
+      ),
       );
   }
 void Translation() async {

@@ -242,312 +242,314 @@ class _MusicsModalState extends State<MusicsModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * .7,
-      decoration: BoxDecoration(
-          color: Colors.white.withAlpha(180),
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20.0), topLeft: Radius.circular(15.0)),
-          border: Border(
-            top: BorderSide(width: 4.0, color: MyColors.secondaryColor),
-          )),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'musics_model_my_music'.tr,
-                      style: TextStyle(color: Colors.black, fontSize: 18.0),
-                    ),
-                  ],
+    return SafeArea(
+      child: Container(
+        height: MediaQuery.of(context).size.height * .7,
+        decoration: BoxDecoration(
+            color: Colors.white.withAlpha(180),
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20.0), topLeft: Radius.circular(15.0)),
+            border: Border(
+              top: BorderSide(width: 4.0, color: MyColors.secondaryColor),
+            )),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'musics_model_my_music'.tr,
+                        style: TextStyle(color: Colors.black, fontSize: 18.0),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (ctx) => Music2BottomSheet());
-                  },
-                  icon: Icon(
-                    Icons.add_circle_outline,
-                    color: Colors.black,
-                  ))
-            ],
-          ),
-          Expanded(
-            child: ListView.separated(
-              itemCount: musicFiles.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    if(playedIndex == index){
-                      if(_isStartedAudioMixing){
-                        _pauseAudioMixing();
+                IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (ctx) => Music2BottomSheet());
+                    },
+                    icon: Icon(
+                      Icons.add_circle_outline,
+                      color: Colors.black,
+                    ))
+              ],
+            ),
+            Expanded(
+              child: ListView.separated(
+                itemCount: musicFiles.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      if(playedIndex == index){
+                        if(_isStartedAudioMixing){
+                          _pauseAudioMixing();
+                        } else {
+                          _resumeAudioMixing();
+                        }
+      
                       } else {
-                        _resumeAudioMixing();
+                        _startAudioMixing(musicFiles[index].path, index);
                       }
-
-                    } else {
-                      _startAudioMixing(musicFiles[index].path, index);
-                    }
-
-                  },
-                  child: Container(
-                    color: Colors.white.withAlpha(50),
-                    height: 80.0,
-                    padding: EdgeInsetsDirectional.only(start: 10.0),
-                    child: Row(
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                              padding: EdgeInsetsDirectional.only(end: 10.0),
-                              height: 50.0,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15.0),
+      
+                    },
+                    child: Container(
+                      color: Colors.white.withAlpha(50),
+                      height: 80.0,
+                      padding: EdgeInsetsDirectional.only(start: 10.0),
+                      child: Row(
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsetsDirectional.only(end: 10.0),
+                                height: 50.0,
+                                width: 80.0,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Image(
+                                  image: AssetImage('assets/images/mp3.png'),
+                                ),
                               ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Image(
-                                image: AssetImage('assets/images/mp3.png'),
-                              ),
-                            ),
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.center,
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              width: 200.0,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      FileManager.basename(musicFiles[index]),
-                                      style: TextStyle(
-                                          color: index == playedIndex
-                                              ? MyColors.primaryColor
-                                              : Colors.black),
-                                      overflow: TextOverflow.ellipsis,
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                          ),
+                          Column(
+                            children: [
+                              Container(
+                                width: 200.0,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        FileManager.basename(musicFiles[index]),
+                                        style: TextStyle(
+                                            color: index == playedIndex
+                                                ? MyColors.primaryColor
+                                                : Colors.black),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                   Icons.save_outlined,
-                                  size: 15.0,
-                                  color: Colors.black,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.only(
-                                      start: 5.0, end: 5.0),
-                                  child: Text(getLength(musicFiles[index].path)
-                                    ,
-                                    style: TextStyle(
-                                        fontSize: 12.0, color: Colors.black),
-                                  ),
-                                ),
-                                Container(
-                                  color: Colors.black,
-                                  width: 1,
-                                  height: 20.0,
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.only(
-                                      start: 5.0, end: 5.0),
-                                  child: Icon(
-                                    CupertinoIcons.time,
+                              Row(
+                                children: [
+                                  Icon(
+                                     Icons.save_outlined,
                                     size: 15.0,
                                     color: Colors.black,
                                   ),
-                                ),
-                                Text(
-                                  getDate(musicFiles[index].path),
-                                  style: TextStyle(
-                                      fontSize: 12.0, color: Colors.black),
-                                )
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsetsDirectional.only(
+                                        start: 5.0, end: 5.0),
+                                    child: Text(getLength(musicFiles[index].path)
+                                      ,
+                                      style: TextStyle(
+                                          fontSize: 12.0, color: Colors.black),
+                                    ),
+                                  ),
+                                  Container(
+                                    color: Colors.black,
+                                    width: 1,
+                                    height: 20.0,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.only(
+                                        start: 5.0, end: 5.0),
+                                    child: Icon(
+                                      CupertinoIcons.time,
+                                      size: 15.0,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    getDate(musicFiles[index].path),
+                                    style: TextStyle(
+                                        fontSize: 12.0, color: Colors.black),
+                                  )
+                                ],
+                              )
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                          Expanded(child: IconButton(icon: Icon(Icons.delete_forever_sharp , color: Colors.red,), onPressed: () {
+                              File(musicFiles[index].path).deleteSync();
+                              _stopAudioMixing();
+                              setState(() {
+                                _isStartedAudioMixing = false;
+                                playedIndex = -1 ;
+                              });
+                              getData();
+                          }, ))
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) => Container(
+                  width: double.infinity,
+                  height: 1.0,
+                  color: Colors.black.withAlpha(50),
+                ),
+              ),
+            ),
+            Container(
+              height: 100.0,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(100),
+                border: Border(
+                  top: BorderSide(
+                      width: 2.0, color: MyColors.lightUnSelectedColor),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                _stopAudioMixing();
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.power_settings_new_outlined,
+                                size: 30.0,
+                              ),
+                              color: Colors.black,
                             )
                           ],
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                         ),
-                        Expanded(child: IconButton(icon: Icon(Icons.delete_forever_sharp , color: Colors.red,), onPressed: () {
-                            File(musicFiles[index].path).deleteSync();
-                            _stopAudioMixing();
-                            setState(() {
-                              _isStartedAudioMixing = false;
-                              playedIndex = -1 ;
-                            });
-                            getData();
-                        }, ))
-                      ],
-                    ),
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) => Container(
-                width: double.infinity,
-                height: 1.0,
-                color: Colors.black.withAlpha(50),
-              ),
-            ),
-          ),
-          Container(
-            height: 100.0,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(100),
-              border: Border(
-                top: BorderSide(
-                    width: 2.0, color: MyColors.lightUnSelectedColor),
-              ),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _stopAudioMixing();
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.power_settings_new_outlined,
-                              size: 30.0,
-                            ),
-                            color: Colors.black,
-                          )
-                        ],
                       ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _prevAudioMixing();
-                            },
-                            icon: Icon(
-                              Icons.skip_previous,
-                              size: 30.0,
-                            ),
-                            color: Colors.black,
-                          )
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          _isStartedAudioMixing
-                              ? IconButton(
-                                  onPressed: () {
-                                    _pauseAudioMixing();
-                                  },
-                                  icon: Icon(
-                                    Icons.pause,
-                                    size: 30.0,
-                                  ),
-                                  color: Colors.black,
-                                )
-                              : IconButton(
-                                  onPressed: () {
-                                    _resumeAudioMixing();
-                                  },
-                                  icon: Icon(
-                                    Icons.play_arrow,
-                                    size: 30.0,
-                                  ),
-                                  color: Colors.black,
-                                )
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _nextAudioMixing();
-                            },
-                            icon: Icon(
-                              Icons.skip_next_rounded,
-                              size: 30.0,
-                            ),
-                            color: Colors.black,
-                          )
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-
-                            },
-                            icon: Icon(
-                              Icons.volume_down,
-                              size: 30.0,
-                            ),
-                            color: Colors.black,
-                          ),
-                            PopupMenuButton(
-                            position: PopupMenuPosition.over,
-                            shadowColor: MyColors.unSelectedColor,
-                            elevation: 4.0,
-
-                            color: MyColors.darkColor,
-                            icon: Container(),
-                            onSelected: (int result) async {
-
-                               await _engine.adjustAudioMixingPlayoutVolume(result);
-                               await _engine.adjustAudioMixingPublishVolume(result);
-                            },
-                            itemBuilder: (BuildContext context) => volumeBuilder()
+                      Expanded(
+                        child: Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                _prevAudioMixing();
+                              },
+                              icon: Icon(
+                                Icons.skip_previous,
+                                size: 30.0,
+                              ),
+                              color: Colors.black,
                             )
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 8,
-                      child: Column(
-                        children: [
-                          // Text(progress.toString() , style: TextStyle(color: MyColors.primaryColor),),
-                          Slider(value:  progress , min: min , max: max, onChanged:  (val) async{
-                            await _engine.setAudioMixingPosition( (val - 1000).toInt() );
-                            setState(() {
-                                 progress = val ;
-
-                            });
-                          } , thumbColor: MyColors.secondaryColor, activeColor: MyColors.secondaryColor,)
-                        ],
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _isStartedAudioMixing
+                                ? IconButton(
+                                    onPressed: () {
+                                      _pauseAudioMixing();
+                                    },
+                                    icon: Icon(
+                                      Icons.pause,
+                                      size: 30.0,
+                                    ),
+                                    color: Colors.black,
+                                  )
+                                : IconButton(
+                                    onPressed: () {
+                                      _resumeAudioMixing();
+                                    },
+                                    icon: Icon(
+                                      Icons.play_arrow,
+                                      size: 30.0,
+                                    ),
+                                    color: Colors.black,
+                                  )
+                          ],
+                        ),
                       ),
-                    ),
-
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
+                      Expanded(
+                        child: Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                _nextAudioMixing();
+                              },
+                              icon: Icon(
+                                Icons.skip_next_rounded,
+                                size: 30.0,
+                              ),
+                              color: Colors.black,
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+      
+                              },
+                              icon: Icon(
+                                Icons.volume_down,
+                                size: 30.0,
+                              ),
+                              color: Colors.black,
+                            ),
+                              PopupMenuButton(
+                              position: PopupMenuPosition.over,
+                              shadowColor: MyColors.unSelectedColor,
+                              elevation: 4.0,
+      
+                              color: MyColors.darkColor,
+                              icon: Container(),
+                              onSelected: (int result) async {
+      
+                                 await _engine.adjustAudioMixingPlayoutVolume(result);
+                                 await _engine.adjustAudioMixingPublishVolume(result);
+                              },
+                              itemBuilder: (BuildContext context) => volumeBuilder()
+                              )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 8,
+                        child: Column(
+                          children: [
+                            // Text(progress.toString() , style: TextStyle(color: MyColors.primaryColor),),
+                            Slider(value:  progress , min: min , max: max, onChanged:  (val) async{
+                              await _engine.setAudioMixingPosition( (val - 1000).toInt() );
+                              setState(() {
+                                   progress = val ;
+      
+                              });
+                            } , thumbColor: MyColors.secondaryColor, activeColor: MyColors.secondaryColor,)
+                          ],
+                        ),
+                      ),
+      
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -42,20 +42,21 @@ class _Agreement_ScreenState extends State<Agreement_Screen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("agreement_title".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(10.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 5.0,),
-              Text("agreement_user_agreement".tr,style: TextStyle(color: Colors.black,fontSize: 20.0),),
-              SizedBox(height: 20.0,),
-              Column(
-                children: [
-                  local == 'en' ?    Text(style: TextStyle(color: Colors.black),''' LikLok User Agreement
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(10.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 5.0,),
+                Text("agreement_user_agreement".tr,style: TextStyle(color: Colors.black,fontSize: 20.0),),
+                SizedBox(height: 20.0,),
+                Column(
+                  children: [
+                    local == 'en' ?    Text(style: TextStyle(color: Colors.black),''' LikLok User Agreement
 Welcome to LikLok (the “Platform” or “APP”). The Platform is provided and controlled by LikLok. (“LikLok”, “we” or “us”) This Terms of Service ("Terms") was written in English (US). This Terms is the legitimate agreement by and between You and LikLok. To the extent any translated version of Terms agreement conflicts against the English version, this English version prevails.
 1. Special Notices
 1.1 This LikLok User Agreement (this “Agreement”) governs your usage of our services, (hereinafter, “Services”) including LikLok App, a Audio streaming application and social network developed by us. For the purposes of this Agreement, you and LikLok will be jointly referred to as the “Parties” and respectively as a “Party”.
@@ -72,14 +73,14 @@ Welcome to LikLok (the “Platform” or “APP”). The Platform is provided an
 2.4.3 You fail to make a payment for using paid-for Services.
 2.5 EXCEPT FOR THE EXPRESS REPRESENTATIONS AND WARRANTIES SET FORTH IN THIS AGREEMENT, LikLok MAKES NO WARRANTY IN CONNECTION WITH THE SUBJECT MATTER OF THIS AGREEMENT AND LikLok HEREBY DISCLAIMS ANY AND ALL OTHER WARRANTIES, WHETHER STATUTORY, EXPRESS OR IMPLIED, INCLUDING ALL IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND ANY IMPLIED WARRANTIES ARISING FROM COURSE OF DEALING OR PERFORMANCE, REGARDING SUCH SUBJECT MATTER.
 3. Privacy
-You acknowledge that you have read and fully understand our Privacy Policy, which describes how we handle the data you provide to us or generated when you use our Services. If you have any question, please contact us at:  support@liklok.live
+You acknowledge that you have read and fully understand our Privacy Policy, which describes how we handle the data you provide to us or generated when you use our Services. If you have any question, please contact us at:  support@chat.apps
 4. Virtual Items
 4.1 You can only buy virtual golds (“Golds”) and virtual gifts (Gifits), send Gifts to others, receive Gifts with monetary value, earn virtual diamonds ("Diamonds").
 4.2 The price of the Golds will be displayed at the point of purchase. All charges and payments for Golds will be made in the currency specified at the point of purchase through the relevant payment mechanism. Currency exchange settlements, foreign transaction fees and payment channel fees, if any, are based on your agreement with the applicable payment provider.
 4.3 You will be responsible for the payment of any Golds purchased by you. Once your purchase has been completed, your user account will be credited with Golds. Golds can be used to purchase Gifts. Golds cannot be exchanged for cash, or legal tender, or currency of any state, region, or any political entity, or any other form of credit. Golds can only be used on LikLok and as part of our Services, and cannot be combined or used in conjunction with other promotions, coupons, discounts or special offers, except those designated by us.
 4.4 Except as otherwise set out in this Agreement, all sales of Golds and Gifts are final, and we do not offer refunds for any purchased Golds and Gifts. Golds and Gifts cannot be converted into or exchanged for cash, or be refunded or reimbursed by us for any reason.
 5. Terminating Services
-You may terminate LikLok Services and this Agreement by revoking your LikLok account. You may contact us at: support@liklok.live
+You may terminate LikLok Services and this Agreement by revoking your LikLok account. You may contact us at: support@chat.apps
 6. Disclaimers
 6.1 You shall be fully responsible for any risks involved in using LikLok Services. Any use or reliance on LikLok Services will be at your own risk.
 6.2 Under no circumstance does LikLok guarantee that the Services will satisfy your requirements, or guarantee that the Services will be uninterrupted. The timeliness, security and accuracy of the Services are also not guaranteed. You acknowledge and agree that the Services is provided by LikLok on an “as is” basis. LikLok make no representations or warranties of any kind express or implied as to the operation and the providing of such Services or any part thereof. LikLok shall not be liable in any way for the quality, timeliness, accuracy or completeness of the Services and shall not be responsible for any consequences which may arise from your use of such Services.
@@ -92,8 +93,8 @@ You may terminate LikLok Services and this Agreement by revoking your LikLok acc
 8. Governing Law
 These Terms of Service and any separate agreements whereby we provide you Services shall be governed by and construed in accordance with the laws of HK.
 9. Contact us
-9.1 Email: support@liklok.live
-9.2 WebSite: https://www.liklok.live
+9.1 Email: support@chat.apps
+9.2 WebSite: https://www.chat.apps
 9.3 App: LikLok'''): Text(style: TextStyle(color: Colors.black) ,  '''   اتفاقية المستخدم LikLok
 مرحبًا بك في الدخول إلى الدردشة ("المنصة" أو "التطبيق"). يتم توفير النظام الأساسي والتحكم فيه بواسطة LikLok. ("ادخل إلى الدردشة" أو "نحن" أو "لنا") تمت كتابة شروط الخدمة هذه ("الشروط") باللغة العربية (الولايات المتحدة). هذه الشروط هي الاتفاقية الشرعية بينك وبين LikLok. إلى الحد الذي تتعارض فيه أي نسخة مترجمة من اتفاقية الشروط مع النسخة العربية، فإن هذه النسخة العربية هي التي تسود.
 1. الإشعارات الخاصة
@@ -111,7 +112,7 @@ These Terms of Service and any separate agreements whereby we provide you Servic
 2.4.3 فشلك في إجراء الدفع مقابل استخدام الخدمات المدفوعة.
 2.5 باستثناء الإقرارات والضمانات الصريحة المنصوص عليها في هذه الاتفاقية، لا تقدم شركة LikLok أي ضمان فيما يتعلق بموضوع هذه الاتفاقية، وتخلي شركة LikLok مسؤوليتها عن أي وجميع الضمانات الأخرى، سواء كانت قانونية أو صريحة أو ضمنية، بما في ذلك جميع الضمانات الضمنية ضمانات إد الملكية، وعدم الانتهاك، وقابلية التسويق، والملاءمة لغرض معين وأي ضمانات ضمنية تنشأ عن سياق التعامل أو الأداء، فيما يتعلق بهذه المسألة الموضوعية.
 3. الخصوصية
-أنت تقر بأنك قرأت وفهمت سياسة الخصوصية الخاصة بنا بشكل كامل، والتي تصف كيفية تعاملنا مع البيانات التي تقدمها لنا أو التي يتم إنشاؤها عند استخدام خدماتنا. إذا كان لديك أي سؤال، يرجى الاتصال بنا على:  support@liklok.live
+أنت تقر بأنك قرأت وفهمت سياسة الخصوصية الخاصة بنا بشكل كامل، والتي تصف كيفية تعاملنا مع البيانات التي تقدمها لنا أو التي يتم إنشاؤها عند استخدام خدماتنا. إذا كان لديك أي سؤال، يرجى الاتصال بنا على:  support@chat.apps
 4. العناصر الافتراضية
 4.1 يمكنك فقط شراء القطع الذهبية الافتراضية ("الذهبيات") والهدايا الافتراضية (الهدايا)، وإرسال الهدايا للآخرين، وتلقي الهدايا ذات القيمة النقدية، وكسب الماسات الافتراضية ("الماسات").
 4.2 سيتم عرض سعر الذهب عند نقطة الشراء. سيتم سداد جميع الرسوم والمدفوعات الخاصة بالذهبيات بالعملة المحددة عند نقطة الشراء من خلال آلية الدفع ذات الصلة. تعتمد تسويات صرف العملات ورسوم المعاملات الأجنبية ورسوم قناة الدفع، إن وجدت، على اتفاقيتك مع مزود الدفع المناسب.
@@ -119,7 +120,7 @@ These Terms of Service and any separate agreements whereby we provide you Servic
 4.4 باستثناء ما هو منصوص عليه خلافًا لذلك في هذه الاتفاقية، فإن جميع مبيعات الذهب والهدايا تكون
 نهائيًا، ولا نعرض المبالغ المستردة مقابل أي هدايا ذهبية وهدايا تم شراؤها. لا يمكن تحويل الذهب والهدايا إلى أموال نقدية أو استبدالها، أو استردادها أو تعويضها من قبلنا لأي سبب من الأسباب.
 5. إنهاء الخدمات
-يجوز لك إنهاء LikLok Services وهذه الاتفاقية عن طريق إلغاء حساب LikLok الخاص بك. يمكنك الاتصال بنا على:  support@liklok.live
+يجوز لك إنهاء LikLok Services وهذه الاتفاقية عن طريق إلغاء حساب LikLok الخاص بك. يمكنك الاتصال بنا على:  support@chat.apps
 6. إخلاء المسؤولية
 6.1 تتحمل المسؤولية الكاملة عن أي مخاطر قد تنتج عن استخدام خدمات LikLok. أي استخدام أو اعتماد على LikLok Services سيكون على مسؤوليتك الخاصة.
 6.2 لا تضمن خدمة LikLok تحت أي ظرف من الظروف أن الخدمات ستلبي متطلباتك، أو تضمن عدم انقطاع الخدمات. كما لا يتم ضمان توقيت الخدمات وأمنها ودقتها. أنت تقر وتوافق على أن الخدمات مقدمة من خلال LikLok على أساس "كما هي". لا تقدم شركة LikLok أي إقرارات أو ضمانات من أي نوع، صريحة أو ضمنية، فيما يتعلق بتشغيل وتقديم هذه الخدمات أو أي جزء منها. لن تكون شركة LikLok مسؤولة بأي شكل من الأشكال عن جودة الخدمات أو توقيتها أو دقتها أو اكتمالها ولن تكون مسؤولة عن أي عواقب قد تنشأ عن استخدامك لهذه الخدمات.
@@ -132,14 +133,15 @@ These Terms of Service and any separate agreements whereby we provide you Servic
 8. القانون الحاكم
 تخضع شروط الخدمة هذه وأي اتفاقيات منفصلة نقدم بموجبها الخدمات لك لقوانين هونج كونج وتفسر وفقًا لها.
 9. اتصل بنا
-9.1 البريد الإلكتروني:  support@liklok.live
-9.2 الموقع الإلكتروني: https://www.liklok.live
+9.1 البريد الإلكتروني:  support@chat.apps
+9.2 الموقع الإلكتروني: https://www.chat.apps
 9.3 التطبيق: LikLok  '''   )
-                ],
-              )
-          
-          
-            ],
+                  ],
+                )
+
+
+              ],
+            ),
           ),
         ),
       ),

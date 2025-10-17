@@ -61,32 +61,34 @@ class _AgencyMembsersScreenState extends State<AgencyMembsersScreen> {
           style: TextStyle(color: MyColors.whiteColor, fontSize: 20.0),
         ),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refresh,
-                  color: MyColors.primaryColor,
-                  child:
-                  members!.length == 0 ? Center(child: Column(
-                    children: [
-                      Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                      SizedBox(height: 30.0,),
-                      Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _refresh,
+                    color: MyColors.primaryColor,
+                    child:
+                    members!.length == 0 ? Center(child: Column(
+                      children: [
+                        Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                        SizedBox(height: 30.0,),
+                        Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
 
 
-                    ],), ) :
-                  ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
-                      separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: members!.length),
+                      ],), ) :
+                    ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
+                        separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: members!.length),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+        ),
       ),
     );
 

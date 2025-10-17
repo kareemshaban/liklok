@@ -60,23 +60,25 @@ class _AgencyChargeOperationsState extends State<AgencyChargeOperations> {
           style: TextStyle(color: MyColors.whiteColor, fontSize: 20.0),
         ),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(15.0),
-        child: loading ? Loading() : Column(
-          children: [
-            Row(
-              children: [
-                Text('Current Balance: '  , style: TextStyle(color: MyColors.whiteColor , fontSize: 20.0),),
-                Text( agency!.wallet!.balance.toString() , style: TextStyle(color: MyColors.primaryColor , fontSize: 20.0),),
-
-              ],
-            ),
-            SizedBox(height: 15.0,),
-            Expanded(child: ListView.separated(itemBuilder: (context, index) => itemBuilder(index),  separatorBuilder: (context, index) => seperatorBuilder() , itemCount: operatins.length)),
-          ],
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(15.0),
+          child: loading ? Loading() : Column(
+            children: [
+              Row(
+                children: [
+                  Text('Current Balance: '  , style: TextStyle(color: MyColors.whiteColor , fontSize: 20.0),),
+                  Text( agency!.wallet!.balance.toString() , style: TextStyle(color: MyColors.primaryColor , fontSize: 20.0),),
+        
+                ],
+              ),
+              SizedBox(height: 15.0,),
+              Expanded(child: ListView.separated(itemBuilder: (context, index) => itemBuilder(index),  separatorBuilder: (context, index) => seperatorBuilder() , itemCount: operatins.length)),
+            ],
+          ),
         ),
       ),
     );

@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/components/Constants.dart';
 import '../chat_bubble/chat_bubble_reciever.dart';
 import '../chat_service/chat_service.dart';
@@ -40,6 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   ScrollController _controller = ScrollController() ;
   final ChatApiService send_Message=  ChatApiService();
   int prevSender = 0 ;
+  String? currentUserId = "" ;
   @override
   void initState() {
     // TODO: implement initState
@@ -47,12 +49,24 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       user = AppUserServices().userGetter();
     });
+
+    getId();
     // Future.delayed(Duration(milliseconds: 1000)).then((value) => {
     //   _controller.animateTo(_controller.position.maxScrollExtent,
     //       duration: Duration(milliseconds: 300), curve: Curves.linear)
     // });
   }
+
+  getId() async{
+    final prefs = await SharedPreferences.getInstance();
+    String? googleUserId = prefs.getString('googleUserId');
+
+    setState(() {
+      currentUserId  =googleUserId ;
+    });
+  }
   final TextEditingController _messageController = TextEditingController();
+  final _scrollController = ScrollController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore= FirebaseFirestore.instance;
@@ -122,136 +136,118 @@ class _ChatScreenState extends State<ChatScreen> {
             ],
           )
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(
-                  //messages
-                  child: _buildMessageList(),
-                ),
-                Offstage(
-                    offstage: !emojiShowing,
-                    child: SizedBox(
-                        height: 250,
-                        child: EmojiPicker(
-                            textEditingController: _messageController,
-                            onBackspacePressed: () {
-                              print('clicked');
-                            },
-                            config: Config(
-                              columns: 7,
-                              // Issue: https://github.com/flutter/flutter/issues/28894
-                              emojiSizeMax: 32 *
-                                  (foundation.defaultTargetPlatform ==
-                                      TargetPlatform.iOS
-                                      ? 1.30
-                                      : 1.0),
-                              verticalSpacing: 0,
-                              horizontalSpacing: 0,
-                              gridPadding: EdgeInsets.zero,
-                              initCategory: Category.RECENT,
-                              bgColor: MyColors.darkColor,
-                              indicatorColor: MyColors.primaryColor,
-                              iconColor: Colors.grey,
-                              iconColorSelected: MyColors.primaryColor,
-                              backspaceColor: MyColors.primaryColor,
-                              skinToneDialogBgColor: MyColors.darkColor,
-                              skinToneIndicatorColor: Colors.grey,
-                              enableSkinTones: true,
-                              recentTabBehavior: RecentTabBehavior.RECENT,
-                              recentsLimit: 28,
-                              replaceEmojiOnLimitExceed: false,
-                              noRecents: Text(
-                                'chat_no_resents'.tr ,
-                                style: TextStyle(fontSize: 20,
-                                    color: Colors.black26),
-                                textAlign: TextAlign.center,
-                              ),
-                              loadingIndicator: const SizedBox.shrink(),
-                              tabIndicatorAnimDuration: kTabScrollDuration,
-                              categoryIcons: const CategoryIcons(),
-                              buttonMode: ButtonMode.MATERIAL,
-                              checkPlatformCompatibility: true,
-                            )
-                        )
-                    )
-                ),
-                Container(
-                  height: 70,
-                  color: MyColors.solidDarkColor,
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(13.0)
-                            ),
-                            height: 45.0,
-                            child: TextFormField(
-                                controller: _messageController,
-                                cursorColor: Colors.grey,
-                                style: TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                    hintText: 'chat_hint_text_form'.tr,
-                                    hintStyle: TextStyle(
-                                        color: Colors.white, fontSize: 14),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(13.0),
-                                      borderSide: BorderSide(
-                                          color: Colors.grey),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.black,),
-                                      borderRadius: BorderRadius.circular(13.0),
-                                    ),
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          emojiShowing = !emojiShowing;
-                                          print(emojiShowing);
-                                        });
-                                      },
-                                      icon: Icon(Icons.emoji_emotions_outlined,
-                                        color: MyColors.primaryColor,), iconSize: 30.0,
-                                    )
-                                )
-                            ),
-                          )
-                      ),
-                      SizedBox(width: 15.0,),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: MyColors.primaryColor,
-                          borderRadius: BorderRadius.circular(10.0)
-                        ),
-                        height: 45.0,
-                        width: 80.0,
-                        child: MaterialButton(
-                          onPressed: () async{
-                            //
-                            // sendMessage();
-                           await send_Message.send_Message(user!.id, widget.receiver.id, _messageController.text);
-                            sendMessage();
-                           send_notification.send_notification(widget.receiver.token , _messageController.text , user!.name);
-                          }, //sendMessage
-                          child: Text('gift_send'.tr, style: TextStyle(
-                              color: MyColors.darkColor,
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.bold),),
-                        ),
-                      )
-                    ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    //messages
+                    child: _buildMessageList(),
                   ),
-                ),
-              ],
+                  Offstage(
+                      offstage: !emojiShowing,
+                      child: SizedBox(
+                          height: 250,
+                          child: EmojiPicker(
+                            textEditingController: _messageController,
+                            scrollController: _scrollController,
+                            config: Config(
+                              height: 256,
+                              checkPlatformCompatibility: true,
+                              viewOrderConfig: const ViewOrderConfig(),
+                              emojiViewConfig: EmojiViewConfig(
+                                // Issue: https://github.com/flutter/flutter/issues/28894
+                                emojiSizeMax: 28 *
+                                    (foundation.defaultTargetPlatform ==
+                                        TargetPlatform.iOS
+                                        ? 1.2
+                                        : 1.0),
+                              ),
+                              skinToneConfig: const SkinToneConfig(),
+                              categoryViewConfig: const CategoryViewConfig(),
+                              bottomActionBarConfig: const BottomActionBarConfig(),
+                              searchViewConfig: const SearchViewConfig(),
+                            ),
+                          ),
+                      )
+                  ),
+                  Container(
+                    height: 70,
+                    color: MyColors.solidDarkColor,
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(13.0)
+                              ),
+                              height: 45.0,
+                              child: TextFormField(
+                                  controller: _messageController,
+                                  cursorColor: Colors.grey,
+                                  style: TextStyle(color: Colors.black),
+                                  decoration: InputDecoration(
+                                      hintText: 'chat_hint_text_form'.tr,
+                                      hintStyle: TextStyle(
+                                          color: Colors.white, fontSize: 14),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(13.0),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black,),
+                                        borderRadius: BorderRadius.circular(13.0),
+                                      ),
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            emojiShowing = !emojiShowing;
+                                            print(emojiShowing);
+                                          });
+                                        },
+                                        icon: Icon(Icons.emoji_emotions_outlined,
+                                          color: MyColors.primaryColor,), iconSize: 30.0,
+                                      )
+                                  )
+                              ),
+                            )
+                        ),
+                        SizedBox(width: 15.0,),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: MyColors.primaryColor,
+                            borderRadius: BorderRadius.circular(10.0)
+                          ),
+                          height: 45.0,
+                          width: 80.0,
+                          child: MaterialButton(
+                            onPressed: () async{
+                              //
+                              // sendMessage();
+                             await send_Message.send_Message(user!.id, widget.receiver.id, _messageController.text);
+                              sendMessage();
+                             send_notification.send_notification(widget.receiver.token , _messageController.text , user!.name);
+                            }, //sendMessage
+                            child: Text('gift_send'.tr, style: TextStyle(
+                                color: MyColors.darkColor,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold),),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -310,8 +306,10 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     }
 
+
+
     // allign the message to the right if the sender is the current user, otherwise to the left
-    var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid)
+    var alignment = (data['senderId'] == currentUserId)
         ? AlignmentDirectional.centerStart
         : AlignmentDirectional.centerEnd;
     return Container(

@@ -23,7 +23,7 @@ class _BannerDetailsScreenState extends State<BannerDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: null ,
-      body: WebViewWidget(controller: controller),
+      body: SafeArea(child: WebViewWidget(controller: controller)),
     );
   }
 }

@@ -52,12 +52,14 @@ class _ChargingOperationScreenState extends State<ChargingOperationScreen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text('charging_details'.tr , style: TextStyle(color: MyColors.whiteColor , fontSize: 18.0),),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(15.0),
-        child: loading ? Loading() : ListView.separated(itemBuilder: (context, index) => itemBuilder(index),  separatorBuilder: (context, index) => seperatorBuilder() , itemCount: operatins.length),
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(15.0),
+          child: loading ? Loading() : ListView.separated(itemBuilder: (context, index) => itemBuilder(index),  separatorBuilder: (context, index) => seperatorBuilder() , itemCount: operatins.length),
+        ),
       ),
     );
   }

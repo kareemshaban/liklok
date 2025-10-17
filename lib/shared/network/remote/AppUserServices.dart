@@ -40,28 +40,33 @@ class AppUserServices {
 
 
   Future<AppUser?> createAccount( name , register_with ,img,  phone , email  ,  password , token) async {
+    print('createAccount');
     AppUser? user = null ;
     String deviceId = await getId() ?? "";
     var data = await getIpAddress() ;
     var ipAddress = data['ip'] ?? "" ;
+    var mbody = jsonEncode(<String, String>{
+      'name': name,
+      'img': img  ?? "",
+      'phone': phone  ?? "",
+      'email': email ,
+      'password': password,
+      'register_with': register_with,
+      'ipAddress': ipAddress,
+      'macAddress': "2.0.0.0",
+      'deviceId': deviceId,
+      'token': token
+    });
+    print('mbody');
+    print(mbody);
     var response = await http.post(
       Uri.parse('${BASEURL}Account/Create'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, String>{
-        'name': name,
-        'img': img  ?? "",
-        'phone': phone  ?? "",
-        'email': email ,
-        'password': password,
-        'register_with': register_with,
-        'ipAddress': ipAddress,
-        'macAddress': "2.0.0.0",
-        'deviceId': deviceId,
-        'token': token
-      }),
+      body: mbody,
     );
+
     print(response.body);
     if (response.statusCode == 200) {
       final Map jsonData = json.decode(response.body);
@@ -103,7 +108,7 @@ class AppUserServices {
       var androidDeviceInfo = await deviceInfo.androidInfo;
 
       return androidDeviceInfo.id; // unique ID on Android
-      
+
     }
   }
 
@@ -799,6 +804,48 @@ class AppUserServices {
     }
   }
 
+    Future<AppUser?> sendOtp(phone )async {
+    var response = await http.post(
+      Uri.parse('${BASEURL}send-otp'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'phone': phone.toString()
+      }),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
 
+
+
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
+  Future<bool> verifyOtp(phone , code )async {
+    var response = await http.post(
+      Uri.parse('${BASEURL}verify-otp'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'phone': phone.toString(),
+        'code': code.toString()
+      }),
+    );
+    print(response.body);
+    if (response.statusCode == 200) {
+          return true ;
+
+
+    } else {
+      return false ;
+      throw Exception('Failed to load album');
+    }
+  }
 
 }

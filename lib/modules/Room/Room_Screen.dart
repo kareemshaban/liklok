@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'package:LikLok/helpers/GiftHelper.dart';
 import 'package:LikLok/models/Badge.dart';
-import 'package:LikLok/models/Settings.dart';
 import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
-import 'package:circular_countdown_timer/countdown_text_format.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:LikLok/helpers/ChatRoomMessagesHelper.dart';
 import 'package:LikLok/helpers/DesigGiftHelper.dart';
@@ -48,15 +45,19 @@ import 'package:LikLok/shared/styles/colors.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svga/flutter_svga.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:svgaplayer_flutter/player.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 import 'package:flutter/services.dart';
+
+import '../../helpers/zego_handler/live_audio_room_manager.dart';
+import '../../helpers/zego_handler/zego_sdk_manager.dart';
+import '../../params/generate_zego_token_params.dart';
 
 
 //const appId = "f26e793582cb48359a4cb36dba3a9d3f";
@@ -131,11 +132,16 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
   int luckyGiftId = 0 ;
   int luckyGiftCount = 0 ;
   int luckyGiftReciver = 0 ;
+  int appID = 1364585881 ;
+  String appSign = 'c65c2660926c15c386764de74a7330df068a35830a77bd059db1fb9dbbc99c24' ;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    ZEGOSDKManager()
+        .init(appID, appSign, scenario: ZegoScenario.HighQualityChatroom);
 
   if(mounted){
     setState(() {
@@ -166,6 +172,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
 
     });
   }
+
+    ZEGOSDKManager().connectUser(user!.id.toString(), user!.name);
+    final zimService = ZEGOSDKManager().zimService;
+    final expressService = ZEGOSDKManager().expressService;
 
     checkRoomBlock();
     getRoomImage();
@@ -752,8 +762,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
         int reward = data['reward'];
         int gift_id = data['gift_id'];
 
-        print('gift_audio');
-        print(gift_audio);
+
 
 
         if (checkGiftShow(available_untill)) {
@@ -825,7 +834,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
             luckyGiftId = gift_id ;
             luckyGiftCount = count ;
             luckyGiftReciver = receiver_id ;
-            if(!_countDownController.isStarted)
+            if(_countDownController.isStarted == false)
             _countDownController.start();
           } else {
             showCounterButton = false ;
@@ -836,8 +845,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
 
      await Future.delayed(Duration(seconds: 1));
       if(gift_audio != ""){
-        final duration = await player.setUrl(gift_audio);
-        player.play();
+        // final duration = await player.setUrl(gift_audio);
+        // player.play();
       }
       if(gift_category_id != 5){
         Future.delayed(Duration(seconds: 8)).then((value) => {
@@ -847,7 +856,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
             })
           }
         });
-        await player.stop();
+        // await player.stop();
       }
 
       // show on tetx
@@ -1052,14 +1061,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
         }
       }
       if(joiner.entery_audio != "" && isNewCommer ){
-        await player.setUrl(ASSETSBASEURL + 'Designs/Audio/' + joiner.entery_audio! );
+       // await player.setUrl(ASSETSBASEURL + 'Designs/Audio/' + joiner.entery_audio! );
       }
 
       await Future.delayed(Duration(seconds: 1)).then((value)  {
 
       if(joiner.entery_audio != "" && isNewCommer && entery != ""){
         showEnteryBanner = true ;
-        player.play();
+     //   player.play();
       }
       });
 
@@ -1075,7 +1084,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
         })
       }
       });
-      await player.stop();
+    //  await player.stop();
     } else {
       if(joiner.banner != ""){
         if(mounted) {
@@ -1273,7 +1282,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
     super.dispose();
     _dispose();
     try{
-      player.stop();
+     // player.stop();
     }catch(err){
 
     }
@@ -1742,7 +1751,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
 
                                                       });
 
-                                                      await player.stop();
+                                                     // await player.stop();
                                                     },
                                                     onChange: (String timeStamp) {
                                                       // Here, do whatever you want
@@ -1846,59 +1855,39 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                                       child: SizedBox(
                                           height: 250,
                                           child: EmojiPicker(
-                                              textEditingController: _messageController,
-                                              onBackspacePressed: () {
-                                                print('clicked');
-                                              },
-                                              config: Config(
-                                                columns: 7,
+                                            textEditingController: _messageController,
+                                            scrollController: _scrollController,
+                                            config: Config(
+                                              height: 256,
+                                              checkPlatformCompatibility: true,
+                                              viewOrderConfig: const ViewOrderConfig(),
+                                              emojiViewConfig: EmojiViewConfig(
                                                 // Issue: https://github.com/flutter/flutter/issues/28894
-                                                emojiSizeMax: 32 *
+                                                emojiSizeMax: 28 *
                                                     (foundation.defaultTargetPlatform ==
                                                         TargetPlatform.iOS
-                                                        ? 1.30
+                                                        ? 1.2
                                                         : 1.0),
-                                                verticalSpacing: 0,
-                                                horizontalSpacing: 0,
-                                                gridPadding: EdgeInsets.zero,
-                                                initCategory: Category.RECENT,
-                                                bgColor: MyColors.darkColor,
-                                                indicatorColor: MyColors.primaryColor,
-                                                iconColor: Colors.grey,
-                                                iconColorSelected: MyColors.primaryColor,
-                                                backspaceColor: MyColors.primaryColor,
-                                                skinToneDialogBgColor: MyColors.darkColor,
-                                                skinToneIndicatorColor: Colors.grey,
-                                                enableSkinTones: true,
-                                                recentTabBehavior: RecentTabBehavior.RECENT,
-                                                recentsLimit: 28,
-                                                replaceEmojiOnLimitExceed: false,
-                                                noRecents: Text(
-                                                  'chat_no_resents'.tr ,
-                                                  style: TextStyle(fontSize: 20,
-                                                      color: Colors.black26),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                loadingIndicator: const SizedBox.shrink(),
-                                                tabIndicatorAnimDuration: kTabScrollDuration,
-                                                categoryIcons: const CategoryIcons(),
-                                                buttonMode: ButtonMode.MATERIAL,
-                                                checkPlatformCompatibility: true,
-                                              )
-                                          )
+                                              ),
+                                              skinToneConfig: const SkinToneConfig(),
+                                              categoryViewConfig: const CategoryViewConfig(),
+                                              bottomActionBarConfig: const BottomActionBarConfig(),
+                                              searchViewConfig: const SearchViewConfig(),
+                                            ),
+                                          ),
                                       )
                                   ),
 
                                 ],
                               ),
-                              entery != ""  ? SVGASimpleImage(   resUrl: entery) : Container() ,
-                              giftImg != "" ?  SVGASimpleImage(   resUrl: giftImg) : Container() ,
+                              entery != ""  ? SVGAEasyPlayer(   resUrl: entery) : Container() ,
+                              giftImg != "" ?  SVGAEasyPlayer(   resUrl: giftImg) : Container() ,
 
                               showRainLuckyCase ?  Stack(
 
                                  alignment: Alignment.center,
                                  children: [
-                                   SVGASimpleImage(   resUrl: ASSETSBASEURL + 'AppBanners/lucky_bags.svga?raw=true'),
+                                   SVGAEasyPlayer(   resUrl: ASSETSBASEURL + 'AppBanners/lucky_bags.svga?raw=true'),
                                    Container(
                                      width: MediaQuery.sizeOf(context).width,
                                      height: MediaQuery.sizeOf(context).height,
@@ -1915,7 +1904,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                                 child: showEnteryBanner ? Stack(
                                    alignment: Alignment.center,
                                   children: [
-                                    Container( width:200.0 , child: SVGASimpleImage(   resUrl: enteryBanner)),
+                                    Container( width:200.0 , child: SVGAEasyPlayer(   resUrl: enteryBanner)),
                                     Container(
                                         padding: EdgeInsets.only(left: 70.0 , right: 10.0),
                                         width: 190.0,
@@ -1938,7 +1927,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            SVGASimpleImage(   resUrl: ASSETSBASEURL + 'AppBanners/gift_red_banner.svga?raw=true'),
+                            SVGAEasyPlayer(   resUrl: ASSETSBASEURL + 'AppBanners/gift_red_banner.svga?raw=true'),
                             SizedBox(height: 100,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1960,7 +1949,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                           alignment: Alignment.center,
                           children: [
                             SizedBox(height: 150.0,),
-                            SVGASimpleImage(   resUrl: local == 'en' ? ASSETSBASEURL + 'AppBanners/lucky_case_banner.svga?raw=true' : ASSETSBASEURL + 'AppBanners/luckybox-banar-ar.svga?raw=true'),
+                            SVGAEasyPlayer(   resUrl: local == 'en' ? ASSETSBASEURL + 'AppBanners/lucky_case_banner.svga?raw=true' : ASSETSBASEURL + 'AppBanners/luckybox-banar-ar.svga?raw=true'),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -1996,7 +1985,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            SVGASimpleImage(   resUrl: ASSETSBASEURL + 'AppBanners/banar_big_win.svga?raw=true'),
+                            SVGAEasyPlayer(   resUrl: ASSETSBASEURL + 'AppBanners/banar_big_win.svga?raw=true'),
                             SizedBox(height: 100,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -2030,7 +2019,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  SizedBox(width: 200,  child: SVGASimpleImage(   resUrl: ASSETSBASEURL + 'AppBanners/banar_small_win.svga?raw=true')),
+                                  SizedBox(width: 200,  child: SVGAEasyPlayer(   resUrl: ASSETSBASEURL + 'AppBanners/banar_small_win.svga?raw=true')),
                                   SizedBox(height: 100,),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -2139,36 +2128,21 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                         Stack(
                           alignment: Alignment.center,
                           children: [
-                            mic!.mic_user_img == null ? RippleAnimation(
-                              color:  MyColors.primaryColor ,
-                              delay: const Duration(milliseconds: 300),
-                              repeat: true,
-                              minRadius: speakers.where((element) => element.toString() == mic!.mic_user_tag ).toList().length > 0 ? 25 : 0,
-                              ripplesCount: 6,
-                              duration: const Duration(milliseconds: 6 * 300),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                radius: 25,
-                                backgroundImage: getMicUserImg(mic),
-                              ),
-                            ) :     RippleAnimation(
-                              color:  MyColors.primaryColor ,
-                              delay: const Duration(milliseconds: 300),
-                              repeat: true,
-                              minRadius: speakers.where((element) => element.toString() == mic!.mic_user_tag ).toList().length > 0 ? 25 : 0,
-                              ripplesCount: 6,
-                              duration: const Duration(milliseconds: 6 * 300),
-                              child: CircleAvatar(
-                                backgroundColor:  mic.mic_user_gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
-                                backgroundImage:  mic!.mic_user_img != "" ? ( mic!.mic_user_img.startsWith('https') ? CachedNetworkImageProvider( mic!.mic_user_img)  :  CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${ mic!.mic_user_img}'))  :    null,
-                                radius: 22,
-                                child:  mic!.mic_user_img== "" ?
-                                Text(mic!.mic_user_name.toUpperCase().substring(0 , 1) +
-                                    (mic!.mic_user_name.contains(" ") ? mic!.mic_user_name.substring(mic!.mic_user_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
-                                  style: const TextStyle(color: Colors.white , fontSize: 22.0 , fontWeight: FontWeight.bold),) : null,
-                              ),
+                            mic!.mic_user_img == null ?
+                            CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 22,
+                              backgroundImage: getMicUserImg(mic),
+                            ) :     CircleAvatar(
+                              backgroundColor:  mic.mic_user_gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
+                              backgroundImage:  mic!.mic_user_img != "" ? ( mic!.mic_user_img.startsWith('https') ? CachedNetworkImageProvider( mic!.mic_user_img)  :  CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${ mic!.mic_user_img}'))  :    null,
+                              radius: 22,
+                              child:  mic!.mic_user_img== "" ?
+                              Text(mic!.mic_user_name.toUpperCase().substring(0 , 1) +
+                                  (mic!.mic_user_name.contains(" ") ? mic!.mic_user_name.substring(mic!.mic_user_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
+                                style: const TextStyle(color: Colors.white , fontSize: 22.0 , fontWeight: FontWeight.bold),) : null,
                             ),
-                            Container(height: 70.0, width: 70.0, child: mic!.frame != "" ? SVGASimpleImage(   resUrl: ASSETSBASEURL + 'Designs/Motion/' + mic!.frame +'?raw=true') : null),
+                            Container(height: 65.0, width: 65.0, child: mic!.frame != "" ? SVGAEasyPlayer(   resUrl: ASSETSBASEURL + 'Designs/Motion/' + mic!.frame +'?raw=true') : null),
                            // Image(image: AssetImage('assets/images/mute.png') , width: 25 , height: 25,)
                             // Container(height: 70.0, width: 70.0,
                             // child: speakers.where((element) => element.toString() == mic!.mic_user_tag ).toList().length > 0  ?
@@ -2179,7 +2153,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin{
                             //frame
                           ],
                         ),
-                        micEmojs[mic.order -1] != "" ?    Container(height: 70.0, width: 70.0, child: SVGASimpleImage(   resUrl: micEmojs[mic.order -1] +'?raw=true') ) : Container()
+                        micEmojs[mic.order -1] != "" ?    Container(height: 65.0, width: 65.0, child: SVGAEasyPlayer(   resUrl: micEmojs[mic.order -1] +'?raw=true') ) : Container()
 
                       ],
                     ),

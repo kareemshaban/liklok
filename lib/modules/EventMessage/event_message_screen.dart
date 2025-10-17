@@ -41,26 +41,28 @@ class _EventMessageState extends State<EventMessage> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("event_message_title".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        child:  Column(
-          children: [
-            announcements.length == 0 ? Center(child: Column(
-              children: [
-                Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                SizedBox(height: 30.0,),
-                Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-              ],), ):
-            Expanded(child: ListView.separated(itemBuilder:(ctx , index) => announcementListItem(index ), separatorBuilder:(ctx , index) => listSeperator(), itemCount: announcements.length)),
-          ],
-        ),
-
-
-           )
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          child:  Column(
+            children: [
+              announcements.length == 0 ? Center(child: Column(
+                children: [
+                  Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                  SizedBox(height: 30.0,),
+                  Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+        
+        
+                ],), ):
+              Expanded(child: ListView.separated(itemBuilder:(ctx , index) => announcementListItem(index ), separatorBuilder:(ctx , index) => listSeperator(), itemCount: announcements.length)),
+            ],
+          ),
+        
+        
+             ),
+      )
     );
   }
 

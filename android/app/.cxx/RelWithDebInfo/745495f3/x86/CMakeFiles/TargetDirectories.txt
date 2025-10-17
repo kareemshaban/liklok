@@ -1,0 +1,2 @@
+D:/projects/mostafa/liklok_app/liklok/android/app/.cxx/RelWithDebInfo/745495f3/x86/CMakeFiles/edit_cache.dir
+D:/projects/mostafa/liklok_app/liklok/android/app/.cxx/RelWithDebInfo/745495f3/x86/CMakeFiles/rebuild_cache.dir

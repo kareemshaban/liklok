@@ -151,12 +151,14 @@ class _GoogleProductsScreenState extends State<GoogleProductsScreen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("Google Pay", style: TextStyle(color: Colors.black),),
       ),
-      body: !_loading  ? Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(10.0),
-        child: ListView.separated(itemBuilder: (context, index) => productListItem(index) , separatorBuilder: (context, index) => itemSperatorBuilder(), itemCount: _products.length)
+      body: !_loading  ? SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(10.0),
+          child: ListView.separated(itemBuilder: (context, index) => productListItem(index) , separatorBuilder: (context, index) => itemSperatorBuilder(), itemCount: _products.length)
+        ),
       ) : Loading(),
     );
   }

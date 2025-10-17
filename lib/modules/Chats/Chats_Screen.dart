@@ -138,208 +138,210 @@ class ChatsScreenState extends State<ChatsScreen> {
             }, icon: const Icon(Icons.cleaning_services_rounded , color: Colors.grey , size: 30.0,))
           ],
           ),
-        body: Container(
-          color: MyColors.darkColor,
-          width: double.infinity,
-          child: TabBarView(
-            children: [
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 10.0),
-                    child: Row(
-                      children: [
-                        //SizedBox(width: 8.0,),
-                        Expanded(child: Column(
-                          children: [
-                            Container(
-                              height: 70,
-                              decoration: BoxDecoration(
-                                color: Color(0xFF6A1B9A) ,
-                                borderRadius: BorderRadius.circular(12.0)
-                              ),
-                              child: Row(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                         GestureDetector(
-                                           behavior: HitTestBehavior.opaque,
-                                           onTap: (){
-                                             Navigator.push(context, MaterialPageRoute(builder: (ctx) => const EventMessage(),),);
-                                           },
-                                           child: Container(
-                                             padding: EdgeInsets.symmetric(horizontal: 8.0)  ,
-                                             width: (MediaQuery.of(context).size.width / 3 - 50 ),
-                                             child: Text('chats_event_message'.tr , style: TextStyle(color: Colors.white ,
-                                                 fontSize: 13.0 , fontWeight: FontWeight.bold),),
-                                           ),
-                                         ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Image(image: AssetImage('assets/images/notification-bell.png') , width: 30.0, height: 30.0,),
-                                      ],
-                                    )
-                                  ],
-                              )
-                            )
-                          ],
-                        )),
-                        SizedBox(width: 5.0,),
-                        Expanded(child: Column(
-                          children: [
-                            Container(
-                                height: 70,
-                                decoration: BoxDecoration(
-                                    color: Color(0xFFF50057) ,
-                                    borderRadius: BorderRadius.circular(12.0)
-                                ),
-                                child: Row(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: (){
-                                            Navigator.push(context, MaterialPageRoute(builder: (ctx) => const FollowersScreen(),),);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 8.0)  ,
-                                            width: (MediaQuery.of(context).size.width / 3 - 50 ),
-                                            child: Text('notification_setting_new_followers'.tr , style: TextStyle(color: Colors.white ,
-                                                fontSize: 12.0 , fontWeight: FontWeight.bold),),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Image(image: AssetImage('assets/images/users.png') , width: 30.0, height: 30.0,),
-                                      ],
-                                    )
-                                  ],
-                                )
-                            )
-                          ],
-                        )),
-                        SizedBox(width: 5.0,),
-                        Expanded(child: Column(
-                          children: [
-                            Container(
-                                height: 70,
-                                decoration: BoxDecoration(
-                                    color: Color(0xFF64FFDA) ,
-                                    borderRadius: BorderRadius.circular(12.0)
-                                ),
-                                child: Row(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: (){
-                                            Navigator.push(context, MaterialPageRoute(builder: (ctx) => const CustomerService(),),);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 8.0)  ,
-                                            width: (MediaQuery.of(context).size.width / 3 - 50 ),
-                                            child: Text('chats_club_chat_service'.tr , style: TextStyle(color: Colors.white ,
-                                                fontSize: 12.0 , fontWeight: FontWeight.bold),),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Image(image: AssetImage('assets/images/customer-service.png') , width: 30.0, height: 30.0,),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                            )
-                          ],
-                        )),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> SystemMessage())) ;
-                    },
-                    child: Container(
-                      color: Colors.white,
-                      padding: EdgeInsets.all(15.0) ,
+        body: SafeArea(
+          child: Container(
+            color: MyColors.darkColor,
+            width: double.infinity,
+            child: TabBarView(
+              children: [
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 10.0),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 28.0,backgroundColor: MyColors.primaryColor,
-                            child: Image(image: AssetImage('assets/images/control-system.png') , width: 35.0, height: 35.0,),
-                          ),
-                          SizedBox(width: 14.0,),
-                          Text("chats_system_massage".tr,style: TextStyle(fontSize: 17.0,color: Colors.black),)
+                          //SizedBox(width: 8.0,),
+                          Expanded(child: Column(
+                            children: [
+                              Container(
+                                height: 70,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF6A1B9A) ,
+                                  borderRadius: BorderRadius.circular(12.0)
+                                ),
+                                child: Row(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                           GestureDetector(
+                                             behavior: HitTestBehavior.opaque,
+                                             onTap: (){
+                                               Navigator.push(context, MaterialPageRoute(builder: (ctx) => const EventMessage(),),);
+                                             },
+                                             child: Container(
+                                               padding: EdgeInsets.symmetric(horizontal: 8.0)  ,
+                                               width: (MediaQuery.of(context).size.width / 3 - 50 ),
+                                               child: Text('chats_event_message'.tr , style: TextStyle(color: Colors.white ,
+                                                   fontSize: 13.0 , fontWeight: FontWeight.bold),),
+                                             ),
+                                           ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Image(image: AssetImage('assets/images/notification-bell.png') , width: 30.0, height: 30.0,),
+                                        ],
+                                      )
+                                    ],
+                                )
+                              )
+                            ],
+                          )),
+                          SizedBox(width: 5.0,),
+                          Expanded(child: Column(
+                            children: [
+                              Container(
+                                  height: 70,
+                                  decoration: BoxDecoration(
+                                      color: Color(0xFFF50057) ,
+                                      borderRadius: BorderRadius.circular(12.0)
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (ctx) => const FollowersScreen(),),);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 8.0)  ,
+                                              width: (MediaQuery.of(context).size.width / 3 - 50 ),
+                                              child: Text('notification_setting_new_followers'.tr , style: TextStyle(color: Colors.white ,
+                                                  fontSize: 12.0 , fontWeight: FontWeight.bold),),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Image(image: AssetImage('assets/images/users.png') , width: 30.0, height: 30.0,),
+                                        ],
+                                      )
+                                    ],
+                                  )
+                              )
+                            ],
+                          )),
+                          SizedBox(width: 5.0,),
+                          Expanded(child: Column(
+                            children: [
+                              Container(
+                                  height: 70,
+                                  decoration: BoxDecoration(
+                                      color: Color(0xFF64FFDA) ,
+                                      borderRadius: BorderRadius.circular(12.0)
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (ctx) => const CustomerService(),),);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 8.0)  ,
+                                              width: (MediaQuery.of(context).size.width / 3 - 50 ),
+                                              child: Text('chats_club_chat_service'.tr , style: TextStyle(color: Colors.white ,
+                                                  fontSize: 12.0 , fontWeight: FontWeight.bold),),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Image(image: AssetImage('assets/images/customer-service.png') , width: 30.0, height: 30.0,),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                              )
+                            ],
+                          )),
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10.0),
-                  isloading ? Loading(
-
-                  ) : Container() ,
-                  Expanded(
-                    child: RefreshIndicator(
-                      color: MyColors.primaryColor,
-                      onRefresh: refresh,
-                      child: ListView.separated(
-                          itemBuilder: (context,index) =>build_list_chats(chats[index]),
-                          separatorBuilder: (context,index) =>Padding(
-                            padding: const EdgeInsetsDirectional.only(start: 10.0),
-                            child: Container(
-                              color: Colors.grey,
-                              height: 1,
-                              width: double.infinity,
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> SystemMessage())) ;
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.all(15.0) ,
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 28.0,backgroundColor: MyColors.primaryColor,
+                              child: Image(image: AssetImage('assets/images/control-system.png') , width: 35.0, height: 35.0,),
                             ),
-                          ),
-                          itemCount: chats.length
+                            SizedBox(width: 14.0,),
+                            Text("chats_system_massage".tr,style: TextStyle(fontSize: 17.0,color: Colors.black),)
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Container(
-                    color: MyColors.darkColor,
-                    width: double.infinity,
-                    height: MediaQuery.sizeOf(context).height - 200,
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      children: [
-                        Expanded(
+                    SizedBox(height: 10.0),
+                    isloading ? Loading(
 
-                          child: friends!.length == 0 ? Center(child: Column(
-                            children: [
-                              Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                              SizedBox(height: 30.0,),
-                              Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                            ],), ): ListView.separated( itemBuilder: (ctx , index) =>itemListBuilder(index) ,
-                              separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: friends!.length),
+                    ) : Container() ,
+                    Expanded(
+                      child: RefreshIndicator(
+                        color: MyColors.primaryColor,
+                        onRefresh: refresh,
+                        child: ListView.separated(
+                            itemBuilder: (context,index) =>build_list_chats(chats[index]),
+                            separatorBuilder: (context,index) =>Padding(
+                              padding: const EdgeInsetsDirectional.only(start: 10.0),
+                              child: Container(
+                                color: Colors.grey,
+                                height: 1,
+                                width: double.infinity,
+                              ),
+                            ),
+                            itemCount: chats.length
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
-              )
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      color: MyColors.darkColor,
+                      width: double.infinity,
+                      height: MediaQuery.sizeOf(context).height - 200,
+                      padding: EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          Expanded(
 
-            ],
+                            child: friends!.length == 0 ? Center(child: Column(
+                              children: [
+                                Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                                SizedBox(height: 30.0,),
+                                Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
 
+
+                              ],), ): ListView.separated( itemBuilder: (ctx , index) =>itemListBuilder(index) ,
+                                separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: friends!.length),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+
+              ],
+
+            ),
           ),
         ),
         ),

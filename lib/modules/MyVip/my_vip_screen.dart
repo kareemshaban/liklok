@@ -51,35 +51,37 @@ class _MyVipScreenState extends State<MyVipScreen> {
         title: Text('vip'.tr , style: TextStyle(color: MyColors.whiteColor , fontSize: 18.0),),
 
       ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: MyColors.darkColor,
-          child: loading ? Loading():   Column(
-            children: [
-              vips.length == 0 ? Center(child: Column(
-                children: [
-                  Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                  SizedBox(height: 30.0,),
-                  Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                ],), )
-                  :
-              Expanded(
-                child: GridView.count(
-                  scrollDirection: Axis.vertical,
-                  childAspectRatio: .7,
-
-                  crossAxisCount: 3,
-                  children: vips.map((gift ) => giftItemBuilder(gift)).toList() ,
-                ),
-              )
-
-            ],
+        body: SafeArea(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: MyColors.darkColor,
+            child: loading ? Loading():   Column(
+              children: [
+                vips.length == 0 ? Center(child: Column(
+                  children: [
+                    Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                    SizedBox(height: 30.0,),
+                    Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                  ],), )
+                    :
+                Expanded(
+                  child: GridView.count(
+                    scrollDirection: Axis.vertical,
+                    childAspectRatio: .7,
+          
+                    crossAxisCount: 3,
+                    children: vips.map((gift ) => giftItemBuilder(gift)).toList() ,
+                  ),
+                )
+          
+              ],
+            ),
+          
+          
           ),
-
-
         )
     );
   }

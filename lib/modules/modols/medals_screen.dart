@@ -44,30 +44,32 @@ class _MedalsScreenState extends State<MedalsScreen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("Medals".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: MyColors.darkColor,
-        padding: EdgeInsets.all(10.0),
-        child: medals.length == 0 ? Center(child: Column(
-          children: [
-            Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-            SizedBox(height: 30.0,),
-            Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-          ],), )
-        : Column(
-          children: [
-            Expanded(
-              child: GridView.count(
-                scrollDirection: Axis.vertical,
-                childAspectRatio: 1,
-                crossAxisCount: 2,
-                children: medals.map((gift ) => giftItemBuilder(gift)).toList() ,
-              ),
-            )
-          ],
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: MyColors.darkColor,
+          padding: EdgeInsets.all(10.0),
+          child: medals.length == 0 ? Center(child: Column(
+            children: [
+              Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+              SizedBox(height: 30.0,),
+              Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+        
+        
+            ],), )
+          : Column(
+            children: [
+              Expanded(
+                child: GridView.count(
+                  scrollDirection: Axis.vertical,
+                  childAspectRatio: 1,
+                  crossAxisCount: 2,
+                  children: medals.map((gift ) => giftItemBuilder(gift)).toList() ,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

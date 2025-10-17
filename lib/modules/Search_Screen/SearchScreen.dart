@@ -63,59 +63,61 @@ class SearchScreenState extends State<SearchScreen> {
           ],
         ) ,
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        child: TabBarView(
-            children:[
-              Container(
-                padding: const EdgeInsets.all(20.0),
-
-                child:  Column(
-                  children: [
-                    Container(
-                      height: 45.0 ,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
-                      child: TextField( controller: userTxt, decoration: InputDecoration(labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
-                        onPressed: (){searchUsers();},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
-                          borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                        style: const TextStyle(color: Colors.black , fontSize: 15.0), cursorColor: MyColors.primaryColor,),
-                    ),
-                    const SizedBox(height: 20.0,),
-
-                    CircularProgressIndicator(
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          child: TabBarView(
+              children:[
+                Container(
+                  padding: const EdgeInsets.all(20.0),
+        
+                  child:  Column(
+                    children: [
+                      Container(
+                        height: 45.0 ,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
+                        child: TextField( controller: userTxt, decoration: InputDecoration(labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
+                          onPressed: (){searchUsers();},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
+                            borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
+                          style: const TextStyle(color: Colors.black , fontSize: 15.0), cursorColor: MyColors.primaryColor,),
+                      ),
+                      const SizedBox(height: 20.0,),
+        
+                      CircularProgressIndicator(
+                          value: isLoading ? null : 0 ,
+                        color: Colors.red,
+                      ),
+                      Expanded(child: ListView.separated(itemBuilder:(ctx , index) => usersListItem(index), separatorBuilder:(ctx , index) => listSeperator(), itemCount: users.length))
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(20.0),
+                  child:  Column(
+                    children: [
+                      Container(
+                        height: 45.0 ,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
+                        child: TextField( controller: roomTxt, decoration: InputDecoration(  labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
+                          onPressed: (){searchRooms();},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
+                            borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
+                          style: const TextStyle(color: Colors.black , fontSize: 15.0), cursorColor: MyColors.primaryColor,),
+                      ),
+                      const SizedBox(height: 20.0,),
+                      CircularProgressIndicator(
                         value: isLoading ? null : 0 ,
-                      color: Colors.red,
-                    ),
-                    Expanded(child: ListView.separated(itemBuilder:(ctx , index) => usersListItem(index), separatorBuilder:(ctx , index) => listSeperator(), itemCount: users.length))
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                child:  Column(
-                  children: [
-                    Container(
-                      height: 45.0 ,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
-                      child: TextField( controller: roomTxt, decoration: InputDecoration(  labelText: "search_label_search".tr , suffixIcon: IconButton(icon: const Icon(Icons.search , color: Colors.white, size: 25.0,),
-                        onPressed: (){searchRooms();},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
-                          borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                        style: const TextStyle(color: Colors.black , fontSize: 15.0), cursorColor: MyColors.primaryColor,),
-                    ),
-                    const SizedBox(height: 20.0,),
-                    CircularProgressIndicator(
-                      value: isLoading ? null : 0 ,
-                      color: Colors.red,
-                    ),
-                    Expanded(
-                        child: ListView.separated(itemBuilder:(ctx , index) => roomListItem(index), separatorBuilder:(ctx , index) => listSeperator(), itemCount: rooms.length)
-                    )
-                  ],
-                ),
-              )
-            ],
-        )
+                        color: Colors.red,
+                      ),
+                      Expanded(
+                          child: ListView.separated(itemBuilder:(ctx , index) => roomListItem(index), separatorBuilder:(ctx , index) => listSeperator(), itemCount: rooms.length)
+                      )
+                    ],
+                  ),
+                )
+              ],
+          )
+        ),
       ),
     ),);
   }

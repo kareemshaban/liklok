@@ -99,24 +99,26 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
 
         ),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        height: double.infinity ,
-        width: double.infinity,
-        padding: EdgeInsets.all(10.0),
-        child: loading ? Loading() : Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-                child: posts.isNotEmpty ?
-                ListView.separated( shrinkWrap: true,itemBuilder:(ctx , index) => postListItem(index , posts),
-                    separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: posts.length)
-                    : const Center(
-                  child: Image(image: AssetImage('assets/images/empty.png'), width: 200.0, ),
-                )
-
-            ),
-          ],
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          height: double.infinity ,
+          width: double.infinity,
+          padding: EdgeInsets.all(10.0),
+          child: loading ? Loading() : Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                  child: posts.isNotEmpty ?
+                  ListView.separated( shrinkWrap: true,itemBuilder:(ctx , index) => postListItem(index , posts),
+                      separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: posts.length)
+                      : const Center(
+                    child: Image(image: AssetImage('assets/images/empty.png'), width: 200.0, ),
+                  )
+        
+              ),
+            ],
+          ),
         ),
       ),
     );

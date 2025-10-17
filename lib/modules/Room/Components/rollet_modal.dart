@@ -48,7 +48,7 @@ class _RolletModalState extends State<RolletModal> with TickerProviderStateMixin
       );
 
     });
-    rouletteController = RouletteController(group: group , vsync: this);
+ //   rouletteController = RouletteController(group: group , vsync: this);
     RolletChangeListner();
     RolletSpinListner();
     RolletJoinListner();
@@ -86,12 +86,12 @@ class _RolletModalState extends State<RolletModal> with TickerProviderStateMixin
           setState(() {
             mrollet = res0 ;
             roulletMembers = mrollet!.members! ;
-            rouletteController =  RouletteController(group: RouletteGroup.uniform(0) , vsync: this);
-            rouletteController = RouletteController(group: RouletteGroup.uniformImages(roulletMembers.length , imageBuilder: (index) => RoulletItemBuilder(index),
-              textBuilder:(index) =>  roulletMembers[index].user_name,
-              styleBuilder: (index) => TextStyle(fontSize: 15.0 ) ,
-
-            ), vsync: this);
+         //   rouletteController =  RouletteController(group: RouletteGroup.uniform(0) , vsync: this);
+         //    rouletteController = RouletteController(group: RouletteGroup.uniformImages(roulletMembers.length , imageBuilder: (index) => RoulletItemBuilder(index),
+         //      textBuilder:(index) =>  roulletMembers[index].user_name,
+         //      styleBuilder: (index) => TextStyle(fontSize: 15.0 ) ,
+         //
+         //    ), vsync: this);
           });
 
 
@@ -116,12 +116,12 @@ class _RolletModalState extends State<RolletModal> with TickerProviderStateMixin
           setState(() {
             mrollet = res0 ;
             roulletMembers = mrollet!.members! ;
-            rouletteController =  RouletteController(group: RouletteGroup.uniform(0) , vsync: this);
-            rouletteController = RouletteController(group: RouletteGroup.uniformImages(roulletMembers.length , imageBuilder: (index) => RoulletItemBuilder(index),
-              textBuilder:(index) =>  roulletMembers[index].user_name,
-              styleBuilder: (index) => TextStyle(fontSize: 15.0 ) ,
-
-            ), vsync: this);
+        //    rouletteController =  RouletteController(group: RouletteGroup.uniform(0) , vsync: this);
+        //     rouletteController = RouletteController(group: RouletteGroup.uniformImages(roulletMembers.length , imageBuilder: (index) => RoulletItemBuilder(index),
+        //       textBuilder:(index) =>  roulletMembers[index].user_name,
+        //       styleBuilder: (index) => TextStyle(fontSize: 15.0 ) ,
+        //
+        //     ), vsync: this);
           });
           print(roulletMembers);
           if(roulletMembers.length > 1){
@@ -138,82 +138,84 @@ class _RolletModalState extends State<RolletModal> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
-      height: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
-      color: Colors.black.withAlpha(150),
-      child: Center(
-        child: Container(
-          height: MediaQuery.sizeOf(context).height * .5,
-          width: MediaQuery.sizeOf(context).width * .9,
-          padding: EdgeInsets.all(5.0),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , image: DecorationImage(image: AssetImage('assets/images/rollet_bg.png') , fit:BoxFit.cover)),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  IconButton(onPressed: (){
-                    Navigator.pop(context);
-                  }, icon: Icon(FontAwesomeIcons.minus , size: 25.0, color: Colors.white,) , color: Colors.white , ),
-                ],
-              ),
-              Container(
-                margin: EdgeInsets.all(10.0),
-                height: MediaQuery.sizeOf(context).height * .35,
-                width: MediaQuery.sizeOf(context).height * .35,
-                child: Stack(
-                  alignment: Alignment.center,
+    return  SafeArea(
+      child: Container(
+        height: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
+        color: Colors.black.withAlpha(150),
+        child: Center(
+          child: Container(
+            height: MediaQuery.sizeOf(context).height * .5,
+            width: MediaQuery.sizeOf(context).width * .9,
+            padding: EdgeInsets.all(5.0),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , image: DecorationImage(image: AssetImage('assets/images/rollet_bg.png') , fit:BoxFit.cover)),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: Roulette(
-                        controller: rouletteController,
-                        style: RouletteStyle(
-                          // Customize appearance
-                        ),
-                      ),
-                    ),
-                    Image(image: AssetImage('assets/images/rollet_frame.png')),
-
-                   mrollet!.state == 0 ?
-                    user!.id == room!.userId ? GestureDetector(
-                      onTap: () => {
-                        StartRollet()
-                      },
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        child: Center(child: Text('rollet_start'.tr   , style: TextStyle(color: Colors.white , fontSize: 20.0),)),
-                        decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/start_btn.png'))),
-                      ),
-                    ) :
-                   mrollet!.members!.where((element) => element.User_id == user!.id).length == 0 ? GestureDetector(
-                      onTap: () => {
-                        joinRollet()
-                      },
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        child: Center(child: Text(  'rollet_join'.tr   , style: TextStyle(color: Colors.white , fontSize: 20.0),)),
-                        decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/start_btn.png'))),
-                      ),
-                    ) : SizedBox()
-
-                       : SizedBox()
-                
+                    IconButton(onPressed: (){
+                      Navigator.pop(context);
+                    }, icon: Icon(FontAwesomeIcons.minus , size: 25.0, color: Colors.white,) , color: Colors.white , ),
                   ],
                 ),
-              ),
-              Column(
-                children: [
-                  Text('rollet_hint_text'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 11.0 ) , textAlign: TextAlign.center ,),
-                ],
-              )
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  height: MediaQuery.sizeOf(context).height * .35,
+                  width: MediaQuery.sizeOf(context).height * .35,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.all(10.0),
+                        // child: Roulette(
+                        //   controller: rouletteController,
+                        //   style: RouletteStyle(
+                        //     // Customize appearance
+                        //   ),
+                        // ),
+                      ),
+                      Image(image: AssetImage('assets/images/rollet_frame.png')),
 
-            ],
+                     mrollet!.state == 0 ?
+                      user!.id == room!.userId ? GestureDetector(
+                        onTap: () => {
+                          StartRollet()
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          child: Center(child: Text('rollet_start'.tr   , style: TextStyle(color: Colors.white , fontSize: 20.0),)),
+                          decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/start_btn.png'))),
+                        ),
+                      ) :
+                     mrollet!.members!.where((element) => element.User_id == user!.id).length == 0 ? GestureDetector(
+                        onTap: () => {
+                          joinRollet()
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          child: Center(child: Text(  'rollet_join'.tr   , style: TextStyle(color: Colors.white , fontSize: 20.0),)),
+                          decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/start_btn.png'))),
+                        ),
+                      ) : SizedBox()
+
+                         : SizedBox()
+
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Text('rollet_hint_text'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 11.0 ) , textAlign: TextAlign.center ,),
+                  ],
+                )
+
+              ],
+            ),
           ),
-        ),
-      ) ,
+        ) ,
+      ),
     );
   }
 

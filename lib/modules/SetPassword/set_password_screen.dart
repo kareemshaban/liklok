@@ -39,55 +39,57 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("account_password".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-      body: Container(
-            color: MyColors.darkColor,
-            width: double.infinity,
-            height: double.infinity,
-            padding: EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: TextField(
-                    controller: contentController,
-                    keyboardType: TextInputType.visiblePassword,
-                    cursorColor: MyColors.primaryColor,
-                    decoration: InputDecoration(  labelText: "enter_password".tr , labelStyle: TextStyle(color: Colors.grey , fontSize: 18.0)),
-                    style: TextStyle(color: MyColors.whiteColor ),
-                  ),
-                ),
-                SizedBox(height: 15.0,),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: TextField(
-                    controller: contentController2,
-                    keyboardType: TextInputType.visiblePassword,
-                    cursorColor: MyColors.primaryColor,
-                    decoration: InputDecoration(  labelText: "re_enter_password".tr , labelStyle: TextStyle(color: Colors.grey , fontSize: 18.0)),
-                    style: TextStyle(color: MyColors.whiteColor ),
-                  ),
-                ),
-                SizedBox(height: 50.0,),
-                GestureDetector(
-                  onTap: (){
-                    updateMyPassword();
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    margin: EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.primaryColor),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('verify_btn'.tr , style: TextStyle(color: Colors.white , fontSize: 20.0 , fontWeight: FontWeight.bold),)
-                      ],
+      body: SafeArea(
+        child: Container(
+              color: MyColors.darkColor,
+              width: double.infinity,
+              height: double.infinity,
+              padding: EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: TextField(
+                      controller: contentController,
+                      keyboardType: TextInputType.visiblePassword,
+                      cursorColor: MyColors.primaryColor,
+                      decoration: InputDecoration(  labelText: "enter_password".tr , labelStyle: TextStyle(color: Colors.grey , fontSize: 18.0)),
+                      style: TextStyle(color: MyColors.whiteColor ),
                     ),
                   ),
-                ),
-              ],
-            ),
-
+                  SizedBox(height: 15.0,),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: TextField(
+                      controller: contentController2,
+                      keyboardType: TextInputType.visiblePassword,
+                      cursorColor: MyColors.primaryColor,
+                      decoration: InputDecoration(  labelText: "re_enter_password".tr , labelStyle: TextStyle(color: Colors.grey , fontSize: 18.0)),
+                      style: TextStyle(color: MyColors.whiteColor ),
+                    ),
+                  ),
+                  SizedBox(height: 50.0,),
+                  GestureDetector(
+                    onTap: (){
+                      updateMyPassword();
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      margin: EdgeInsets.symmetric(horizontal: 20.0),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: MyColors.primaryColor),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('verify_btn'.tr , style: TextStyle(color: Colors.white , fontSize: 20.0 , fontWeight: FontWeight.bold),)
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        
+        ),
       ),
     );
   }

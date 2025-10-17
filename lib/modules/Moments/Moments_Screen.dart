@@ -94,71 +94,73 @@ class MomentsScreenState extends State<MomentsScreen> {
             ],
           ),
 
-         body: Container(
-           color: MyColors.darkColor,
-           width: double.infinity,
-           padding: const EdgeInsets.all(20.0),
-           child: loading ? Loading() : Stack(
-             alignment: AlignmentDirectional.bottomEnd,
-             children: [
-              posts.length > 0 ? TabBarView(
-                 children: [
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.end,
-                     children: [
-                       posts.isNotEmpty ?
-                           Expanded(child: RefreshIndicator( color:MyColors.primaryColor ,onRefresh:_refresh ,child: ListView.separated(  itemBuilder:(ctx , index) => postListItem(index , posts), separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: posts.length)))
-                           :  RefreshIndicator(
-                         color: MyColors.primaryColor,
-                         onRefresh: _refresh,
-                         child: ListView.builder(
-                           itemBuilder: (context,index)=>Show_image(),
-                           itemCount: 1,
-                         ),
-                       ) ,
-                     ],
-                   ),
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.end,
-                     children: [
-                       Expanded(
-                           child: followingPosts.isNotEmpty ?
-                           RefreshIndicator(color:MyColors.primaryColor ,onRefresh:_refresh ,child: ListView.separated( shrinkWrap: true,itemBuilder:(ctx , index) => postListItem(index , posts), separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: followingPosts.length))
-                               : RefreshIndicator(
+         body: SafeArea(
+           child: Container(
+             color: MyColors.darkColor,
+             width: double.infinity,
+             padding: const EdgeInsets.all(20.0),
+             child: loading ? Loading() : Stack(
+               alignment: AlignmentDirectional.bottomEnd,
+               children: [
+                posts.length > 0 ? TabBarView(
+                   children: [
+                     Column(
+                       crossAxisAlignment: CrossAxisAlignment.end,
+                       children: [
+                         posts.isNotEmpty ?
+                             Expanded(child: RefreshIndicator( color:MyColors.primaryColor ,onRefresh:_refresh ,child: ListView.separated(  itemBuilder:(ctx , index) => postListItem(index , posts), separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: posts.length)))
+                             :  RefreshIndicator(
+                           color: MyColors.primaryColor,
+                           onRefresh: _refresh,
+                           child: ListView.builder(
+                             itemBuilder: (context,index)=>Show_image(),
+                             itemCount: 1,
+                           ),
+                         ) ,
+                       ],
+                     ),
+                     Column(
+                       crossAxisAlignment: CrossAxisAlignment.end,
+                       children: [
+                         Expanded(
+                             child: followingPosts.isNotEmpty ?
+                             RefreshIndicator(color:MyColors.primaryColor ,onRefresh:_refresh ,child: ListView.separated( shrinkWrap: true,itemBuilder:(ctx , index) => postListItem(index , posts), separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: followingPosts.length))
+                                 : RefreshIndicator(
+                                   color: MyColors.primaryColor,
+                                   onRefresh: _refresh,
+                                   child: ListView.builder(
+                                       itemBuilder: (context,index)=>Show_image(),
+                                       itemCount: 1,
+                                   ),
+                                 ) ,
+           
+                       ),
+                       ],
+                     ),
+                     Column(
+                       crossAxisAlignment: CrossAxisAlignment.end,
+                       children: [
+                         Expanded(
+                             child: myPosts.isNotEmpty ?
+                             RefreshIndicator(color:MyColors.primaryColor,onRefresh:_refresh,child: ListView.separated(shrinkWrap: true ,itemBuilder:(ctx , index) => postListItem(index , posts), separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: myPosts.length))
+                                 : RefreshIndicator(
                                  color: MyColors.primaryColor,
                                  onRefresh: _refresh,
                                  child: ListView.builder(
-                                     itemBuilder: (context,index)=>Show_image(),
-                                     itemCount: 1,
+                                   itemBuilder: (context,index)=>Show_image(),
+                                   itemCount: 1,
                                  ),
                                ) ,
-
+                         ),
+                       ],
                      ),
-                     ],
-                   ),
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.end,
-                     children: [
-                       Expanded(
-                           child: myPosts.isNotEmpty ?
-                           RefreshIndicator(color:MyColors.primaryColor,onRefresh:_refresh,child: ListView.separated(shrinkWrap: true ,itemBuilder:(ctx , index) => postListItem(index , posts), separatorBuilder:(ctx , index) => listSeperatorItem(), itemCount: myPosts.length))
-                               : RefreshIndicator(
-                               color: MyColors.primaryColor,
-                               onRefresh: _refresh,
-                               child: ListView.builder(
-                                 itemBuilder: (context,index)=>Show_image(),
-                                 itemCount: 1,
-                               ),
-                             ) ,
-                       ),
-                     ],
-                   ),
-
-                 ],
-               ) : Container(),
-                FloatingActionButton(onPressed: (){openAddPostPage();} , backgroundColor: MyColors.primaryColor, mini: true, child: const Icon(FontAwesomeIcons.pen , color: Colors.white),)
-
-             ],
+           
+                   ],
+                 ) : Container(),
+                  FloatingActionButton(onPressed: (){openAddPostPage();} , backgroundColor: MyColors.primaryColor, mini: true, child: const Icon(FontAwesomeIcons.pen , color: Colors.white),)
+           
+               ],
+             ),
            ),
          ),
         )
@@ -233,15 +235,24 @@ class MomentsScreenState extends State<MomentsScreen> {
                children: [
                  Row(
                    children: [
-                     Text(_posts[index].user_name , style: TextStyle(color: MyColors.whiteColor , fontSize: 15.0),),
-                     const SizedBox(width: 5.0,),
+                     Flexible(  // <-- Add this
+                       child: Text(
+                         _posts[index].user_name,
+                         overflow: TextOverflow.ellipsis,
+                         style: TextStyle(color: MyColors.whiteColor, fontSize: 15.0),
+                       ),
+                     ),
+                     const SizedBox(width: 5.0),
                      CircleAvatar(
-                       backgroundColor: _posts[index].gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
+                       backgroundColor: _posts[index].gender == 0 ? MyColors.blueColor : MyColors.pinkColor,
                        radius: 10.0,
-                       child: _posts[index].gender == 0 ?  const Icon(Icons.male , color: Colors.white, size: 15.0,) :  const Icon(Icons.female , color: Colors.white, size: 15.0,),
-                     )
+                       child: _posts[index].gender == 0
+                           ? const Icon(Icons.male, color: Colors.white, size: 15.0)
+                           : const Icon(Icons.female, color: Colors.white, size: 15.0),
+                     ),
                    ],
                  ),
+
                  Row(
     
                    children: [

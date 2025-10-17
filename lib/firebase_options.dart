@@ -44,47 +44,46 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyAKLX3wO09ayV7W5vUELtIuhK6NMC4qscc',
     appId: '1:672957384118:web:58836e30b304ad6b6fed17',
     messagingSenderId: '672957384118',
-    projectId: 'liklok-4286b',
-    authDomain: 'liklok-4286b.firebaseapp.com',
-    storageBucket: 'liklok-4286b.firebasestorage.app',
+    projectId: 'chat-4286b',
+    authDomain: 'chat-4286b.firebaseapp.com',
+    storageBucket: 'chat-4286b.firebasestorage.app',
     measurementId: 'G-5Z2R5K3MT2',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC_t_y5AjJEJW35CvQefNOdoKV5FZBU_iY',
-    appId: '1:672957384118:android:d8c7a76bcb75e5276fed17',
-    messagingSenderId: '672957384118',
-    projectId: 'liklok-4286b',
-    storageBucket: 'liklok-4286b.firebasestorage.app',
+    apiKey: 'AIzaSyCNLclGPtK7EaI5W3Q92dFhTUVYrG_pi70',
+    appId: '1:924350665536:android:5db960c4347acf3bf560a5',
+    messagingSenderId: '924350665536',
+    projectId: 'liklok-new',
+    storageBucket: 'liklok-new.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD8ePJjKNvoU2cRsWTCw12AtPHGrKlOyRo',
-    appId: '1:672957384118:ios:9ea188c4e11098e36fed17',
-    messagingSenderId: '672957384118',
-    projectId: 'liklok-4286b',
-    storageBucket: 'liklok-4286b.firebasestorage.app',
-    iosClientId: '672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com',
-    iosBundleId: 'com.liklok.live.chat.liklok',
+    apiKey: 'AIzaSyDE1YSwuiUfcD3X3661JgoiiPdBdUOekyc',
+    appId: '1:924350665536:ios:9106e000d832418ff560a5',
+    messagingSenderId: '924350665536',
+    projectId: 'liklok-new',
+    storageBucket: 'liklok-new.firebasestorage.app',
+    iosBundleId: 'com.chat.apps.chat.liklok',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyD8ePJjKNvoU2cRsWTCw12AtPHGrKlOyRo',
     appId: '1:672957384118:ios:9ea188c4e11098e36fed17',
     messagingSenderId: '672957384118',
-    projectId: 'liklok-4286b',
-    storageBucket: 'liklok-4286b.firebasestorage.app',
+    projectId: 'chat-4286b',
+    storageBucket: 'chat-4286b.firebasestorage.app',
     iosClientId: '672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com',
-    iosBundleId: 'com.liklok.live.chat.liklok',
+    iosBundleId: 'com.chat.apps.chat.chat',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyAKLX3wO09ayV7W5vUELtIuhK6NMC4qscc',
     appId: '1:672957384118:web:5687954bce242d466fed17',
     messagingSenderId: '672957384118',
-    projectId: 'liklok-4286b',
-    authDomain: 'liklok-4286b.firebaseapp.com',
-    storageBucket: 'liklok-4286b.firebasestorage.app',
+    projectId: 'chat-4286b',
+    authDomain: 'chat-4286b.firebaseapp.com',
+    storageBucket: 'chat-4286b.firebasestorage.app',
     measurementId: 'G-TBK8EC1C0E',
   );
 

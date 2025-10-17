@@ -1,64 +1,56 @@
 {
   "project_info": {
-    "project_number": "672957384118",
-    "project_id": "liklok-4286b",
-    "storage_bucket": "liklok-4286b.firebasestorage.app"
+    "project_number": "924350665536",
+    "project_id": "liklok-new",
+    "storage_bucket": "liklok-new.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:672957384118:android:d8c7a76bcb75e5276fed17",
+        "mobilesdk_app_id": "1:924350665536:android:5db960c4347acf3bf560a5",
         "android_client_info": {
-          "package_name": "com.liklok.live.chat.liklok"
+          "package_name": "com.chat.apps.chat.liklok"
         }
       },
       "oauth_client": [
         {
-          "client_id": "672957384118-0kca4nopic05edd7aevbai0v4rfduaup.apps.googleusercontent.com",
+          "client_id": "924350665536-jvc6fg7fqs45ub7bscq7j5njcamptkj7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.liklok.live.chat.liklok",
+            "package_name": "com.chat.apps.chat.liklok",
             "certificate_hash": "fc7dc2575feca30ab99c024a229ec87db08f08b3"
           }
         },
         {
-          "client_id": "672957384118-2sdjl8d4i50ebct8p6r5hsdie80ir6r3.apps.googleusercontent.com",
+          "client_id": "924350665536-mo11b08u9bbll5bmfeeav9pd8mm1ag90.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.liklok.live.chat.liklok",
-            "certificate_hash": "6901b44f9468836a809db793f662774ec1ff7cf6"
+            "package_name": "com.chat.apps.chat.liklok",
+            "certificate_hash": "42eed7effb5e61e04f7f88249473054f90dc06d8"
           }
         },
         {
-          "client_id": "672957384118-tpp3uhg5bn5ec4pd2ol4a9iuf6uv4ovd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.liklok.live.chat.liklok",
-            "certificate_hash": "8244bc2035cfb5e443bb5b95b0d0aa4b2f838c5d"
-          }
-        },
-        {
-          "client_id": "672957384118-jkgm6hst41f5palv3oer0f1km1tciq77.apps.googleusercontent.com",
+          "client_id": "924350665536-q9epbjch322bjc92suu9j6dktl1aebu1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC_t_y5AjJEJW35CvQefNOdoKV5FZBU_iY"
+          "current_key": "AIzaSyCNLclGPtK7EaI5W3Q92dFhTUVYrG_pi70"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "672957384118-jkgm6hst41f5palv3oer0f1km1tciq77.apps.googleusercontent.com",
+              "client_id": "924350665536-q9epbjch322bjc92suu9j6dktl1aebu1.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com",
+              "client_id": "924350665536-b7391e7gpqbbsg0ka4k81sra3ir83nio.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.liklok.live.chat.liklok"
+                "bundle_id": "com.chat.apps.chat.liklok"
               }
             }
           ]

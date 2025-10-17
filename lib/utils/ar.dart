@@ -47,7 +47,7 @@ const Map<String, String> ar = {
   'inner_my_frames': 'إطاراتي',
   'inner_cars_(Entries)': 'السيارات (المدخلات)',
   'login_welcome_msg': 'مرحبا بكم في LikLok !',
-  'login_title': 'الأمر يتعلق بالمرح !',
+  'login_title': 'تواصل. دردش. احتفل',
   'login_privacy': 'بتسجيلك في LikLok فانك توافق على ذلك',
   'login_policy': 'سياسة LikLok',
   'login_and': 'و',

@@ -22,10 +22,12 @@ class _SystemMessageState extends State<SystemMessage> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("chats_system_massage".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-    body: Container(
-    color: MyColors.darkColor,
-    width: double.infinity,
-    height: double.infinity,
+    body: SafeArea(
+      child: Container(
+      color: MyColors.darkColor,
+      width: double.infinity,
+      height: double.infinity,
+      ),
     )
     );
   }

@@ -26,114 +26,241 @@ class _IdLoginScreenState extends State<IdLoginScreen> {
 
   bool isChecked = false;
   bool _isLoading = false ;
-  @override
-  Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: MyColors.whiteColor, //change your color here
-        ),
-        centerTitle: true,
-        backgroundColor: MyColors.solidDarkColor,
-        title: Text("id_login".tr , style: TextStyle(color: MyColors.whiteColor),),
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required IconData icon,
+    required String hint,
+    bool obscureText = false,
+  }) {
+    return Container(
+      height: 55,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(25),
       ),
-      body: Container(
-        color: MyColors.blueDarkColor,
-        width: double.infinity,
-        height: double.infinity,
-        child: SingleChildScrollView(
-          child: !_isLoading ? Column(
-            children: [
-              const SizedBox(height: 120.0,),
-              Container(
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(40.0)),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: const Image(image: AssetImage("assets/images/logo_splash.png") , width: 200.0, height: 200.0,)),
-              Container(
-                height: 55.0 ,
-                width: MediaQuery.sizeOf(context).width * .85,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
-                child: TextField( controller: idController, keyboardType: TextInputType.number,  decoration: InputDecoration( hintText: "id_text".tr ,  hintStyle: TextStyle(color: Colors.white), suffixIcon: IconButton(icon: const Icon(Icons.perm_identity , color: Colors.white, size: 25.0,),
-                  onPressed: (){},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
-                    borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                  style: const TextStyle(color: Colors.white , fontSize: 15.0) , cursorColor: MyColors.primaryColor,  ),
-              ),
-              SizedBox(height: 20.0,),
-              Container(
-                height: 55.0 ,
-                width: MediaQuery.sizeOf(context).width * .85,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0) , color: MyColors.lightUnSelectedColor.withAlpha(100),),
-                child: TextField( controller: passwordController, keyboardType: TextInputType.visiblePassword,  decoration: InputDecoration( hintText: "account_password".tr ,  hintStyle: TextStyle(color: Colors.white), suffixIcon: IconButton(icon: const Icon(Icons.lock , color: Colors.white, size: 25.0,),
-                  onPressed: (){},) , fillColor: MyColors.primaryColor, focusColor: MyColors.primaryColor, focusedBorder: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ,
-                    borderSide: BorderSide(color: Colors.white) ) ,  border: OutlineInputBorder( borderRadius: BorderRadius.circular(25.0) ) , labelStyle: const TextStyle(color: Colors.black , fontSize: 13.0) ,  ),
-                  style: const TextStyle(color: Colors.white , fontSize: 15.0) , cursorColor: MyColors.primaryColor,  ),
-              ),
-              SizedBox(height: 20.0,),
-              GestureDetector(
-                onTap: () {
-                  if(isChecked){
-                    loginUserViaID();
-                  }  else {
-                    Fluttertoast.showToast(
-                        msg: "check_privacy".tr,
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black26,
-                        textColor: MyColors.secondaryColor,
-                        fontSize: 16.0);
-                  }
-                },
-                child: Container(
-                  width: MediaQuery.sizeOf(context).width * .50 ,
-                  height: 50,
-                  margin: EdgeInsets.symmetric(horizontal: 20.0),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0) , color: Colors.yellow),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('login'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0 , fontWeight: FontWeight.bold),)
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.0,),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Checkbox(
-                      activeColor: MyColors.primaryColor,
-                      tristate: false,
-                      value: isChecked,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isChecked = value!;
-                        });
-                      },
-                    ),
-                    Text('login_privacy'.tr , style: TextStyle(fontSize: 12.0 , color: Colors.white)  ,),
-                    TextButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => const Privacy_Policy_Screen(),));}, child:  Text("login_policy".tr , style: TextStyle(color:  MyColors.secondaryColor , fontSize: 12.0 , fontWeight: FontWeight.bold , decoration: TextDecoration.underline , decorationColor:  MyColors.secondaryColor,),) ),
-                    Text('login_and'.tr , style: TextStyle(fontSize: 12.0 , color: Colors.white) ),
-                    TextButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (context) => const Agreement_Screen(),));}, child:  Text("login_services".tr , style: TextStyle(color:  MyColors.secondaryColor , fontSize: 12.0 , fontWeight: FontWeight.bold , decoration: TextDecoration.underline , decorationColor:  MyColors.secondaryColor,),)),
-                  ],
-                ),
-              ),
-            ],
-          ) : Loading(),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        style: const TextStyle(color: Colors.white),
+        cursorColor: Colors.amber,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Colors.white54),
+          prefixIcon: Icon(icon, color: Colors.white),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: const BorderSide(color: Colors.amber),
+          ),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.1),
         ),
       ),
     );
   }
+
+  Widget _buildPrivacyAgreementSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // The Checkbox
+          Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Checkbox(
+              value: isChecked,
+              activeColor: MyColors.primaryColor,
+              onChanged: (bool? value) {
+                setState(() {
+                  isChecked = value ?? false;
+                });
+              },
+            ),
+          ),
+
+          // The wrap of texts and links
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 12.0, color: Colors.white),
+                children: [
+                  TextSpan(text: 'login_privacy'.tr + ' '),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const Privacy_Policy_Screen()),
+                        );
+                      },
+                      child: Text(
+                        "login_policy".tr,
+                        style: TextStyle(
+                          color: MyColors.secondaryColor,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                          fontSize: 12.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TextSpan(text: ' ${'login_and'.tr} '),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const Agreement_Screen()),
+                        );
+                      },
+                      child: Text(
+                        "login_services".tr,
+                        style: TextStyle(
+                          color: MyColors.secondaryColor,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                          fontSize: 12.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white, // or MyColors.whiteColor
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [MyColors.blueDarkColor, MyColors.solidDarkColor],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          width: double.infinity,
+          height: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: SingleChildScrollView(
+            child: !_isLoading
+                ? Column(
+              children: [
+                const SizedBox(height: 150),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40.0),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black26, blurRadius: 10.0),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: const Image(
+                    image: AssetImage("assets/images/logo_splash.png"),
+                    width: 150,
+                    height: 150,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                _buildInputField(
+                  controller: idController,
+                  icon: Icons.perm_identity,
+                  hint: "id_text".tr,
+                ),
+                const SizedBox(height: 20),
+                _buildInputField(
+                  controller: passwordController,
+                  icon: Icons.lock,
+                  hint: "account_password".tr,
+                  obscureText: true,
+                ),
+                const SizedBox(height: 30),
+                GestureDetector(
+                  onTap: () {
+                    if (isChecked) {
+                      loginUserViaID();
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: "check_privacy".tr,
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.black87,
+                        textColor: MyColors.secondaryColor,
+                      );
+                    }
+                  },
+                  child: Container(
+                    width: width * 0.6,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25.0),
+                      gradient: const LinearGradient(
+                        colors: [Colors.amber, Colors.orangeAccent],
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 2)),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'login'.tr,
+                      style: const TextStyle(
+                          color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                _buildPrivacyAgreementSection(),
+              ],
+            )
+                : SizedBox(
+              height: MediaQuery.of(context).size.height, // full screen height
+              child:  Center(child: CircularProgressIndicator(color: MyColors.secondaryColor,)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   loginUserViaID() async{
       if(idController.text != "" && passwordController.text != "" ){
         setState(() {
           _isLoading = true ;
         });
         AppUser? user = await AppUserServices().LoginWithIdAndPassword(idController.text , passwordController.text);
-        if(user!.id > 0){
+        print('user');
+        print(user);
+        if(user != null){
           if(user.enable == 1 ) {
             setState(() {
               _isLoading = false ;
@@ -163,6 +290,18 @@ class _IdLoginScreenState extends State<IdLoginScreen> {
             });
             showAlertDialog(context);
           }
+        } else {
+          setState(() {
+            _isLoading = false ;
+          });
+          Fluttertoast.showToast(
+              msg: "ID or Password is not valid",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.black26,
+              textColor: MyColors.secondaryColor,
+              fontSize: 16.0);
         }
 
       } else {

@@ -55,14 +55,16 @@ class _GameModalState extends State<GameModal> {
   @override
 
   Widget build(BuildContext context) {
-    return  Container(
-        height: MediaQuery.sizeOf(context).height * widget.height_ratio,
-        decoration: BoxDecoration(color: Colors.white.withAlpha(200),
-            borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
-            border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
-          child:WebViewWidget(controller: _controller),
-
-
-      );
+    return  SafeArea(
+      child: Container(
+          height: MediaQuery.sizeOf(context).height * widget.height_ratio,
+          decoration: BoxDecoration(color: Colors.white.withAlpha(200),
+              borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
+              border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
+            child:WebViewWidget(controller: _controller),
+      
+      
+        ),
+    );
   }
 }

@@ -51,32 +51,34 @@ class _AddAdminModalState extends State<AddAdminModal> {
       await loadData() ;
     }
 
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
-      color: Colors.white.withAlpha(200),
-
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(onPressed: (){
-                Navigator.pop(context);
-              }, icon: Icon(Icons.arrow_back_ios , color: Colors.black, size: 25.0,)),
-              Expanded(child: Text('add_admin_title'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0), textAlign: TextAlign.center,)),
-            ],
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              color: MyColors.primaryColor,
-              child: ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
-                  separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: members!.length),
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
+        color: Colors.white.withAlpha(200),
+      
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(onPressed: (){
+                  Navigator.pop(context);
+                }, icon: Icon(Icons.arrow_back_ios , color: Colors.black, size: 25.0,)),
+                Expanded(child: Text('add_admin_title'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0), textAlign: TextAlign.center,)),
+              ],
             ),
-          ),
-
-        ],
-
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _refresh,
+                color: MyColors.primaryColor,
+                child: ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
+                    separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: members!.length),
+              ),
+            ),
+      
+          ],
+      
+        ),
       ),
     );
   }

@@ -59,89 +59,91 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height / 2,
-      decoration: BoxDecoration(color: Colors.white.withAlpha(220),
-          borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
-          border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
-      child:  Column(
-        children: [
-          Container(
-            height: 50.0,
-            padding: EdgeInsetsDirectional.only(start: 10.0 , end: 10.0),
-            width: double.infinity,
-            child: Row(
-              children: [
-              Text(getTypeValue(sendGiftReceiverType) , style: TextStyle(color: MyColors.primaryColor), ),
-              PopupMenuButton(
-                position: PopupMenuPosition.under,
-                shadowColor: MyColors.whiteColor,
-                elevation: 4.0,
-
-                color: Colors.white,
-                icon: Icon(Icons.expand_circle_down , color: MyColors.primaryColor,),
-                onSelected: (String result) {
-                  setState(() {
-                    sendGiftReceiverType = result ;
-                  });
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    value: 'select_one_ore_more',
-                    child: Text('gift_one_or_more_user'.tr , style: TextStyle(color: sendGiftReceiverType == 'select_one_ore_more' ?  MyColors.primaryColor  : Colors.black),),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'all_mic_users',
-                    child: Text('gift_all_mic_users'.tr , style: TextStyle(color:  sendGiftReceiverType == 'all_mic_users' ?  MyColors.primaryColor  : Colors.black),),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'all_room_members',
-                    child: Text('gift_all_room_users'.tr , style: TextStyle(color:  sendGiftReceiverType == 'all_room_members' ?  MyColors.primaryColor  : Colors.black),),
-
-                  )
-                ],
-              ),
-
-              Expanded(child:
-              sendGiftReceiverType == "select_one_ore_more" ?
-              ListView.separated(itemBuilder: (ctx , index) => giftBoxMicUserListItem(index),
-                separatorBuilder:  (ctx , index) => giftBoxMicUserSperator() , itemCount: room!.members!.where((e) => e.user_id >0).length ,
-                scrollDirection: Axis.horizontal,) :
-              sendGiftReceiverType == "all_room_members" ?
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return SafeArea(
+      child: Container(
+        height: MediaQuery.of(context).size.height / 2,
+        decoration: BoxDecoration(color: Colors.white.withAlpha(220),
+            borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
+            border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
+        child:  Column(
+          children: [
+            Container(
+              height: 50.0,
+              padding: EdgeInsetsDirectional.only(start: 10.0 , end: 10.0),
+              width: double.infinity,
+              child: Row(
                 children: [
-                  Text("gift_send_to_all_room_members".tr , style: TextStyle(color: MyColors.whiteColor),)
-                ],
-              ) :  Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("gift_all_mic_users".tr , style: TextStyle(color: MyColors.whiteColor),)
-                ],
-              )
-              ),
-            ],),
-          ),
-          Container(
-            height: 1.0,
-            width: double.infinity,
-            color: MyColors.lightUnSelectedColor,
-          ),
-          TabBar(
-            dividerColor: MyColors.lightUnSelectedColor,
-            tabAlignment: TabAlignment.start,
-            isScrollable: true ,
-            unselectedLabelColor: MyColors.whiteColor,
-            labelColor: MyColors.primaryColor,
-            indicatorColor: MyColors.primaryColor,
-            controller: _tabController,
-            labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w700),
-            tabs:  giftTabs,
-          ),
-          SizedBox(height: 5.0,),
-          Expanded(child: TabBarView(children: giftViews ,   controller: _tabController,)),
-
-        ],
+                Text(getTypeValue(sendGiftReceiverType) , style: TextStyle(color: MyColors.primaryColor), ),
+                PopupMenuButton(
+                  position: PopupMenuPosition.under,
+                  shadowColor: MyColors.whiteColor,
+                  elevation: 4.0,
+      
+                  color: Colors.white,
+                  icon: Icon(Icons.expand_circle_down , color: MyColors.primaryColor,),
+                  onSelected: (String result) {
+                    setState(() {
+                      sendGiftReceiverType = result ;
+                    });
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      value: 'select_one_ore_more',
+                      child: Text('gift_one_or_more_user'.tr , style: TextStyle(color: sendGiftReceiverType == 'select_one_ore_more' ?  MyColors.primaryColor  : Colors.black),),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'all_mic_users',
+                      child: Text('gift_all_mic_users'.tr , style: TextStyle(color:  sendGiftReceiverType == 'all_mic_users' ?  MyColors.primaryColor  : Colors.black),),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'all_room_members',
+                      child: Text('gift_all_room_users'.tr , style: TextStyle(color:  sendGiftReceiverType == 'all_room_members' ?  MyColors.primaryColor  : Colors.black),),
+      
+                    )
+                  ],
+                ),
+      
+                Expanded(child:
+                sendGiftReceiverType == "select_one_ore_more" ?
+                ListView.separated(itemBuilder: (ctx , index) => giftBoxMicUserListItem(index),
+                  separatorBuilder:  (ctx , index) => giftBoxMicUserSperator() , itemCount: room!.members!.where((e) => e.user_id >0).length ,
+                  scrollDirection: Axis.horizontal,) :
+                sendGiftReceiverType == "all_room_members" ?
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("gift_send_to_all_room_members".tr , style: TextStyle(color: MyColors.whiteColor),)
+                  ],
+                ) :  Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("gift_all_mic_users".tr , style: TextStyle(color: MyColors.whiteColor),)
+                  ],
+                )
+                ),
+              ],),
+            ),
+            Container(
+              height: 1.0,
+              width: double.infinity,
+              color: MyColors.lightUnSelectedColor,
+            ),
+            TabBar(
+              dividerColor: MyColors.lightUnSelectedColor,
+              tabAlignment: TabAlignment.start,
+              isScrollable: true ,
+              unselectedLabelColor: MyColors.whiteColor,
+              labelColor: MyColors.primaryColor,
+              indicatorColor: MyColors.primaryColor,
+              controller: _tabController,
+              labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w700),
+              tabs:  giftTabs,
+            ),
+            SizedBox(height: 5.0,),
+            Expanded(child: TabBarView(children: giftViews ,   controller: _tabController,)),
+      
+          ],
+        ),
       ),
     );
   }

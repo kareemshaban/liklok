@@ -50,6 +50,7 @@ Future<void> main() async {
     var token = await FirebaseMessaging.instance.getToken();
 
 
+
     FirebaseMessaging.onMessage.listen((event) {
       AwesomeNotifications().createNotification(
           content: NotificationContent(
@@ -125,6 +126,7 @@ class _MyAppState extends State<MyApp> {
       getAppSettings();
       getRandomIntro();
       getDeviceToken();
+      intialize();
 
 
 

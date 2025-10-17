@@ -9,12 +9,11 @@ import 'package:LikLok/shared/network/remote/DesignServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svga/flutter_svga.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:svgaplayer_flutter/parser.dart';
-import 'package:svgaplayer_flutter/player.dart';
 import 'package:path/path.dart' as path;
 import '../../models/Category.dart';
 import '../Loading/loadig_screen.dart';
@@ -129,7 +128,7 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
       categories!.sort((a, b) => a.order.compareTo(b.order));
       user = AppUserServices().userGetter();
       selectedCategory = categories![0].id ;
-      tabsCount = categories!.length + 1 ;
+      tabsCount = categories!.length ;
       _tabController = new TabController(vsync: this, length: tabsCount);
       _tabController!.addListener((){
         setState(() {
@@ -184,48 +183,50 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
               ))
         ],
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        child: loading ? Loading(): (
-        tabsCount > 0 ?  Stack(
-          children: [
-            Column(
-                children: [
-                  SizedBox(height: 10.0,),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    height:40.0,
-                    child: TabBar(
-                      dividerColor: Colors.transparent,
-                      tabAlignment: TabAlignment.center,
-                      isScrollable: true ,
-                      unselectedLabelColor: Colors.grey,
-                      labelColor: MyColors.darkColor,
-                      indicatorColor: Colors.transparent,
-                      controller: _tabController,
-                      indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20.0), // Creates border
-                          color: MyColors.primaryColor ),
-                      labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w900),
-                      tabs:  tabs,
-                    )
-                  ),
-                  const SizedBox(height: 10.0,),
-
-                  Expanded(child: TabBarView(children: views ,   controller: _tabController,
-                  )),
-
-
-                ],
-              ),
-            Center(
-             // child: animationController!.videoItem != null ? SVGAImage(animationController!) : Container(),
-               child: preview_img != "" ?  SVGASimpleImage( resUrl: preview_img) : Container(),
-            )
-          ],
-        ) : Container()
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          child: loading ? Loading(): (
+          tabsCount > 0 ?  Stack(
+            children: [
+              Column(
+                  children: [
+                    SizedBox(height: 10.0,),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      height:40.0,
+                      child: TabBar(
+                        dividerColor: Colors.transparent,
+                        tabAlignment: TabAlignment.center,
+                        isScrollable: true ,
+                        unselectedLabelColor: Colors.grey,
+                        labelColor: MyColors.darkColor,
+                        indicatorColor: Colors.transparent,
+                        controller: _tabController,
+                        indicator: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0), // Creates border
+                            color: MyColors.primaryColor ),
+                        labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w900),
+                        tabs:  tabs,
+                      )
+                    ),
+                    const SizedBox(height: 10.0,),
+        
+                    Expanded(child: TabBarView(children: views ,   controller: _tabController,
+                    )),
+        
+        
+                  ],
+                ),
+              Center(
+               // child: animationController!.videoItem != null ? SVGAImage(animationController!) : Container(),
+                 child: preview_img != "" ?  SVGAEasyPlayer( resUrl: preview_img) : Container(),
+              )
+            ],
+          ) : Container()
+          ),
         ),
       ),
     );
@@ -462,11 +463,11 @@ class _MallScreenState extends State<MallScreen>  with TickerProviderStateMixin 
                               (user!.name.contains(" ") ? user!.name.substring(user!.name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
                             style: const TextStyle(color: Colors.white , fontSize: 22.0 , fontWeight: FontWeight.bold),) : null,
                         ),
-                        SizedBox(height: 200.0, width: 200.0, child: SVGASimpleImage( resUrl: ASSETSBASEURL + 'Designs/Motion/' + design.motion_icon +'?raw=true')),
+                        SizedBox(height: 200.0, width: 200.0, child: SVGAEasyPlayer( resUrl: ASSETSBASEURL + 'Designs/Motion/' + design.motion_icon +'?raw=true')),
                       ],
                     ) :
 
-                    SVGASimpleImage( resUrl: ASSETSBASEURL + 'Designs/Motion/' + design.motion_icon +'?raw=true'),
+                    SVGAEasyPlayer( resUrl: ASSETSBASEURL + 'Designs/Motion/' + design.motion_icon +'?raw=true'),
                   // /  SVGASimpleImage( resUrl: "https://chat.gifty-store.com/images/Designs/Motion/1703720610motion_icon.svga" ),
                   ),
                 ),

@@ -25,7 +25,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:svgaplayer_flutter/player.dart';
+import 'package:flutter_svga/flutter_svga.dart';
 
 import '../Loading/loadig_screen.dart';
 
@@ -211,217 +211,198 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
           ],
         ),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 150.0,
-                      decoration: BoxDecoration(
-                          image:  user!.cover != "" ?
-                          DecorationImage( image: CachedNetworkImageProvider(ASSETSBASEURL + 'AppUsers/Covers/' + user!.cover), fit: BoxFit.cover) :
-                          DecorationImage( image: AssetImage('assets/images/cover.png'), fit: BoxFit.cover ,
-                            )
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
 
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 150.0,
+                        decoration: BoxDecoration(
+                            image:  user!.cover != "" ?
+                            DecorationImage( image: CachedNetworkImageProvider(ASSETSBASEURL + 'AppUsers/Covers/' + user!.cover), fit: BoxFit.cover) :
+                            DecorationImage( image: AssetImage('assets/images/cover.png'), fit: BoxFit.cover ,
+                              )
+        
+                        ),
                       ),
-                    ),
-                    Stack(
-                      alignment: Alignment.topCenter,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          color: MyColors.darkColor,
-                          padding: EdgeInsets.all(20.0),
-                          child: Column(
-                            children: [
-                              SizedBox(height: 40.0,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(user!.name , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),),
-                                  const SizedBox(width: 10.0,),
-                                  CircleAvatar(
-                                    backgroundColor: user!.gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
-                                    radius: 12.0,
-                                    child: user!.gender == 0 ?  const Icon(Icons.male , color: Colors.white, size: 15.0,) :  const Icon(Icons.female , color: Colors.white, size: 15.0,),
-                                  ),
-                                  const SizedBox(width: 10.0,),
-                                  Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Countries/' + user!.country_flag) , width: 30.0,),
-                                ],
-                              ),
-                              GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () async{
-                                  await Clipboard.setData(ClipboardData(text: user!.tag));
-                                  Fluttertoast.showToast(
-                                      msg: 'profile_msg_copied'.tr,
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.CENTER,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.black26,
-                                      textColor: Colors.orange,
-                                      fontSize: 16.0
-                                  );
-                                },
-                                child: Row(
+                      Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            color: MyColors.darkColor,
+                            padding: EdgeInsets.all(20.0),
+                            child: Column(
+                              children: [
+                                SizedBox(height: 40.0,),
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text("ID:" + user!.tag , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 12.0),),
-                                    const SizedBox(width: 5.0,),
-                                    Icon(Icons.copy_outlined , color: MyColors.unSelectedColor , size: 20.0,)
+                                    Text(user!.name , style: TextStyle(color: Colors.black , fontSize: 18.0 , fontWeight: FontWeight.bold),),
+                                    const SizedBox(width: 10.0,),
+                                    CircleAvatar(
+                                      backgroundColor: user!.gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
+                                      radius: 12.0,
+                                      child: user!.gender == 0 ?  const Icon(Icons.male , color: Colors.white, size: 15.0,) :  const Icon(Icons.female , color: Colors.white, size: 15.0,),
+                                    ),
+                                    const SizedBox(width: 10.0,),
+                                    Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Countries/' + user!.country_flag) , width: 30.0,),
                                   ],
                                 ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  user!.vips!.length > 0 ?  Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}VIP/${user!.vips![0].icon}') , width: 40,) : Container(),
-                                  user!.vips!.length > 0 ?  const SizedBox(width: 5.0,):  Container(),
-
-                                  
-                     
-                                  Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Levels/${user!.share_level_icon}') , width: 40,),
-                                  const SizedBox(width: 5.0,),
-                                  Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Levels/${user!.karizma_level_icon}') , width: 40,),
-                                  const SizedBox(width: 5.0),
-                                  Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Levels/${user!.charging_level_icon}') , width: 40,),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  user!.vips!.length > 0  && designs.where((element) => element.category_id == 10).toList().length > 0  ?  Container(width: 50.0 , height: 50.0, child: SVGASimpleImage( resUrl: ASSETSBASEURL + 'Designs/Motion/' + designs.where((element) => element.category_id == 10).toList()[0].motion_icon +'?raw=true')) : Container(),
-                                  Row(
-
-                                    children:  user!.medals!.map((medal) =>  getMedalItem(medal)).toList()
-
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () async{
+                                    await Clipboard.setData(ClipboardData(text: user!.tag));
+                                    Fluttertoast.showToast(
+                                        msg: 'profile_msg_copied'.tr,
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.black26,
+                                        textColor: Colors.orange,
+                                        fontSize: 16.0
+                                    );
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("ID:" + user!.tag , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 12.0),),
+                                      const SizedBox(width: 5.0,),
+                                      Icon(Icons.copy_outlined , color: MyColors.unSelectedColor , size: 20.0,)
+                                    ],
                                   ),
-                                  Row(
-
-                                      children:  user!.relations!.map((relation) =>  getRelationItem(relation)).toList()
-
-                                  )
-                                ],
-                              ),
-                              Text(user!.status !="" ? user!.status  : (isVisitor ? "inner_nothing".tr : "inner_nothing_update".tr)  , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 16.0),),
-                            ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    user!.vips!.length > 0 ?  Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}VIP/${user!.vips![0].icon}') , width: 40,) : Container(),
+                                    user!.vips!.length > 0 ?  const SizedBox(width: 5.0,):  Container(),
+        
+                                    
+                       
+                                    Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Levels/${user!.share_level_icon}') , width: 40,),
+                                    const SizedBox(width: 5.0,),
+                                    Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Levels/${user!.karizma_level_icon}') , width: 40,),
+                                    const SizedBox(width: 5.0),
+                                    Image(image: CachedNetworkImageProvider('${ASSETSBASEURL}Levels/${user!.charging_level_icon}') , width: 40,),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    user!.vips!.length > 0  && designs.where((element) => element.category_id == 10).toList().length > 0  ?  Container(width: 50.0 , height: 50.0, child: SVGAEasyPlayer( resUrl: ASSETSBASEURL + 'Designs/Motion/' + designs.where((element) => element.category_id == 10).toList()[0].motion_icon +'?raw=true')) : Container(),
+                                    Row(
+        
+                                      children:  user!.medals!.map((medal) =>  getMedalItem(medal)).toList()
+        
+                                    ),
+                                    Row(
+        
+                                        children:  user!.relations!.map((relation) =>  getRelationItem(relation)).toList()
+        
+                                    )
+                                  ],
+                                ),
+                                Text(user!.status !="" ? user!.status  : (isVisitor ? "inner_nothing".tr : "inner_nothing_update".tr)  , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 16.0),),
+                              ],
+                            ),
                           ),
-                        ),
-                        Transform.translate(
-                          offset: Offset(0, -40.0),
-                          child: Stack(
-                            alignment: Alignment.center,
-
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: user!.gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
-                                backgroundImage: user?.img != "" ?  CachedNetworkImageProvider(getUserImage()!) : null,
-                                radius: 35,
-                                child: user?.img== "" ?
-                                Text(user!.name.toUpperCase().substring(0 , 1) +
-                                    (user!.name.contains(" ") ? user!.name.substring(user!.name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
-                                  style: const TextStyle(color: Colors.white , fontSize: 22.0 , fontWeight: FontWeight.bold),) : null,
-                              ),
-                              Container(height: 100.0, width: 100.0, child: frame != "" ? SVGASimpleImage(   resUrl: frame) : null),
-                            ],
+                          Transform.translate(
+                            offset: Offset(0, -40.0),
+                            child: Stack(
+                              alignment: Alignment.center,
+        
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: user!.gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
+                                  backgroundImage: user?.img != "" ?  CachedNetworkImageProvider(getUserImage()!) : null,
+                                  radius: 35,
+                                  child: user?.img== "" ?
+                                  Text(user!.name.toUpperCase().substring(0 , 1) +
+                                      (user!.name.contains(" ") ? user!.name.substring(user!.name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
+                                    style: const TextStyle(color: Colors.white , fontSize: 22.0 , fontWeight: FontWeight.bold),) : null,
+                                ),
+                                Container(height: 100.0, width: 100.0, child: frame != "" ? SVGAEasyPlayer( resUrl: frame,) : null),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-
-                    Container(
-                      width: double.infinity,
-                      height: 6.0,
-                      color: MyColors.solidDarkColor,
-                      margin: EdgeInsetsDirectional.only(top: 20.0),
-                    ),
-
-                    Container(
-                       width: MediaQuery.sizeOf(context).width * .85,
-                       height: MediaQuery.sizeOf(context).width * .5,
-                       decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/CP.png') , fit: BoxFit.cover)),
-                       child: relations.where((element) => element.id == 2).toList().length > 0 ? Row(
-                         children: [
-                           Expanded(child: getRelationUserImage(relations.where((element) => element.id == 2).toList()[0] , 0),),
-                           Expanded(child: getRelationUserImage2(relations.where((element) => element.id == 2).toList()[0] , 0),),
-
-                         ],
-                       ) : Container(
-                         child: Column(
-                           mainAxisAlignment: MainAxisAlignment.end,
+                        ],
+                      ),
+        
+                      Container(
+                        width: double.infinity,
+                        height: 6.0,
+                        color: MyColors.solidDarkColor,
+                        margin: EdgeInsetsDirectional.only(top: 20.0),
+                      ),
+        
+                      Container(
+                         width: MediaQuery.sizeOf(context).width * .85,
+                         height: MediaQuery.sizeOf(context).width * .5,
+                         decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/CP.png') , fit: BoxFit.cover)),
+                         child: relations.where((element) => element.id == 2).toList().length > 0 ? Row(
                            children: [
-                             GestureDetector(
-                                 behavior: HitTestBehavior.opaque,
-                                 onTap: (){
-                                   Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
-                                 },
-                                 child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 60.0 , height: 60.0,)),
-
+                             Expanded(child: getRelationUserImage(relations.where((element) => element.id == 2).toList()[0] , 0),),
+                             Expanded(child: getRelationUserImage2(relations.where((element) => element.id == 2).toList()[0] , 0),),
+        
                            ],
+                         ) : Container(
+                           child: Column(
+                             mainAxisAlignment: MainAxisAlignment.end,
+                             children: [
+                               GestureDetector(
+                                   behavior: HitTestBehavior.opaque,
+                                   onTap: (){
+                                     Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                   },
+                                   child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 60.0 , height: 60.0,)),
+        
+                             ],
+                           ),
                          ),
-                       ),
-
-                    ),
-                    SizedBox(height: 10.0,),
-                    Container(
-                      width: MediaQuery.sizeOf(context).width * .9,
-                      child: Center(
-                        child: Row(
-                          children: [
-                             Container(
-                               width: (MediaQuery.sizeOf(context).width * .85) / 3,
-                               height:  MediaQuery.sizeOf(context).width * .5,
-                               decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/CF.png'))),
-                               child: relations.where((element) => element.id == 3).toList().length > 0 ?
-                               getRelationUserImage3(relations.where((element) => element.id == 3).toList()[0] ) :
+        
+                      ),
+                      SizedBox(height: 10.0,),
+                      Container(
+                        width: MediaQuery.sizeOf(context).width * .9,
+                        child: Center(
+                          child: Row(
+                            children: [
                                Container(
-                                 child: Column(
-                                   mainAxisAlignment: MainAxisAlignment.center,
-                                   children: [
-                                     GestureDetector(
-                                         behavior: HitTestBehavior.opaque,
-                                         onTap: (){
-                                           Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
-                                         },
-                                         child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
-
-                                   ],
+                                 width: (MediaQuery.sizeOf(context).width * .85) / 3,
+                                 height:  MediaQuery.sizeOf(context).width * .5,
+                                 decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/CF.png'))),
+                                 child: relations.where((element) => element.id == 3).toList().length > 0 ?
+                                 getRelationUserImage3(relations.where((element) => element.id == 3).toList()[0] ) :
+                                 Container(
+                                   child: Column(
+                                     mainAxisAlignment: MainAxisAlignment.center,
+                                     children: [
+                                       GestureDetector(
+                                           behavior: HitTestBehavior.opaque,
+                                           onTap: (){
+                                             Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                           },
+                                           child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
+        
+                                     ],
+                                   ),
                                  ),
                                ),
-                             ),
-                            SizedBox(width: 5.0,),
-                            Container(
-                                width:(MediaQuery.sizeOf(context).width * .85) / 3,
-                                height:  MediaQuery.sizeOf(context).width * .5,
-                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/TF.png'))),
-                              child: relations.where((element) => element.id == 5).toList().length > 0 ?
-                              getRelationUserImage3(relations.where((element) => element.id == 5).toList()[0] ) : Container(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: (){
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
-                                        },
-                                        child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
-
-                                  ],
-                                ),
-                              ) ,
-                            ),
-                            SizedBox(width: 5.0,),
-                            Container(
-                                width: (MediaQuery.sizeOf(context).width * .85) / 3,
-                                height:  MediaQuery.sizeOf(context).width * .5,
-                                decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/BF.png'))),
-                                child: relations.where((element) => element.id == 4).toList().length > 0 ?
-                                getRelationUserImage3(relations.where((element) => element.id == 4).toList()[0] ) : Container(
+                              SizedBox(width: 5.0,),
+                              Container(
+                                  width:(MediaQuery.sizeOf(context).width * .85) / 3,
+                                  height:  MediaQuery.sizeOf(context).width * .5,
+                                  decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/TF.png'))),
+                                child: relations.where((element) => element.id == 5).toList().length > 0 ?
+                                getRelationUserImage3(relations.where((element) => element.id == 5).toList()[0] ) : Container(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -431,229 +412,251 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
                                             Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
                                           },
                                           child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
-
+        
                                     ],
                                   ),
                                 ) ,
+                              ),
+                              SizedBox(width: 5.0,),
+                              Container(
+                                  width: (MediaQuery.sizeOf(context).width * .85) / 3,
+                                  height:  MediaQuery.sizeOf(context).width * .5,
+                                  decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/BF.png'))),
+                                  child: relations.where((element) => element.id == 4).toList().length > 0 ?
+                                  getRelationUserImage3(relations.where((element) => element.id == 4).toList()[0] ) : Container(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => MallScreen(),));
+                                            },
+                                            child: Image(image: AssetImage('assets/images/add_relation.png' ) , width: 40.0 , height: 40.0,)),
+        
+                                      ],
+                                    ),
+                                  ) ,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+        
+                      Container(
+                        width: double.infinity,
+                        height: 6.0,
+                        color: MyColors.solidDarkColor,
+                        margin: EdgeInsetsDirectional.only(top: 20.0),
+                      ),
+        
+                     Container(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                                ),
+                                SizedBox(width: 10.0,),
+                                Text("edit_profile_my_tags".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+                              ],
                             ),
+                            SizedBox(height:10.0,),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Row(
+                                mainAxisAlignment: user!.hoppies!.length == 0 ? MainAxisAlignment.center : MainAxisAlignment.start,
+                                children: [
+                                  user!.hoppies!.length == 0 ?
+                                  Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
+                                  : SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: user!.hoppies!.map((e) => hoppyListItem(e)).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+        
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 6.0,
+                        color: MyColors.solidDarkColor,
+                        margin: EdgeInsetsDirectional.only(top: 20.0),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                                ),
+                                SizedBox(width: 10.0,),
+                                Text("inner_room_gifts".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                            SizedBox(height: 5.0,),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Container(
+                                height: 100.0,
+                                child:  gifts.length == 0 ?
+                                Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
+                                    : Row(
+                                  children: [
+                                     Expanded(child: ListView.separated(itemBuilder: (ctx , index) => giftItemBuilder(index), separatorBuilder:(ctx , index) =>  seperatorItem(), itemCount: gifts.length > 3 ? 4 : gifts.length + 1 , scrollDirection: Axis.horizontal, ))
+                                  ],
+                                ),
+                              ),
+                            ),
+        
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 6.0,
+                        color: MyColors.solidDarkColor,
+                        margin: EdgeInsetsDirectional.only(top: 20.0),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                                ),
+                                SizedBox(width: 10.0,),
+                                Text("inner_my_frames".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                            SizedBox(height: 15.0,),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Container(
+                                height: 100.0,
+                                child:  designs.where((element) => element.category_id == 4).toList().length == 0 ?
+                                Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
+                                    : Row(
+                                  children: [
+                                    Expanded(child: ListView.separated(itemBuilder: (ctx , index) => designItemBuilder(index , 4), separatorBuilder:(ctx , index) =>  seperatorItem(), itemCount: designs.where((element) => element.category_id == 4).toList().length   , scrollDirection: Axis.horizontal, ))
+                                  ],
+                                ),
+                              ),
+                            ),
+        
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 6.0,
+                        color: MyColors.solidDarkColor,
+                        margin: EdgeInsetsDirectional.only(top: 20.0),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(15.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8.0,
+                                  height: 30.0,
+                                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                                ),
+                                SizedBox(width: 10.0,),
+                                Text("inner_cars_(Entries)".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                            SizedBox(height: 15.0,),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Container(
+                                height: 100.0,
+                                child:  designs.where((element) => element.category_id == 5).toList().length == 0 ?
+                                Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
+                                    :Row(
+                                  children: [
+                                    Expanded(child: ListView.separated(itemBuilder: (ctx , index) => designItemBuilder(index , 5), separatorBuilder:(ctx , index) =>  seperatorItem(), itemCount: designs.where((element) => element.category_id == 5).toList().length   , scrollDirection: Axis.horizontal, ))
+                                  ],
+                                ),
+                              ),
+                            ),
+        
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+             isVisitor! ? Container(
+                color: MyColors.solidDarkColor.withAlpha(150),
+                width: double.infinity,
+                height: 80.0,
+                padding: EdgeInsets.all(5.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          getFollowBtn()
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: (){openChat();},
+                              child: Image(image: AssetImage('assets/images/message.png') , width: 80.0)),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: (){openUserRoom();}, child: Image(image: AssetImage('assets/images/home.png') , width: 80.0)),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                       behavior: HitTestBehavior.opaque,
+                       onTap: (){trackUser();},
+                        child: Column(
+                          children: [
+                            Image(image: AssetImage('assets/images/tracking.png') , width: 80.0),
                           ],
                         ),
                       ),
                     ),
-
-                    Container(
-                      width: double.infinity,
-                      height: 6.0,
-                      color: MyColors.solidDarkColor,
-                      margin: EdgeInsetsDirectional.only(top: 20.0),
-                    ),
-
-                   Container(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-                              ),
-                              SizedBox(width: 10.0,),
-                              Text("edit_profile_my_tags".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                          SizedBox(height:10.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              mainAxisAlignment: user!.hoppies!.length == 0 ? MainAxisAlignment.center : MainAxisAlignment.start,
-                              children: [
-                                user!.hoppies!.length == 0 ?
-                                Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
-                                : SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: user!.hoppies!.map((e) => hoppyListItem(e)).toList(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 6.0,
-                      color: MyColors.solidDarkColor,
-                      margin: EdgeInsetsDirectional.only(top: 20.0),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-                              ),
-                              SizedBox(width: 10.0,),
-                              Text("inner_room_gifts".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                          SizedBox(height: 5.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Container(
-                              height: 100.0,
-                              child:  gifts.length == 0 ?
-                              Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
-                                  : Row(
-                                children: [
-                                   Expanded(child: ListView.separated(itemBuilder: (ctx , index) => giftItemBuilder(index), separatorBuilder:(ctx , index) =>  seperatorItem(), itemCount: gifts.length > 3 ? 4 : gifts.length + 1 , scrollDirection: Axis.horizontal, ))
-                                ],
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 6.0,
-                      color: MyColors.solidDarkColor,
-                      margin: EdgeInsetsDirectional.only(top: 20.0),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-                              ),
-                              SizedBox(width: 10.0,),
-                              Text("inner_my_frames".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                          SizedBox(height: 15.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Container(
-                              height: 100.0,
-                              child:  designs.where((element) => element.category_id == 4).toList().length == 0 ?
-                              Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
-                                  : Row(
-                                children: [
-                                  Expanded(child: ListView.separated(itemBuilder: (ctx , index) => designItemBuilder(index , 4), separatorBuilder:(ctx , index) =>  seperatorItem(), itemCount: designs.where((element) => element.category_id == 4).toList().length   , scrollDirection: Axis.horizontal, ))
-                                ],
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: 6.0,
-                      color: MyColors.solidDarkColor,
-                      margin: EdgeInsetsDirectional.only(top: 20.0),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 8.0,
-                                height: 30.0,
-                                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-                              ),
-                              SizedBox(width: 10.0,),
-                              Text("inner_cars_(Entries)".tr , style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                          SizedBox(height: 15.0,),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Container(
-                              height: 100.0,
-                              child:  designs.where((element) => element.category_id == 5).toList().length == 0 ?
-                              Text('inner_nothing'.tr , style: TextStyle(color: MyColors.unSelectedColor , fontSize: 15.0),)
-                                  :Row(
-                                children: [
-                                  Expanded(child: ListView.separated(itemBuilder: (ctx , index) => designItemBuilder(index , 5), separatorBuilder:(ctx , index) =>  seperatorItem(), itemCount: designs.where((element) => element.category_id == 5).toList().length   , scrollDirection: Axis.horizontal, ))
-                                ],
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
+        
                   ],
                 ),
-              ),
-            ),
-           isVisitor! ? Container(
-              color: MyColors.solidDarkColor.withAlpha(150),
-              width: double.infinity,
-              height: 80.0,
-              padding: EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        getFollowBtn()
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: (){openChat();},
-                            child: Image(image: AssetImage('assets/images/message.png') , width: 80.0)),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: (){openUserRoom();}, child: Image(image: AssetImage('assets/images/home.png') , width: 80.0)),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                     behavior: HitTestBehavior.opaque,
-                     onTap: (){trackUser();},
-                      child: Column(
-                        children: [
-                          Image(image: AssetImage('assets/images/tracking.png') , width: 80.0),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                ],
-              ),
-            ) : SizedBox(height: 5.0,)
-          ],
+              ) : SizedBox(height: 5.0,)
+            ],
+          ),
         ),
       ),
     ) : Loading();
@@ -671,12 +674,15 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
   Widget hoppyListItem(tag) => Container(
     margin: EdgeInsets.symmetric(horizontal: 10.0),
     child: DottedBorder (
-      borderType: BorderType.RRect,
-      color: MyColors.primaryColor,
-      strokeWidth: 1,
-      dashPattern: [8, 4],
-      strokeCap: StrokeCap.round,
-      radius: Radius.circular(100.0),
+      options: RectDottedBorderOptions(
+      //  borderType: BorderType.RRect,
+        color: MyColors.primaryColor,
+        strokeWidth: 1,
+        dashPattern: [8, 4],
+        strokeCap: StrokeCap.round,
+       // radius: Radius.circular(100.0),
+      ),
+
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15.0 , vertical: 8.0),
         decoration: BoxDecoration(border: Border.all(color: Colors.transparent , width: 1.0 , style: BorderStyle.solid) , borderRadius: BorderRadius.circular(25.0) ,
@@ -1025,7 +1031,7 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
                (relation.sender_name.contains(" ") ? relation.sender_name.substring(relation.sender_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
              style:  TextStyle(color: Colors.white , fontSize: small == 1 ? 18.0 : 24.0 , fontWeight: FontWeight.bold),) : null,
          ),
-         Container(  height:  small == 1 ? 70 :  100.0, width: small == 1 ? 70 :  100.0, child: relation.frame != "" ? SVGASimpleImage(   resUrl: '${ASSETSBASEURL}Designs/Motion/${relation.frame}?raw=true') : null),
+         Container(  height:  small == 1 ? 70 :  100.0, width: small == 1 ? 70 :  100.0, child: relation.frame != "" ? SVGAEasyPlayer(   resUrl: '${ASSETSBASEURL}Designs/Motion/${relation.frame}?raw=true') : null),
        ],
 
      ),
@@ -1049,7 +1055,7 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
                 (relation.recivier_name.contains(" ") ? relation.recivier_name.substring(relation.recivier_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
               style:  TextStyle(color: Colors.white , fontSize: small == 1 ? 18.0 : 24.0 ,  fontWeight: FontWeight.bold),) : null,
           ),
-          Container(  height:  small == 1 ? 70 :  100.0, width: small == 1 ? 70 :  100.0, child: relation.frame != "" ? SVGASimpleImage(   resUrl: '${ASSETSBASEURL}Designs/Motion/${relation.frame}?raw=true') : null),
+          Container(  height:  small == 1 ? 70 :  100.0, width: small == 1 ? 70 :  100.0, child: relation.frame != "" ? SVGAEasyPlayer(   resUrl: '${ASSETSBASEURL}Designs/Motion/${relation.frame}?raw=true') : null),
         ],
       ),
       SizedBox(height: 5,),

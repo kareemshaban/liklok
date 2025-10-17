@@ -55,376 +55,378 @@ class _RoomSettingsModalState extends State<RoomSettingsModal> {
   }
   @override
   Widget build(BuildContext context) {
-    return  Container(
-
-        padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
-        color: Colors.white.withAlpha(200),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(onPressed: (){
-                Navigator.pop(context);
-              }, icon: Icon(Icons.arrow_back_ios , color: Colors.black, size: 30.0,)),
-              Expanded(child: Text('room_settings'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0), textAlign: TextAlign.center,))
-            ],
-          ),
-          SizedBox(height: 10.0,),
-          Row(
-            children: [
-              Container(
-                width: 6.0,
-                height: 30.0,
-                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-              ),
-              SizedBox(width: 10.0,),
-              Text("room_settings_room_title".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-            ],
-          ),
-          SizedBox(height: 8.0,),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-
-                  children: [
-                    Container(
-                      height: 70.0,
-                      child: TextFormField(
-                        controller: roomTitleController,
-                        style: TextStyle(color: Colors.black),
-                        cursorColor: MyColors.primaryColor,
-                        maxLength: 20,
-                        decoration: InputDecoration(
-                            hintText: "room_settings_room_title".tr,
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(color: MyColors.whiteColor)),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0))),
-                      ),
-                    ),
-                  ],
+    return  SafeArea(
+      child: Container(
+      
+          padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
+          color: Colors.white.withAlpha(200),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(onPressed: (){
+                  Navigator.pop(context);
+                }, icon: Icon(Icons.arrow_back_ios , color: Colors.black, size: 30.0,)),
+                Expanded(child: Text('room_settings'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0), textAlign: TextAlign.center,))
+              ],
+            ),
+            SizedBox(height: 10.0,),
+            Row(
+              children: [
+                Container(
+                  width: 6.0,
+                  height: 30.0,
+                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
                 ),
-              ),
-              SizedBox(width: 15.0,),
-              ElevatedButton.icon(
-                onPressed: (){
-                  updateRoomName();
-                },
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
-                ),
-                icon: _isLoading1
-                    ? Container(
-                  width: 20,
-                  height: 20,
-                  padding: const EdgeInsets.all(2.0),
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 3,
-                  ),
-                )
-                    :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
-                label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
-              )
-            ],
-          ),
-
-
-          Row(
-            children: [
-              Container(
-                width: 6.0,
-                height: 30.0,
-                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-              ),
-              SizedBox(width: 10.0,),
-              Text("room_settings_hello".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-            ],
-          ),
-          SizedBox(height: 8.0,),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-
-                  children: [
-                    Container(
-                      height: 70.0,
-                      child: TextFormField(
-                        controller: roomHelloController,
-                        style: TextStyle(color: Colors.black),
-                        cursorColor: MyColors.primaryColor,
-                        maxLength: 20,
-                        decoration: InputDecoration(
-                            hintText: "room_settings_room_title".tr,
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(color: MyColors.whiteColor)),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0))),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 15.0,),
-              ElevatedButton.icon(
-                onPressed: (){
-                  updateRoomHello();
-                },
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
-                ),
-                icon: _isLoading2
-                    ? Container(
-                  width: 20,
-                  height: 20,
-                  padding: const EdgeInsets.all(2.0),
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 3,
-                  ),
-                )
-                    :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
-                label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
-              )
-            ],
-          ),
-          Row(
-            children: [
-              Container(
-                width: 6.0,
-                height: 30.0,
-                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-              ),
-              SizedBox(width: 10.0,),
-              Text("room_settings_room_password".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-            ],
-          ),
-          SizedBox(height: 8.0,),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-
-                  children: [
-                    Container(
-                      height: 70.0 ,
-                      child: TextFormField(
-                        controller: roomPasswordController,
-                        style: TextStyle(color: Colors.black),
-                        cursorColor: MyColors.primaryColor,
-                        maxLength: 20,
-                        decoration: InputDecoration(
-                          prefixIcon: room!.state == 1 ? Icon(Icons.lock , color: MyColors.primaryColor, size: 20.0,) :
-                          Icon(Icons.lock_open , color: MyColors.whiteColor, size: 20.0,) ,
-                            hintText: "room_settings_room_password".tr,
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(color: MyColors.whiteColor)),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0))),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 15.0,),
-              ElevatedButton.icon(
-                onPressed: (){
-                  updateRoomPassword();
-                },
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
-                ),
-                icon: _isLoading3
-                    ? Container(
-                  width: 20,
-                  height: 20,
-                  padding: const EdgeInsets.all(2.0),
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 3,
-                  ),
-                )
-                    :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
-                label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
-              )
-            ],
-          ),
-          Row(
-            children: [
-              Container(
-                width: 6.0,
-                height: 30.0,
-                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-              ),
-              SizedBox(width: 10.0,),
-              Text("room_settings_room_subject".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-            ],
-          ),
-
-          SizedBox(height: 15.0,),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            height:40.0,
-            child: ListView.separated(itemBuilder: (ctx , index) => chatRoomCategoryListItem(index)  , separatorBuilder: (ctx , index) => countryListSpacer(), itemCount: chatRoomCats.length , scrollDirection: Axis.horizontal,),
-
-          ),
-          SizedBox(height: 15.0,),
-          Row(
-            children: [
-              Container(
-                width: 6.0,
-                height: 30.0,
-                decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
-              ),
-              SizedBox(width: 10.0,),
-              Text("room_settings_room_img".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
-            ],
-          ),
-          SizedBox(height: 15.0,),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-
-                  children: [
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                       // showPickImageOptions('PHOTO');
-                      },
-                      child: Stack(
-                        alignment: Alignment.bottomCenter,
-                        children: [
-                          Container(
-                              width: 60.0,
-                              height: 60.0,
-                              child: SizedBox(),
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              decoration: BoxDecoration(
-                                  color: Colors.red,
+                SizedBox(width: 10.0,),
+                Text("room_settings_room_title".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+              ],
+            ),
+            SizedBox(height: 8.0,),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+      
+                    children: [
+                      Container(
+                        height: 70.0,
+                        child: TextFormField(
+                          controller: roomTitleController,
+                          style: TextStyle(color: Colors.black),
+                          cursorColor: MyColors.primaryColor,
+                          maxLength: 20,
+                          decoration: InputDecoration(
+                              hintText: "room_settings_room_title".tr,
+                              focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),
-                                  image:
-                                      DecorationImage(
-                                      image: _image == null ? getRoomImage() : Image.file(
-                                    _image!,
-                                    width: 100,
-                                  ).image,
-                                      fit: BoxFit.cover)
-
-                              )),
-                          GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              showPickImageOptions('PHOTO');
-                            },
-                            child: Transform.translate(
-                              offset: Offset(0, 10.0),
-                              child: CircleAvatar(
-                                radius: 18.0,
-                                backgroundColor: Colors.black54,
-                                child: Icon(
-                                  Icons.camera_alt_outlined,
-                                  color: Colors.white,
-                                  size: 18,
+                                  borderSide: BorderSide(color: MyColors.whiteColor)),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0))),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 15.0,),
+                ElevatedButton.icon(
+                  onPressed: (){
+                    updateRoomName();
+                  },
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
+                  ),
+                  icon: _isLoading1
+                      ? Container(
+                    width: 20,
+                    height: 20,
+                    padding: const EdgeInsets.all(2.0),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
+                  )
+                      :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
+                  label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
+                )
+              ],
+            ),
+      
+      
+            Row(
+              children: [
+                Container(
+                  width: 6.0,
+                  height: 30.0,
+                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                ),
+                SizedBox(width: 10.0,),
+                Text("room_settings_hello".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+              ],
+            ),
+            SizedBox(height: 8.0,),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+      
+                    children: [
+                      Container(
+                        height: 70.0,
+                        child: TextFormField(
+                          controller: roomHelloController,
+                          style: TextStyle(color: Colors.black),
+                          cursorColor: MyColors.primaryColor,
+                          maxLength: 20,
+                          decoration: InputDecoration(
+                              hintText: "room_settings_room_title".tr,
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide(color: MyColors.whiteColor)),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0))),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 15.0,),
+                ElevatedButton.icon(
+                  onPressed: (){
+                    updateRoomHello();
+                  },
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
+                  ),
+                  icon: _isLoading2
+                      ? Container(
+                    width: 20,
+                    height: 20,
+                    padding: const EdgeInsets.all(2.0),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
+                  )
+                      :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
+                  label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
+                )
+              ],
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 6.0,
+                  height: 30.0,
+                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                ),
+                SizedBox(width: 10.0,),
+                Text("room_settings_room_password".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+              ],
+            ),
+            SizedBox(height: 8.0,),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+      
+                    children: [
+                      Container(
+                        height: 70.0 ,
+                        child: TextFormField(
+                          controller: roomPasswordController,
+                          style: TextStyle(color: Colors.black),
+                          cursorColor: MyColors.primaryColor,
+                          maxLength: 20,
+                          decoration: InputDecoration(
+                            prefixIcon: room!.state == 1 ? Icon(Icons.lock , color: MyColors.primaryColor, size: 20.0,) :
+                            Icon(Icons.lock_open , color: MyColors.whiteColor, size: 20.0,) ,
+                              hintText: "room_settings_room_password".tr,
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide(color: MyColors.whiteColor)),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0))),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 15.0,),
+                ElevatedButton.icon(
+                  onPressed: (){
+                    updateRoomPassword();
+                  },
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
+                  ),
+                  icon: _isLoading3
+                      ? Container(
+                    width: 20,
+                    height: 20,
+                    padding: const EdgeInsets.all(2.0),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
+                  )
+                      :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
+                  label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
+                )
+              ],
+            ),
+            Row(
+              children: [
+                Container(
+                  width: 6.0,
+                  height: 30.0,
+                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                ),
+                SizedBox(width: 10.0,),
+                Text("room_settings_room_subject".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+              ],
+            ),
+      
+            SizedBox(height: 15.0,),
+      
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              height:40.0,
+              child: ListView.separated(itemBuilder: (ctx , index) => chatRoomCategoryListItem(index)  , separatorBuilder: (ctx , index) => countryListSpacer(), itemCount: chatRoomCats.length , scrollDirection: Axis.horizontal,),
+      
+            ),
+            SizedBox(height: 15.0,),
+            Row(
+              children: [
+                Container(
+                  width: 6.0,
+                  height: 30.0,
+                  decoration: BoxDecoration(color: MyColors.secondaryColor , borderRadius: BorderRadius.circular(3.0)),
+                ),
+                SizedBox(width: 10.0,),
+                Text("room_settings_room_img".tr, style: TextStyle(color: Colors.black , fontSize: 16.0 , fontWeight: FontWeight.bold),)
+              ],
+            ),
+            SizedBox(height: 15.0,),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+      
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                         // showPickImageOptions('PHOTO');
+                        },
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            Container(
+                                width: 60.0,
+                                height: 60.0,
+                                child: SizedBox(),
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    image:
+                                        DecorationImage(
+                                        image: _image == null ? getRoomImage() : Image.file(
+                                      _image!,
+                                      width: 100,
+                                    ).image,
+                                        fit: BoxFit.cover)
+      
+                                )),
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                showPickImageOptions('PHOTO');
+                              },
+                              child: Transform.translate(
+                                offset: Offset(0, 10.0),
+                                child: CircleAvatar(
+                                  radius: 18.0,
+                                  backgroundColor: Colors.black54,
+                                  child: Icon(
+                                    Icons.camera_alt_outlined,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 15.0,),
-              ElevatedButton.icon(
-                onPressed: (){
-                  uploadRoomImg();
-                },
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
-                ),
-                icon: _isLoading4
-                    ? Container(
-                  width: 20,
-                  height: 20,
-                  padding: const EdgeInsets.all(2.0),
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 3,
+                    ],
                   ),
-                )
-                    :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
-                label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
-              )
-            ],
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Row(
-              children: [
-                Text("room_settings_room_admins".tr , style: TextStyle(fontSize: 16.0 , color: MyColors.whiteColor , fontWeight: FontWeight.bold),),
-                Expanded(child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(onPressed: (){
-                          Navigator.pop(context);
-                          showModalBottomSheet(
-                              isScrollControlled: true ,
-                              context: context,
-                              builder: (ctx) => roomAdminsBottomSheet());
-                        }, icon: Icon(Icons.arrow_forward_ios_outlined , color: Colors.black , size: 20.0,) ,)
-                      ],
-                    )                          ],
-                )
-
+                ),
+                SizedBox(width: 15.0,),
+                ElevatedButton.icon(
+                  onPressed: (){
+                    uploadRoomImg();
+                  },
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 5.0) , backgroundColor: MyColors.primaryColor ,
+                  ),
+                  icon: _isLoading4
+                      ? Container(
+                    width: 20,
+                    height: 20,
+                    padding: const EdgeInsets.all(2.0),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
+                    ),
+                  )
+                      :  Icon(Icons.check_circle , color: MyColors.darkColor , size: 20.0,),
+                  label:  Text('room_settings_update'.tr , style: TextStyle(color: MyColors.darkColor , fontSize: 13.0), ),
                 )
               ],
             ),
-          ),
-          SizedBox(height: 15.0,),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Row(
-              children: [
-                Text("room_settings_room_block_list".tr , style: TextStyle(fontSize: 16.0 , color: MyColors.whiteColor , fontWeight: FontWeight.bold),),
-                Expanded(child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(onPressed: (){
-                          Navigator.pop(context);
-                          showModalBottomSheet(
-                              isScrollControlled: true ,
-                              context: context,
-                              builder: (ctx) => roomBlockBottomSheet());
-                        }, icon: Icon(Icons.arrow_forward_ios_outlined , color: Colors.black , size: 20.0,) ,)
-                      ],
-                    )                          ],
-                )
-
-                )
-              ],
+      
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                children: [
+                  Text("room_settings_room_admins".tr , style: TextStyle(fontSize: 16.0 , color: MyColors.whiteColor , fontWeight: FontWeight.bold),),
+                  Expanded(child:
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(onPressed: (){
+                            Navigator.pop(context);
+                            showModalBottomSheet(
+                                isScrollControlled: true ,
+                                context: context,
+                                builder: (ctx) => roomAdminsBottomSheet());
+                          }, icon: Icon(Icons.arrow_forward_ios_outlined , color: Colors.black , size: 20.0,) ,)
+                        ],
+                      )                          ],
+                  )
+      
+                  )
+                ],
+              ),
             ),
-          ),
-
-
-        ],
+            SizedBox(height: 15.0,),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                children: [
+                  Text("room_settings_room_block_list".tr , style: TextStyle(fontSize: 16.0 , color: MyColors.whiteColor , fontWeight: FontWeight.bold),),
+                  Expanded(child:
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(onPressed: (){
+                            Navigator.pop(context);
+                            showModalBottomSheet(
+                                isScrollControlled: true ,
+                                context: context,
+                                builder: (ctx) => roomBlockBottomSheet());
+                          }, icon: Icon(Icons.arrow_forward_ios_outlined , color: Colors.black , size: 20.0,) ,)
+                        ],
+                      )                          ],
+                  )
+      
+                  )
+                ],
+              ),
+            ),
+      
+      
+          ],
+        ),
       ),
     );
 

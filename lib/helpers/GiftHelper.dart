@@ -43,7 +43,7 @@ class GiftHelper {
            'gift_img': '${gift.motion_icon}',
            'giftImgSmall':'${ASSETSBASEURL}Designs/${gift.icon}',
            'count' : sendGiftCount,
-           'sender_share_level': user!.share_level_icon,
+           'sender_share_level': user.share_level_icon,
            'available_untill':DateTime.now().add(Duration(minutes: 1)) ,
            'gift_category_id': gift.gift_category_id,
            'reward': reward,

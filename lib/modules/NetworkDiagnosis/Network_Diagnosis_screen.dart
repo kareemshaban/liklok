@@ -23,28 +23,30 @@ class _Network_Diagnosis_ScreenState extends State<Network_Diagnosis_Screen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("network_title".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-        body: Container(
-          color: MyColors.darkColor,
-          width: double.infinity,
-          height: double.infinity,
-          child: Center(
-             child: Column(
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Container(
-                   padding: EdgeInsetsDirectional.symmetric(horizontal: 40.0 , vertical: 5.0),
-                   decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(20.0)),
-                   child: MaterialButton(onPressed: (){start();} ,
-                   child: Text("network_start".tr , style: TextStyle(color: Colors.white , fontSize: 18.0),),
+        body: SafeArea(
+          child: Container(
+            color: MyColors.darkColor,
+            width: double.infinity,
+            height: double.infinity,
+            child: Center(
+               child: Column(
+                 mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
+                   Container(
+                     padding: EdgeInsetsDirectional.symmetric(horizontal: 40.0 , vertical: 5.0),
+                     decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.circular(20.0)),
+                     child: MaterialButton(onPressed: (){start();} ,
+                     child: Text("network_start".tr , style: TextStyle(color: Colors.white , fontSize: 18.0),),
+                     ),
                    ),
-                 ),
-                  CircularProgressIndicator(
-                   color: MyColors.secondaryColor,
-                   strokeWidth: 3,
-                     value: isLoading ? null : 0
-                 ),
-               ],
-             ),
+                    CircularProgressIndicator(
+                     color: MyColors.secondaryColor,
+                     strokeWidth: 3,
+                       value: isLoading ? null : 0
+                   ),
+                 ],
+               ),
+            ),
           ),
         ),
     );

@@ -72,84 +72,86 @@ setState(() {
           ],
         ) ,
         ),
-        body: Container(
-          color: MyColors.darkColor,
-          width: double.infinity,
-          padding: const EdgeInsets.all(20.0),
-         child: loading ? Loading() : TabBarView(
-             children:[
-               Column(
-                 children: [
-                   notifications.where((element) => element.type == "MOMENTS").toList().length == 0 ? Center(child: Column(
-                     children: [
-                       Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                       SizedBox(height: 30.0,),
-                       Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                     ],), ) :
-                   Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "MOMENTS").toList() , 'MOMENTS'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "MOMENTS").toList().length)),
-
-                 ],
-               ),
-               Column(
-                 children: [
-                   notifications.where((element) => element.type == "PROFILE").toList().length == 0 ? Center(child: Column(
-                     children: [
-                       Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                       SizedBox(height: 30.0,),
-                       Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                     ],), ):
-                   Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "PROFILE").toList() , 'PROFILE'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "PROFILE").toList().length)),
-
-                 ],
-               ),
-               Column(
-                 children: [
-                   notifications.where((element) => element.type == "CHARGING").toList().length == 0 ? Center(child: Column(
-                     children: [
-                       Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                       SizedBox(height: 30.0,),
-                       Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                     ],), ):
-                   Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "CHARGING").toList() , 'CHARGING'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "CHARGING").toList().length)),
-
-                 ],
-               ),
-               Column(
-                 children: [
-                   notifications.where((element) => element.type == "SYSTEM").toList().length == 0 ? Center(child: Column(
-                     children: [
-                       Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                       SizedBox(height: 30.0,),
-                       Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                     ],), ):
-                   Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "SYSTEM").toList() , 'SYSTEM'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "SYSTEM").toList().length)),
-
-                 ],
-               ),
-               Column(
-                 children: [
-                   announcements.length == 0 ? Center(child: Column(
-                     children: [
-                       Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
-                       SizedBox(height: 30.0,),
-                       Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
-
-
-                     ],), ):
-                   Expanded(child: ListView.separated(itemBuilder:(ctx , index) => announcementListItem(index ), separatorBuilder:(ctx , index) => listSeperator(), itemCount: announcements.length)),
-                 ],
-               )
-
-             ]
-         )
+        body: SafeArea(
+          child: Container(
+            color: MyColors.darkColor,
+            width: double.infinity,
+            padding: const EdgeInsets.all(20.0),
+           child: loading ? Loading() : TabBarView(
+               children:[
+                 Column(
+                   children: [
+                     notifications.where((element) => element.type == "MOMENTS").toList().length == 0 ? Center(child: Column(
+                       children: [
+                         Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                         SizedBox(height: 30.0,),
+                         Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                       ],), ) :
+                     Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "MOMENTS").toList() , 'MOMENTS'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "MOMENTS").toList().length)),
+          
+                   ],
+                 ),
+                 Column(
+                   children: [
+                     notifications.where((element) => element.type == "PROFILE").toList().length == 0 ? Center(child: Column(
+                       children: [
+                         Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                         SizedBox(height: 30.0,),
+                         Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                       ],), ):
+                     Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "PROFILE").toList() , 'PROFILE'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "PROFILE").toList().length)),
+          
+                   ],
+                 ),
+                 Column(
+                   children: [
+                     notifications.where((element) => element.type == "CHARGING").toList().length == 0 ? Center(child: Column(
+                       children: [
+                         Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                         SizedBox(height: 30.0,),
+                         Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                       ],), ):
+                     Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "CHARGING").toList() , 'CHARGING'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "CHARGING").toList().length)),
+          
+                   ],
+                 ),
+                 Column(
+                   children: [
+                     notifications.where((element) => element.type == "SYSTEM").toList().length == 0 ? Center(child: Column(
+                       children: [
+                         Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                         SizedBox(height: 30.0,),
+                         Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                       ],), ):
+                     Expanded(child: ListView.separated(itemBuilder:(ctx , index) => notificationsListItem(index , notifications.where((element) => element.type == "SYSTEM").toList() , 'SYSTEM'), separatorBuilder:(ctx , index) => listSeperator(), itemCount: notifications.where((element) => element.type == "SYSTEM").toList().length)),
+          
+                   ],
+                 ),
+                 Column(
+                   children: [
+                     announcements.length == 0 ? Center(child: Column(
+                       children: [
+                         Image(image: AssetImage('assets/images/sad.png') , width: 100.0 , height: 100.0,),
+                         SizedBox(height: 30.0,),
+                         Text('no_data'.tr , style: TextStyle(color: Colors.red , fontSize: 18.0 ) ,)
+          
+          
+                       ],), ):
+                     Expanded(child: ListView.separated(itemBuilder:(ctx , index) => announcementListItem(index ), separatorBuilder:(ctx , index) => listSeperator(), itemCount: announcements.length)),
+                   ],
+                 )
+          
+               ]
+           )
+          ),
         ),
       ),
     );

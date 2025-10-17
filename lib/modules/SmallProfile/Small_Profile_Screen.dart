@@ -17,10 +17,10 @@ import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svga/flutter_svga.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:svgaplayer_flutter/player.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
 class SmallProfileModal extends StatefulWidget {
@@ -93,8 +93,8 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
       List<Mall>? vipDesigns = user!.vips![0].designs;
       final profile_frame = vipDesigns!.where((element) => element.category_id == 8).toList()[0].motion_icon;
       return   Transform.translate(
-          offset: Offset(0 , -170),
-          child: SVGASimpleImage(resUrl:(ASSETSBASEURL + 'Designs/Motion/' + profile_frame)));
+          offset: Offset(0 , -160),
+          child: SVGAEasyPlayer(resUrl:(ASSETSBASEURL + 'Designs/Motion/' + profile_frame)));
     } else {
       return SizedBox();
     }
@@ -107,7 +107,7 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
       children: [
         Container(
           height: MediaQuery.sizeOf(context).height * .38,
-          padding: EdgeInsets.only(top: 15.0),
+          padding: EdgeInsets.only(top: 10.0),
           decoration: BoxDecoration(color:  Colors.white.withAlpha(210)  ,
               borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(20.0)) ,
               border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),),
@@ -168,7 +168,7 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
                                   (user!.name.contains(" ") ? user!.name.substring(user!.name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
                                 style: const TextStyle(color: Colors.white , fontSize: 24.0 , fontWeight: FontWeight.bold),) : null,
                             ),
-                            Container(height: 100.0, width: 100.0, child: frame != "" ? SVGASimpleImage(   resUrl: frame) : null),
+                            Container(height: 100.0, width: 100.0, child: frame != "" ? SVGAEasyPlayer(   resUrl: frame) : null),
                           ],
                         ),
                       ],
@@ -212,7 +212,7 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      user!.vips!.length > 0  && designs.where((element) => element.category_id == 10).toList().length > 0  ?  Container(width: 50.0 , height: 50.0, child: SVGASimpleImage( resUrl: ASSETSBASEURL + 'Designs/Motion/' + designs.where((element) => element.category_id == 10).toList()[0].motion_icon +'?raw=true')) : Container(),
+                      user!.vips!.length > 0  && designs.where((element) => element.category_id == 10).toList().length > 0  ?  Container(width: 50.0 , height: 50.0, child: SVGAEasyPlayer( resUrl: ASSETSBASEURL + 'Designs/Motion/' + designs.where((element) => element.category_id == 10).toList()[0].motion_icon +'?raw=true')) : Container(),
                       Row(
                           children:  user!.medals!.map((medal) =>  getMedalItem(medal)).toList()
 

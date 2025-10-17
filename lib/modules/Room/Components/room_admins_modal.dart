@@ -54,40 +54,42 @@ class _RoomAdminsModalState extends State<RoomAdminsModal> {
   }
 
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
-      color: Colors.white.withAlpha(200),
-
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(onPressed: (){
-                Navigator.pop(context);
-              }, icon: Icon(Icons.arrow_back_ios , color: Colors.black, size: 25.0,)),
-              Expanded(child: Text('room_settings_room_admins'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0), textAlign: TextAlign.center,)),
-              IconButton(onPressed: (){
-                Navigator.pop(context);
-                showModalBottomSheet(
-                    isScrollControlled: true ,
-                    context: context,
-                    builder: (ctx) => addAdminsBottomSheet());
-
-              }, icon: Icon(Icons.add_circle_outline , color: Colors.black, size: 25.0,)),
-            ],
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              color: MyColors.primaryColor,
-              child: ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
-                  separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: admins!.length),
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 50.0 , horizontal: 10.0),
+        color: Colors.white.withAlpha(200),
+      
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(onPressed: (){
+                  Navigator.pop(context);
+                }, icon: Icon(Icons.arrow_back_ios , color: Colors.black, size: 25.0,)),
+                Expanded(child: Text('room_settings_room_admins'.tr , style: TextStyle(color: Colors.black , fontSize: 20.0), textAlign: TextAlign.center,)),
+                IconButton(onPressed: (){
+                  Navigator.pop(context);
+                  showModalBottomSheet(
+                      isScrollControlled: true ,
+                      context: context,
+                      builder: (ctx) => addAdminsBottomSheet());
+      
+                }, icon: Icon(Icons.add_circle_outline , color: Colors.black, size: 25.0,)),
+              ],
             ),
-          ),
-
-        ],
-
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _refresh,
+                color: MyColors.primaryColor,
+                child: ListView.separated(itemBuilder: (ctx , index) =>itemListBuilder(index) ,
+                    separatorBuilder: (ctx , index) =>itemSperatorBuilder(), itemCount: admins!.length),
+              ),
+            ),
+      
+          ],
+      
+        ),
       ),
     );
   }

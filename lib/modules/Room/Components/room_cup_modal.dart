@@ -39,59 +39,61 @@ class _RoomCupModalState extends State<RoomCupModal> {
   }
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Container(
-        decoration: BoxDecoration(color: Colors.white.withAlpha(200),
-            borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
-            border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
-        width: double.infinity,
-        height: MediaQuery.sizeOf(context).height * .6,
-        padding: EdgeInsets.symmetric(vertical: 20.0 , horizontal: 15.0),
-
-        child: loading ?  Column(
-          children: [
-            TabBar(
-              dividerColor: Colors.transparent,
-              tabAlignment: TabAlignment.center,
-              isScrollable: true ,
-              indicatorColor: MyColors.primaryColor,
-              labelColor: MyColors.primaryColor,
-              unselectedLabelColor: MyColors.whiteColor,
-              labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w500),
-
-              tabs:  [
-                Tab(text: "daily".tr ),
-                Tab(text: "weekly".tr,),
-                Tab(text: "monthly".tr,),
-              ],
-            ),
-            SizedBox(height: 15.0,),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  Column(
-                    children: [
-                      Expanded(child: ListView.separated(itemBuilder:(context, index) => itemBuilder(index), separatorBuilder:(context, index) =>  separatorBuilder(), itemCount: helper!.daily.length)),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Expanded(child: ListView.separated(itemBuilder:(context, index) => itemBuilder2(index), separatorBuilder:(context, index) =>  separatorBuilder(), itemCount: helper!.weekly.length)),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Expanded(child: ListView.separated(itemBuilder:(context, index) => itemBuilder3(index), separatorBuilder:(context, index) =>  separatorBuilder(), itemCount: helper!.monthly.length)),
-                    ],
-                  )
-              
-              
+    return SafeArea(
+      child: DefaultTabController(
+        length: 3,
+        child: Container(
+          decoration: BoxDecoration(color: Colors.white.withAlpha(200),
+              borderRadius: BorderRadius.only(topRight: Radius.circular(20.0) , topLeft: Radius.circular(15.0)) ,
+              border: Border(top: BorderSide(width: 4.0, color: MyColors.secondaryColor),) ),
+          width: double.infinity,
+          height: MediaQuery.sizeOf(context).height * .6,
+          padding: EdgeInsets.symmetric(vertical: 20.0 , horizontal: 15.0),
+      
+          child: loading ?  Column(
+            children: [
+              TabBar(
+                dividerColor: Colors.transparent,
+                tabAlignment: TabAlignment.center,
+                isScrollable: true ,
+                indicatorColor: MyColors.primaryColor,
+                labelColor: MyColors.primaryColor,
+                unselectedLabelColor: MyColors.whiteColor,
+                labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w500),
+      
+                tabs:  [
+                  Tab(text: "daily".tr ),
+                  Tab(text: "weekly".tr,),
+                  Tab(text: "monthly".tr,),
                 ],
               ),
-            )
-          ],
-        ) : Loading(),
+              SizedBox(height: 15.0,),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    Column(
+                      children: [
+                        Expanded(child: ListView.separated(itemBuilder:(context, index) => itemBuilder(index), separatorBuilder:(context, index) =>  separatorBuilder(), itemCount: helper!.daily.length)),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Expanded(child: ListView.separated(itemBuilder:(context, index) => itemBuilder2(index), separatorBuilder:(context, index) =>  separatorBuilder(), itemCount: helper!.weekly.length)),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Expanded(child: ListView.separated(itemBuilder:(context, index) => itemBuilder3(index), separatorBuilder:(context, index) =>  separatorBuilder(), itemCount: helper!.monthly.length)),
+                      ],
+                    )
+                
+                
+                  ],
+                ),
+              )
+            ],
+          ) : Loading(),
+        ),
       ),
     );
   }

@@ -132,36 +132,38 @@ class _MyDesignScreenState extends State<MyDesignScreen> with TickerProviderStat
 
         ),
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: MyColors.darkColor,
-        padding: EdgeInsets.all(10.0),
-        child:  tabsCount > 0 ?  loading ? Loading() : Column(
-          children: [
-            SizedBox(height: 10.0,),
-            Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                height:40.0,
-                child: TabBar(
-                  dividerColor: Colors.transparent,
-                  tabAlignment: TabAlignment.center,
-                  isScrollable: true ,
-                  unselectedLabelColor: Colors.grey,
-                  labelColor: MyColors.darkColor,
-                  indicatorColor: Colors.transparent,
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0), // Creates border
-                      color: MyColors.primaryColor ),
-                  labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w900),
-                  tabs:  tabs,
-                )
-            ),
-            Expanded(child:  TabBarView(children: views ,   controller: _tabController,
-            )),
-          ],
-        ) : Container(),
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: MyColors.darkColor,
+          padding: EdgeInsets.all(10.0),
+          child:  tabsCount > 0 ?  loading ? Loading() : Column(
+            children: [
+              SizedBox(height: 10.0,),
+              Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  height:40.0,
+                  child: TabBar(
+                    dividerColor: Colors.transparent,
+                    tabAlignment: TabAlignment.center,
+                    isScrollable: true ,
+                    unselectedLabelColor: Colors.grey,
+                    labelColor: MyColors.darkColor,
+                    indicatorColor: Colors.transparent,
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0), // Creates border
+                        color: MyColors.primaryColor ),
+                    labelStyle: const TextStyle(fontSize: 17.0 , fontWeight: FontWeight.w900),
+                    tabs:  tabs,
+                  )
+              ),
+              Expanded(child:  TabBarView(children: views ,   controller: _tabController,
+              )),
+            ],
+          ) : Container(),
+        ),
       ),
     );
   }

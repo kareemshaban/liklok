@@ -43,18 +43,19 @@ class _Privacy_Policy_ScreenState extends State<Privacy_Policy_Screen> {
         backgroundColor: MyColors.solidDarkColor,
         title: Text("privacy_policy_title".tr , style: TextStyle(color: MyColors.whiteColor,fontSize: 20.0) ,),
       ),
-      body: Container(
-        color: MyColors.darkColor,
-        width: double.infinity,
-        height: double.infinity,
-        padding: EdgeInsets.all(10.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 5.0,),
-              Text("privacy_policy".tr,style: TextStyle(color: Colors.black,fontSize: 20.0),),
-              SizedBox(height: 20.0,),
-              local == 'en' ?   Text(''' Privacy Policy for LikLok
+      body: SafeArea(
+        child: Container(
+          color: MyColors.darkColor,
+          width: double.infinity,
+          height: double.infinity,
+          padding: EdgeInsets.all(10.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 5.0,),
+                Text("privacy_policy".tr,style: TextStyle(color: Colors.black,fontSize: 20.0),),
+                SizedBox(height: 20.0,),
+                local == 'en' ?   Text(''' Privacy Policy for LikLok
           
           Privacy Policy
           Last updated: January 16, 2024
@@ -227,8 +228,8 @@ class _Privacy_Policy_ScreenState extends State<Privacy_Policy_Screen> {
           Contact Us
           If you have any questions about this Privacy Policy, You can contact us:
           
-          By email: support@liklok.live ''' , style: TextStyle(color: Colors.grey),)
-                  : Text(style: TextStyle(color: Colors.grey) , ''' سياسة الخصوصية LikLok
+          By email: support@chat.apps ''' , style: TextStyle(color: Colors.grey),)
+                    : Text(style: TextStyle(color: Colors.grey) , ''' سياسة الخصوصية LikLok
           
            سياسة الخصوصية
            آخر تحديث: 16 يناير 2024
@@ -402,8 +403,9 @@ class _Privacy_Policy_ScreenState extends State<Privacy_Policy_Screen> {
            اتصل بنا
            إذا كانت لديك أي أسئلة حول سياسة الخصوصية هذه، يمكنك الاتصال بنا:
           
-           عبر البريد الإلكتروني: support@liklok.live ''')
-            ],
+           عبر البريد الإلكتروني: support@chat.apps ''')
+              ],
+            ),
           ),
         ),
       ),
