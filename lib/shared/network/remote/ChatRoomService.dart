@@ -18,6 +18,7 @@ import 'package:LikLok/models/RoomCup.dart';
 import 'package:LikLok/models/RoomFollow.dart';
 import 'package:LikLok/models/RoomMember.dart';
 import 'package:LikLok/models/RoomTheme.dart';
+import 'package:LikLok/models/token_model.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:flutter/material.dart';
@@ -1462,6 +1463,16 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       // If the server did not return a 200 OK response,
       // then throw an exception.
       throw Exception('Failed to load album');
+    }
+  }
+
+  Future<TokenModel> generateToken(id) async {
+    final response = await  http.get(Uri.parse('${BASEURL}chatRooms/rollet/loser/zego/token?user_id=$id'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      return TokenModel.fromJson(data);
+    } else {
+      throw Exception('Failed to fetch token: ${response.statusCode}');
     }
   }
 

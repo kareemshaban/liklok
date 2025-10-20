@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:LikLok/helpers/GiftHelper.dart';
 import 'package:LikLok/models/Badge.dart';
+import 'package:LikLok/models/token_model.dart';
 import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -164,6 +165,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   String appSign =
       'c65c2660926c15c386764de74a7330df068a35830a77bd059db1fb9dbbc99c24';
+  TokenModel? zegoToken ;
 
   List<ZegoUser> users = [];
 
@@ -173,7 +175,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     if (mounted) {
       setState(() {
         appId = AppSettingsServices().appSettingGetter()!.agora_id;
@@ -210,7 +211,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     getRoomImage();
     print('room!.id');
     print(room!.id);
-    EnterRoomHelper(user!.id, room!.id, token);
+    EnterRoomHelper(user!.id, room!.id, zegoToken!.token);
 
     geAdminDesigns();
 
@@ -270,6 +271,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Future<void> initZego() async {
+    zegoToken = await ChatRoomService().generateToken(user!.id) ;
+    print(zegoToken!.token);
     await ZEGOSDKManager().init(
       appID,
       appSign,
