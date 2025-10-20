@@ -36,6 +36,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
+import '../../helpers/zego_handler/zego_sdk_manager.dart';
 import '../ContactUs/contact_us_screen.dart';
 import '../Loading/loadig_screen.dart';
 import '../modols/medals_screen.dart';
@@ -53,6 +54,8 @@ class ProfileScreenState extends State<ProfileScreen> {
   String frame = "" ;
   List<ChargingOperation> operatins = [] ;
   bool loading = false ;
+  int appID = 1364585881 ;
+  String appSign = 'c65c2660926c15c386764de74a7330df068a35830a77bd059db1fb9dbbc99c24' ;
   @override
   void initState() {
     // TODO: implement initState
@@ -111,11 +114,20 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   void openMyRoom() async{
+    initZego();
     ChatRoom? room =  await ChatRoomService().openMyRoom(user!.id);
     await checkForSavedRoom(room!);
-    ChatRoomService().roomSetter(room!);
+    ChatRoomService().roomSetter(room);
     print(room);
     Navigator.push(context, MaterialPageRoute(builder: (ctx) => const RoomScreen()));
+  }
+
+  initZego() async {
+    await ZEGOSDKManager()
+        .init(appID, appSign, scenario: ZegoScenario.HighQualityChatroom);
+    await ZEGOSDKManager().connectUser(user!.id.toString(), user!.name);
+    final zimService = ZEGOSDKManager().zimService;
+    final expressService = ZEGOSDKManager().expressService;
   }
 
   checkForSavedRoom(ChatRoom room) async {
