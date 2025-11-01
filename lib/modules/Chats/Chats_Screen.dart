@@ -10,7 +10,7 @@ import 'package:LikLok/modules/CustomerService/customer_service_screen.dart';
 import 'package:LikLok/modules/EventMessage/event_message_screen.dart';
 import 'package:LikLok/modules/Followers/Followers_Screen.dart';
 import 'package:LikLok/modules/SystemMessage/system_message_screen.dart';
-import 'package:LikLok/modules/chat/chat.dart';
+import 'package:LikLok/modules/chatScreen/chat_screen.dart';
 import 'package:LikLok/modules/chat_service/chat_service.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/ChatServic.dart';
@@ -385,7 +385,7 @@ class ChatsScreenState extends State<ChatsScreen> {
             child: ListTile(
               title: Text(document.id, style: TextStyle(color: Colors.white),),
               onTap: (){
-                // pass the clicked user's UID to the chat page
+                // pass the clicked user's UID to the chatScreen page
                 // Navigator.push(
                 //     context,
                 //     MaterialPageRoute(
@@ -408,15 +408,15 @@ class ChatsScreenState extends State<ChatsScreen> {
     behavior: HitTestBehavior.opaque,
     onTap: () async{
       int id = 0 ;
-      if(user!.id == article.sender_id) id = article.reciver_id ;
-      else id = article.sender_id ;
+      if(user!.id == article.senderId) id = article.receiverId ;
+      else id = article.senderId ;
       AppUser? rec = await AppUserServices().getUser(id);
       print(rec!.id);
       print(user!.id);
       Navigator.push(context, MaterialPageRoute(builder: (ctx) =>  ChatScreen(
-        receiverUserEmail:  rec!.email ,
+        receiverUserEmail:  rec.email ,
         receiverUserID: rec.id,
-        receiver: rec,
+        receiver: rec, messages: article.messages,
 
       )
       )
@@ -439,7 +439,7 @@ class ChatsScreenState extends State<ChatsScreen> {
             children: [
               Text(getUserName(article),style: TextStyle(fontSize: 17.0,color: Colors.black),),
               SizedBox(height: 5.0,),
-              Container( width: 90.0, child: Text((article.last_message),style: TextStyle(fontSize: 15.0,color: Colors.black), overflow: TextOverflow.ellipsis,)),
+              Container( width: 90.0, child: Text((article.lastMessage),style: TextStyle(fontSize: 15.0,color: Colors.black), overflow: TextOverflow.ellipsis,)),
             ],
           ),
           Expanded(
@@ -450,9 +450,9 @@ class ChatsScreenState extends State<ChatsScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(formattedDate(article.last_action_date) ,style: TextStyle(color: Colors.black),),
+                    Text(formattedDate(article.lastActionDate) ,style: TextStyle(color: Colors.black),),
                     SizedBox(width: 5.0,),
-                    Text(formattedTime(article.last_action_date) ,style: TextStyle(color: Colors.black),),
+                    Text(formattedTime(article.lastActionDate) ,style: TextStyle(color: Colors.black),),
                   ],
                 ),
               ],
@@ -463,25 +463,25 @@ class ChatsScreenState extends State<ChatsScreen> {
     ),
   );
 
-  ImageProvider getChatItemImg(chat){
-     if(chat.sender_id == user!.id){
-       return CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${chat.receiver_img}') ;
+  ImageProvider getChatItemImg(Chat chat){
+     if(chat.senderId == user!.id){
+       return CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${chat.receiverImg}') ;
      } else {
-       return CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${chat.sender_img}') ;
+       return CachedNetworkImageProvider('${ASSETSBASEURL}AppUsers/${chat.senderImg}') ;
      }
 
   }
-  Widget getUserIntial(chat){
-    String user_img = chat.sender_id == user!.id ? chat.receiver_img : chat.sender_img ;
-    String user_name = chat.sender_id == user!.id ? chat.receiver_name : chat.sender_name ;
+  Widget getUserIntial(Chat chat){
+    String user_img = chat.senderId == user!.id ? chat.receiverImg : chat.senderImg ;
+    String user_name = chat.senderId == user!.id ? chat.receiverName : chat.senderName ;
 
     return user_img== "" ?
     Text(user_name.toUpperCase().substring(0 , 1) +
         (user_name.contains(" ") ? user_name.substring(user_name.indexOf(" ")).toUpperCase().substring(1 , 2) : ""),
       style: const TextStyle(color: Colors.white , fontSize: 22.0 , fontWeight: FontWeight.bold),) : Container();
   }
-  String getUserName(chat){
-    String user_name = chat.sender_id == user!.id ? chat.receiver_name : chat.sender_name ;
+  String getUserName(Chat chat){
+    String user_name = chat.senderId == user!.id ? chat.receiverName : chat.senderName ;
      return user_name ;
   }
 
@@ -496,13 +496,10 @@ class ChatsScreenState extends State<ChatsScreen> {
     print('dateTime ($dateTime)');
     return DateFormat(DATE_FORMAT).format(DateTime.parse(dateTime) );
   }
-
-
   Widget itemListBuilder(index) => GestureDetector(
     onTap: (){
       Navigator.push(context, MaterialPageRoute(builder: (ctx) =>
           InnerProfileScreen(visitor_id: friends![index].friend_id == user!.id ?  friends![index].user_id :  friends![index].friend_id)));
-
     },
     child: Column(
       children: [
@@ -514,7 +511,6 @@ class ChatsScreenState extends State<ChatsScreen> {
                 children: [
                   CircleAvatar(
                     backgroundColor: friends![index].follower_gender == 0 ? MyColors.blueColor : MyColors.pinkColor ,
-
                     backgroundImage: friends![index].follower_img != "" ?
                     CachedNetworkImageProvider(getUserImage(index)!) : null,
                     radius: 30,
@@ -541,7 +537,6 @@ class ChatsScreenState extends State<ChatsScreen> {
                     ],
                   ),
                   Row(
-
                     children: [
                       Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Levels/' + friends![index].share_level_img) , width: 40,),
                       const SizedBox(width: 10.0,),

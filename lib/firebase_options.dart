@@ -44,9 +44,9 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyAKLX3wO09ayV7W5vUELtIuhK6NMC4qscc',
     appId: '1:672957384118:web:58836e30b304ad6b6fed17',
     messagingSenderId: '672957384118',
-    projectId: 'chat-4286b',
-    authDomain: 'chat-4286b.firebaseapp.com',
-    storageBucket: 'chat-4286b.firebasestorage.app',
+    projectId: 'chatScreen-4286b',
+    authDomain: 'chatScreen-4286b.firebaseapp.com',
+    storageBucket: 'chatScreen-4286b.firebasestorage.app',
     measurementId: 'G-5Z2R5K3MT2',
   );
 
@@ -71,19 +71,19 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyD8ePJjKNvoU2cRsWTCw12AtPHGrKlOyRo',
     appId: '1:672957384118:ios:9ea188c4e11098e36fed17',
     messagingSenderId: '672957384118',
-    projectId: 'chat-4286b',
-    storageBucket: 'chat-4286b.firebasestorage.app',
+    projectId: 'chatScreen-4286b',
+    storageBucket: 'chatScreen-4286b.firebasestorage.app',
     iosClientId: '672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com',
-    iosBundleId: 'com.chat.apps.chat.chat',
+    iosBundleId: 'com.chatScreen.apps.chatScreen.chatScreen',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyAKLX3wO09ayV7W5vUELtIuhK6NMC4qscc',
     appId: '1:672957384118:web:5687954bce242d466fed17',
     messagingSenderId: '672957384118',
-    projectId: 'chat-4286b',
-    authDomain: 'chat-4286b.firebaseapp.com',
-    storageBucket: 'chat-4286b.firebasestorage.app',
+    projectId: 'chatScreen-4286b',
+    authDomain: 'chatScreen-4286b.firebaseapp.com',
+    storageBucket: 'chatScreen-4286b.firebasestorage.app',
     measurementId: 'G-TBK8EC1C0E',
   );
 

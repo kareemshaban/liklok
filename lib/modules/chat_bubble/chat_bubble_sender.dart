@@ -52,61 +52,82 @@ class _ChatBubble1State extends State<ChatBubble1> {
 
   }
 
+  TextDirection _getTextDirection(message) {
+    final arabicRegex = RegExp(r'[\u0600-\u06FF]');
+    if (arabicRegex.hasMatch(widget.message)) {
+      return TextDirection.rtl;
+    } else {
+      return TextDirection.ltr;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width:  MediaQuery.of(context).size.width * 0.5,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.5,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
             alignment: AlignmentDirectional.bottomStart,
             children: [
               Container(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadiusDirectional.only(
-                      topStart: Radius.circular(10.0),
-                      topEnd: Radius.circular(10.0),
-                      bottomStart: Radius.circular(10.0),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadiusDirectional.only(
+                    topStart: Radius.circular(10.0),
+                    topEnd: Radius.circular(10.0),
+                    bottomStart: Radius.circular(10.0),
+                  ),
+                  color: Colors.blue[500],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.message.contains('YOU CAN DECLINE OR ACCEPT')
+                          ? widget.message.substring(
+                        0,
+                        widget.message.indexOf('YOU CAN DECLINE OR ACCEPT'),
+                      )
+                          : widget.message,
+                      style: const TextStyle(fontSize: 16.0, color: Colors.white),
+                      softWrap: true,
+                      textDirection: _getTextDirection(widget.message),
                     ),
-                    color: Colors.blue[500] ,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      (widget.message.contains('YOU CAN DECLINE OR ACCEPT')) ? Text(
-                        widget.message.substring(0 , widget.message.indexOf('YOU CAN DECLINE OR ACCEPT')),
-                        style:const TextStyle(fontSize: 16.0 , color: Colors.white),
-                        maxLines: 20,
-                        overflow: TextOverflow.ellipsis,
-                      ):
-                      Text(
-                        widget.message,
-                        style:const TextStyle(fontSize: 16.0 , color: Colors.white),
-                        maxLines: 20,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                       (widget.message.contains('YOU CAN DECLINE OR ACCEPT')) ? Center(
-                         child:  (widget.reciver_id == widget.current_user_id && isCompleted == 0) ?  GestureDetector(
-                           behavior: HitTestBehavior.opaque,
-                           onTap: (){
-                               print('showAlertDialog');
 
-                               showAlertDialog(context);
-                           },
-                           child: Container(
-                               height: 40.0,
-                               width: 200.0,
-                               margin: EdgeInsets.only(bottom: 10.0),
-                               decoration: BoxDecoration(color: MyColors.primaryColor , borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                               child:    Center(child: Text("Take Action" , style: TextStyle(color: Colors.white),)),
-                           ),
-                         ) : Container(),
-                       ) : Container()
-                    ],
-                  ),
+                    if (widget.message.contains('YOU CAN DECLINE OR ACCEPT'))
+                      Center(
+                        child: (widget.reciver_id == widget.current_user_id && isCompleted == 0)
+                            ? GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            print('showAlertDialog');
+                            showAlertDialog(context);
+                          },
+                          child: Container(
+                            height: 40.0,
+                            width: 200.0,
+                            margin: const EdgeInsets.only(top: 8.0, bottom: 10.0),
+                            decoration: BoxDecoration(
+                              color: MyColors.primaryColor,
+                              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Take Action",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        )
+                            : Container(),
+                      ),
+                  ],
                 ),
               ),
             ],

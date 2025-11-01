@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '2.1.0'
+    ext.kotlin_version = '2.2.21'
     repositories {
         google()
         mavenCentral()
@@ -10,8 +10,6 @@ buildscript {
         classpath 'com.google.gms:google-services:4.3.15'
         // END: FlutterFire Configuration
         classpath 'com.android.tools.build:gradle:8.6.0'
-
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // ✅ Use the ext variable
     }
 }
 

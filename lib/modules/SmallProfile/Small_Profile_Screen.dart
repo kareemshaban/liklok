@@ -10,7 +10,6 @@ import 'package:LikLok/models/Relation.dart';
 import 'package:LikLok/modules/InnerProfile/Inner_Profile_Screen.dart';
 import 'package:LikLok/modules/Room/Components/gift_modal.dart';
 import 'package:LikLok/modules/Room/Room_Screen.dart';
-import 'package:LikLok/modules/chat/chat.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
@@ -19,9 +18,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svga/flutter_svga.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+
+import '../chatScreen/chat_screen.dart';
 
 class SmallProfileModal extends StatefulWidget {
   final AppUser? visitor ;
@@ -406,7 +406,7 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
         ChatRoomService().savedRoomSetter(null);
         await ChatRoomService.engine!.leaveChannel();
         await ChatRoomService.engine!.release();
-        MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0).leaveMic();
+        MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0 , user!).leaveMic();
         ExitRoomHelper(user!.id , savedRoom.id);
 
       }
@@ -545,7 +545,7 @@ class _SmallProfileModalState extends State<SmallProfileModal> {
     print('visitor');
     print(user);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(receiverUserEmail: user!.email, receiverUserID: user!.id , receiver: user!,),));
+    // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(receiverUserEmail: user!.email, receiverUserID: user!.id , receiver: user!, messages: [],),));
   }
 
   trackUser() async {

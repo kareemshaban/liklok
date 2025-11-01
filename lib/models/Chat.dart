@@ -1,64 +1,100 @@
-class Chat {
-  final int id ;
-  final int sender_id ;
-  final int reciver_id ;
-  final String last_action_date ;
-  final String last_message ;
-  final int last_sender ;
-  final String created_at ;
-  final String updated_at ;
-  final String sender_name ;
-  final String sender_img ;
-  final String receiver_name ;
-  final String receiver_img ;
-  // final int message_id ;
-  // final String message_sender ;
-  // final String message_reciver ;
-  // final String message_date ;
-  // final String message ;
-  // final String img ;
-  // final String type ;
-  // final String isSeen ;
+import 'message.dart';
 
-  Chat({required this.id, required this.sender_id, required this.reciver_id,
-    required this.last_action_date, required this.last_message , required this.last_sender ,
-    required this.created_at , required this.updated_at , required this.sender_name ,
-    required this.sender_img , required this.receiver_name, required this.receiver_img,
- });
+class ChatResponse {
+  final String state;
+  final List<Chat> chats;
 
-  factory Chat.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-       'id': int id ,
-       'sender_id': int sender_id ,
-      'reciver_id': int reciver_id ,
-      'last_action_date': String last_action_date ,
-      'last_message': String last_message ,
-      'last_sender': int last_sender ,
-      'created_at': String created_at ,
-      'updated_at': String updated_at ,
-      'sender_name': String sender_name ,
-      'sender_img': String sender_img ,
-      'receiver_name': String receiver_name ,
-      'receiver_img': String receiver_img ,
+  ChatResponse({
+    required this.state,
+    required this.chats,
+  });
 
-      } =>
-          Chat(
-              id: id,
-              sender_id: sender_id,
-              reciver_id: reciver_id,
-              last_action_date: last_action_date,
-              last_message: last_message,
-              last_sender:last_sender,
-              created_at: created_at,
-              updated_at: updated_at,
-              sender_name: sender_name,
-              sender_img: sender_img,
-              receiver_name: receiver_name,
-              receiver_img: receiver_img,
+  factory ChatResponse.fromJson(Map<String, dynamic> json) {
+    return ChatResponse(
+      state: json['state'] ?? '',
+      chats: (json['chats'] as List<dynamic>?)
+          ?.map((chatJson) => Chat.fromJson(chatJson))
+          .toList() ??
+          [],
+    );
+  }
 
-          ),
-      _ => throw const FormatException('Failed to load Chat.'),
+  Map<String, dynamic> toJson() {
+    return {
+      'state': state,
+      'chats': chats.map((c) => c.toJson()).toList(),
     };
   }
 }
+
+class Chat {
+  final int id;
+  final int senderId;
+  final int receiverId;
+  final String lastActionDate;
+  final String lastMessage;
+  final int lastSender;
+  final String createdAt;
+  final String updatedAt;
+  final String senderName;
+  final String senderImg;
+  final String receiverName;
+  final String receiverImg;
+  final List<Message> messages;
+
+  Chat({
+    required this.id,
+    required this.senderId,
+    required this.receiverId,
+    required this.lastActionDate,
+    required this.lastMessage,
+    required this.lastSender,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.senderName,
+    required this.senderImg,
+    required this.receiverName,
+    required this.receiverImg,
+    required this.messages,
+  });
+
+  factory Chat.fromJson(Map<String, dynamic> json) {
+    return Chat(
+      id: json['id'] ?? 0,
+      senderId: json['sender_id'] ?? 0,
+      receiverId: json['reciver_id'] ?? 0,
+      lastActionDate: json['last_action_date'] ?? '',
+      lastMessage: json['last_message'] ?? '',
+      lastSender: json['last_sender'] ?? 0,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      senderName: json['sender_name'] ?? '',
+      senderImg: json['sender_img'] ?? '',
+      receiverName: json['receiver_name'] ?? '',
+      receiverImg: json['receiver_img'] ?? '',
+      messages: (json['messages'] as List<dynamic>?)
+          ?.map((msg) => Message.fromJson(msg))
+          .toList() ??
+          [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sender_id': senderId,
+      'reciver_id': receiverId,
+      'last_action_date': lastActionDate,
+      'last_message': lastMessage,
+      'last_sender': lastSender,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'sender_name': senderName,
+      'sender_img': senderImg,
+      'receiver_name': receiverName,
+      'receiver_img': receiverImg,
+      'messages': messages.map((m) => m.toJson()).toList(),
+    };
+  }
+}
+

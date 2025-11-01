@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'package:LikLok/helpers/GiftHelper.dart';
 import 'package:LikLok/models/Badge.dart';
+import 'package:LikLok/models/Mic.dart';
 import 'package:LikLok/models/token_model.dart';
+import 'package:LikLok/modules/Room/Components/gift_image.dart';
 import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -17,7 +20,6 @@ import 'package:LikLok/helpers/RoomBasicDataHelper.dart';
 import 'package:LikLok/layout/tabs_screen.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Category.dart' as Cat;
-import 'package:LikLok/models/Chat.dart';
 import 'package:LikLok/models/ChatRoom.dart';
 import 'package:LikLok/models/ChatRoomMessage.dart';
 import 'package:LikLok/models/Design.dart';
@@ -53,12 +55,10 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' as foundation;
-import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 import 'package:flutter/services.dart';
-
 import '../../helpers/zego_handler/live_audio_room_manager.dart';
-import '../../helpers/zego_handler/zego_sdk_manager.dart';
-import '../../params/generate_zego_token_params.dart';
+import '../../shared/constants/Contants.dart';
+import 'Components/app_utils/app_snack_bar.dart';
 
 //const appId = "f26e793582cb48359a4cb36dba3a9d3f";
 //const appId = "36fdda9bf58b40caa90d34b1893909f0";
@@ -71,8 +71,8 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
-  String appId = "";
-
+  late final SVGAAnimationController _controller;
+  bool isSending = false;
   AppUser? user;
   List<Design> designs = [];
   String frame = "";
@@ -83,7 +83,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   List<Gift> gifts = [];
   List<Cat.Category> categories = [];
   TabController? _tabController;
-
   List<Widget> giftTabs = [];
 
   List<Widget> giftViews = [];
@@ -106,7 +105,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   String giftImg = "";
   List<String> micEmojs = ["", "", "", "", "", "", "", "", "", "", "", ""];
   bool _localUserJoined = false;
-  bool _localUserMute = true;
+  bool _localUserMute = false;
 
   int bannerState = 0;
 
@@ -137,6 +136,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   String enteryMessage = "";
   bool showEnteryBanner = false;
 
+  bool isVip = false;
+
   bool showRainLuckyCase = false;
 
   bool showLuckyCase = false;
@@ -165,21 +166,30 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   String appSign =
       'c65c2660926c15c386764de74a7330df068a35830a77bd059db1fb9dbbc99c24';
-  TokenModel? zegoToken ;
+  TokenModel? zegoToken;
 
   List<ZegoUser> users = [];
 
   List<StreamSubscription> subscriptions = [];
+
+  late ZegoExpressEngine zegoEngine;
+
+  ZegoMediaPlayer? audioPlayer;
+
+  List<RoomMember>? matchedMembers;
+
+  final List<Map<String, dynamic>> queue = [];
+  bool isPlaying = false;
+
+  List<String> entryQueue = [];
+  bool isShowingEntry = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     if (mounted) {
-      setState(() {
-        appId = AppSettingsServices().appSettingGetter()!.agora_id;
-      });
-
+      _controller = SVGAAnimationController(vsync: this);
       setState(() {
         isNewCommer = false;
         sendGiftReceiverType = "select_one_ore_more";
@@ -206,52 +216,49 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         }
       });
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkRoomBlock();
+    });
+
+    EnterRoomHelper(user!.id, room!.id, context);
     initZego();
-    checkRoomBlock();
     getRoomImage();
     print('room!.id');
     print(room!.id);
-    EnterRoomHelper(user!.id, room!.id, zegoToken!.token);
-
     geAdminDesigns();
 
     //listeners//
-    RolletCreatListner();
-    enterRoomListener();
-    exitRoomListener();
-    micListener();
-    micUsageListener();
-    themesListener();
-    micEmossionListener();
-    giftListener();
-    micCounterListener();
-    micRemoveListener();
-    blockRoomListener();
-    luckyCaseListener();
-    RoomAdminsListener();
-    messagesListener();
+    // RolletCreatListner();
+    // enterRoomListener();
+    // exitRoomListener();
+    // micListener();
+    // micUsageListener();
+    // themesListener();
+    // micEmossionListener();
+    // giftListener();
+    // micCounterListener();
+    // micRemoveListener();
+    // blockRoomListener();
+    // luckyCaseListener();
+    // RoomAdminsListener();
+    // messagesListener();
 
-    if (ChatRoomService.savedRoom == null) {
-      setState(() {
-        isNewCommer = true;
-      });
-      initAgora();
-    } else {
-      ChatRoomService().savedRoomSetter(null);
-      String role = ChatRoomService.userRole;
-      if (mounted) {
-        setState(() {
-          _localUserJoined = true;
-          isNewCommer = false;
-          _engine = ChatRoomService.engine!;
-          if (role == 'clientRoleAudience') {
-            _localUserMute = true;
-          } else {
-            _localUserMute = false;
-          }
-        });
-      }
-    }
+    // if (ChatRoomService.savedRoom == null) {
+    //   setState(() {
+    //     isNewCommer = true;
+    //   });
+    //   // initAgora();
+    // } else {
+    //   ChatRoomService().savedRoomSetter(null);
+    //   String role = ChatRoomService.userRole;
+    //   if (mounted) {
+    //     setState(() {
+    //       _localUserJoined = true;
+    //       isNewCommer = false;
+    //     });
+    //   }
+    // }
 
     getRoomBasicData();
     focusNode.addListener(() {
@@ -270,34 +277,722 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     luckyCaseForNewComers();
   }
 
+  void playNext() async {
+    if (isPlaying || queue.isEmpty) return;
+
+    isPlaying = true;
+    final gift = queue.removeAt(0);
+
+    await playGift(gift);
+
+    isPlaying = false;
+    playNext();
+  }
+
+  Future<void> playGift(Map<String, dynamic> gift) async {
+    if (gift['gift_img'].toLowerCase().endsWith('.svga')) {
+      await svgaImagesListener(
+        gift['room_id'],
+        gift['gift_img'],
+        gift['gift_name'],
+        gift['receiver_name'],
+        gift['sender_name'],
+        gift['sender_share_level'],
+        gift['sender_img'],
+        gift['sender_id'],
+        gift['gift_audio'],
+        gift['giftImgSmall'],
+        gift['sender'],
+        gift['gift_category_id'],
+        gift['reward'],
+        gift['gift_id'],
+        gift['receiver_id'],
+        gift['count'],
+      );
+    }
+    await Future.delayed(const Duration(milliseconds: 800));
+  }
+
+  void addGift(Map<String, dynamic> giftData) {
+    queue.add(giftData);
+    print('queue.length');
+    print(queue.length);
+    playNext();
+  }
+
+  void addUserToEntryQueue(String userId) {
+    entryQueue.add(userId);
+    _playNextEntry();
+  }
+
+  void _playNextEntry() async {
+    if (isShowingEntry || entryQueue.isEmpty) return;
+
+    isShowingEntry = true;
+
+    while (entryQueue.isNotEmpty) {
+      final nextUserId = entryQueue.removeAt(0);
+      Future.delayed(Duration(milliseconds: 350));
+      await userJoinRoomWelcome(nextUserId);
+    }
+
+    isShowingEntry = false;
+    print('All users have joined the room!');
+  }
+
   Future<void> initZego() async {
-    zegoToken = await ChatRoomService().generateToken(user!.id) ;
-    print(zegoToken!.token);
+    room = ChatRoomService().roomGetter();
+
+    for (var member in room!.members!) {
+      print('🧍 Member ID: ${member.user_id}, Name: ${member.user_id}');
+      print(user!.id);
+    }
+
     await ZEGOSDKManager().init(
       appID,
       appSign,
       scenario: ZegoScenario.HighQualityChatroom,
     );
-
+    print('All Data');
+    print(user!.id);
+    print(user!.name);
     await ZEGOSDKManager().connectUser(user!.id.toString(), user!.name);
 
     final zimService = ZEGOSDKManager().zimService;
     final expressService = ZEGOSDKManager().expressService;
 
+    createMediaPlayer();
+
+    final token = await ChatRoomService().generateToken(user!.id);
+    print('token');
+    print(token.token);
+
+    ZegoLiveAudioRoomManager().logoutRoom();
+
+    await ZegoLiveAudioRoomManager()
+        .loginRoom(
+          room!.id.toString(),
+          ZegoLiveAudioRoomRole.audience,
+          token: token.token,
+        )
+        .then((result) {
+          setState(() {
+            _localUserJoined = true;
+          });
+          if (result.errorCode == 0) {
+            print("✅ Login Room Success");
+            ChatRoomMessage message = ChatRoomMessage(
+              message: 'room_msg'.tr,
+              user_name: 'APP',
+              user_share_level_img: '',
+              user_img: '',
+              user_id: 0,
+              type: "TEXT",
+            );
+            List<ChatRoomMessage> old = [...messages];
+            old.add(message);
+            if (room!.hello_message != "") {
+              message = ChatRoomMessage(
+                message: room!.hello_message,
+                user_name: 'ROOM',
+                user_share_level_img: '',
+                user_img: '',
+                user_id: 0,
+                type: "TEXT",
+              );
+              old.add(message);
+            }
+            if (mounted) {
+              setState(() {
+                messages = old;
+              });
+            }
+            // remove await from refreshRoom
+            ChatRoomMessagesHelper(
+              room_id: room!.id,
+              user_id: user!.id,
+              message: 'user_enter_message'.tr,
+              type: 'TEXT',
+              user_name: user!.name,
+              user_share_level_img: user!.share_level_icon,
+              user_img: user!.img,
+              vip: user!.vips!.length > 0 ? user!.vips![0].icon : "",
+              pubble: '',
+              badges: [],
+            ).sendRoomEvent();
+          } else {
+            print("❌ Login Room Failed: ${result.errorCode}");
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => TabsScreen()),
+              (Route<dynamic> route) => false,
+            );
+          }
+        })
+        .onError((error, _) {
+          print("❌ Login Room Exception: $error");
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => TabsScreen()),
+            (Route<dynamic> route) => false,
+          );
+        });
+
+    users.add(ZegoUser(user!.id.toString(), user!.name));
+
+    ZegoExpressEngine.onRoomStreamUpdate =
+        (
+          String roomID,
+          ZegoUpdateType updateType,
+          List<ZegoStream> streamList,
+          Map<String, dynamic> extendedData,
+        ) {
+          if (updateType == ZegoUpdateType.Add) {
+            for (var stream in streamList) {
+              print("📡 New stream added: ${stream.streamID}");
+              ZegoExpressEngine.instance.startPlayingStream(stream.streamID);
+            }
+          } else if (updateType == ZegoUpdateType.Delete) {
+            for (var stream in streamList) {
+              print("❌ Stream removed: ${stream.streamID}");
+              ZegoExpressEngine.instance.stopPlayingStream(stream.streamID);
+            }
+          }
+        };
+
     // Listen to room user updates
-    expressService.roomUserListUpdateStreamCtrl.stream.listen((event) async {
-      if (event.updateType == ZegoUpdateType.Add) {
-        // Handle user joining the room
-        users.addAll(event.userList);
-        await ChatRoomService().enterRoom(user!.id, room!.id);
-        print('User entered');
-      } else if (event.updateType == ZegoUpdateType.Delete) {
-        // Handle user leaving the room
-        users.removeWhere((element) => element.userID == event.userList.first.userID);
-        await ChatRoomService().exitRoom(user!.id, room!.id);
-        print('User exited');
-      }
-    });
+    subscriptions.addAll([
+      expressService.roomUserListUpdateStreamCtrl.stream.listen((event) async {
+        if (event.updateType == ZegoUpdateType.Add) {
+          print('User(s) entered: ${event.userList.length}');
+          users.addAll(event.userList);
+
+          for (var newUser in event.userList) {
+            await ChatRoomService().enterRoom(newUser.userID, room!.id);
+
+            await refreshRoom(0);
+
+            addUserToEntryQueue(newUser.userID);
+          }
+        } else if (event.updateType == ZegoUpdateType.Delete) {
+          print('User(s) exited: ${event.userList.length}');
+
+          for (var exitedUser in event.userList) {
+            ChatRoomService().exitRoom(exitedUser.userID, room!.id);
+            users.removeWhere((element) => element.userID == exitedUser.userID);
+          }
+        }
+      }),
+      zimService.roomAttributeUpdateStreamCtrl.stream.listen((event) async {
+        final attrs = event.updateInfo.roomAttributes;
+
+        if (attrs.containsKey("theme_change_event")) {
+          final rawData = attrs["theme_change_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            final eventRoomId = data['room_id'];
+            final user_id = data['user_id'];
+            final theme_id = data['bg'];
+
+            if (user_id == user!.id) {
+              await ChatRoomService().changeTheme(theme_id, eventRoomId);
+            }
+            refreshRoom(0);
+          }
+        }
+
+        if (attrs.containsKey("mic_event")) {
+          final rawData = attrs["mic_event"];
+
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            final targetMicId = data['id'];
+            final targetRoomId = data['room_id'];
+            final targetOrder = data['order'];
+            final targetUserId = data['user_id'];
+            final targetIsClosed = data['isClosed'];
+            final targetIsMute = data['isMute'];
+            final targetCounter = data['counter'];
+            final targetChargingLevel = data['mic_user_charging_level'];
+            final targetKarizmaLevel = data['mic_user_karizma_level'];
+            final targetBirthDate = data['mic_user_birth_date'];
+            final targetShareLevel = data['mic_user_share_level'];
+            final targetTag = data['mic_user_tag'];
+            final targetUserName = data['mic_user_name'];
+            final targetUserImg = data['mic_user_img'];
+            final targetUserGender = data['mic_user_gender'];
+
+            if (targetUserId == user!.id) {
+              String streamId = "${user!.id}_${targetRoomId}";
+              await startMicStream(streamId);
+              ChatRoomService().useMic(targetUserId, targetRoomId, targetOrder);
+              if (mounted) {
+                _localUserMute = false;
+              }
+            } else {
+              String streamId = "${targetUserId}_${targetRoomId}";
+              ZegoExpressEngine.instance.startPlayingStream(streamId);
+              print('Voice done');
+            }
+            if(mounted){
+              setState(() {
+                // refreshRoom(user!.id);
+                print(room!.mics.toString());
+
+                int index = room!.mics!.indexWhere(
+                      (mic) => mic.user_id == targetUserId,
+                );
+                if (index != -1) {
+                  room!.mics![index] = Mic(
+                    id: index,
+                    room_id: targetRoomId,
+                    order: index + 1,
+                    user_id: 0,
+                    isClosed: 0,
+                    isMute: 0,
+                    counter: 0,
+                    mic_user_gender: null,
+                    mic_user_img: null,
+                    mic_user_name: null,
+                    mic_user_tag: null,
+                    mic_user_share_level: null,
+                    mic_user_birth_date: null,
+                    mic_user_karizma_level: null,
+                    mic_user_charging_level: null,
+                    frame: '',
+                  );
+                }
+
+                room!.mics![targetOrder - 1] = Mic(
+                  id: targetMicId,
+                  room_id: targetRoomId,
+                  order: targetOrder,
+                  user_id: targetUserId,
+                  isClosed: targetIsClosed,
+                  isMute: targetIsMute,
+                  counter: targetCounter,
+                  mic_user_gender: targetUserGender,
+                  mic_user_img: targetUserImg,
+                  mic_user_name: targetUserName,
+                  mic_user_tag: targetTag,
+                  mic_user_share_level: targetShareLevel,
+                  mic_user_birth_date: targetBirthDate,
+                  mic_user_karizma_level: targetKarizmaLevel,
+                  mic_user_charging_level: targetChargingLevel,
+                  frame: '',
+                );
+              });
+            }
+          }
+        }
+
+        if (attrs.containsKey("mic_leave_event")) {
+          final rawData = attrs["mic_leave_event"];
+
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            final targetRoomId = data['room_id'];
+            final targetOrder = data['order'];
+            final targetUserId = data['user_id'];
+
+            if (targetUserId == user!.id) {
+              await ZegoExpressEngine.instance.stopPublishingStream();
+              await ZegoExpressEngine.instance.muteMicrophone(true);
+              ChatRoomService().leaveMic(
+                targetUserId,
+                targetRoomId,
+                targetOrder,
+                user!.id,
+              );
+            } else {
+              final streamId = "${targetUserId}_${targetRoomId}";
+              ZegoExpressEngine.instance.stopPlayingStream(streamId);
+            }
+            if(mounted){
+              setState(() {
+                int index = room!.mics!.indexWhere(
+                      (mic) => mic.user_id == targetUserId,
+                );
+                if (index != -1) {
+                  room!.mics![index] = Mic(
+                    id: index,
+                    room_id: targetRoomId,
+                    order: index + 1,
+                    user_id: 0,
+                    isClosed: 0,
+                    isMute: _localUserMute ? 1 : 0,
+                    counter: 0,
+                    mic_user_gender: null,
+                    mic_user_img: null,
+                    mic_user_name: null,
+                    mic_user_tag: null,
+                    mic_user_share_level: null,
+                    mic_user_birth_date: null,
+                    mic_user_karizma_level: null,
+                    mic_user_charging_level: null,
+                    frame: '',
+                  );
+                }
+              });
+            }
+          }
+        }
+
+        if (attrs.containsKey("gift_event")) {
+          final rawData = attrs["gift_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            dynamic availableUntil = DateTime.parse(data['available_untill']);
+            if (checkGiftShow(availableUntil)) {
+              AppUser? sender = await AppUserServices().getUser(
+                data['sender_id'],
+              );
+
+              final giftData = {
+                'room_id': data['room_id'],
+                'sender_id': data['sender_id'],
+                'sender_name': data['sender_name'],
+                'sender_img': data['sender_img'],
+                'receiver_id': data['receiver_id'],
+                'receiver_name': data['receiver_name'],
+                'receiver_img': data['receiver_img'],
+                'gift_name': data['gift_name'],
+                'gift_audio': data['gift_audio'],
+                'gift_img': data['gift_img'],
+                'giftImgSmall': data['giftImgSmall'],
+                'count': data['count'],
+                'sender_share_level': data['sender_share_level'],
+                'sender': sender,
+                'gift_category_id': data['gift_category_id'],
+                'reward': data['reward'],
+                'gift_id': data['gift_id'],
+              };
+              print('giftData[gift_img]');
+              print(giftData['gift_img']);
+              addGift(giftData);
+            }
+          }
+
+          refreshRoom(0);
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'gift_event',
+          ]);
+        }
+
+        if (attrs.containsKey("emoji_event")) {
+          print('emoji_event');
+          final rawData = attrs["emoji_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            final roomId = data['room_id'];
+            final userId = data['user_id'];
+            final mic = data['mic'];
+            final emoji = data['emoj'];
+            print('mic');
+            print(mic);
+
+            if (roomId == room!.id && micEmojs[mic - 1] == '') {
+              if (mounted) {
+                setState(() {
+                  micEmojs[mic - 1] = emoji;
+                });
+              }
+              print('micEmojs[mic - 1]');
+              print(micEmojs[mic - 1]);
+
+              await Future.delayed(Duration(seconds: 5));
+              if (mounted) {
+                setState(() {
+                  micEmojs[mic - 1] = "";
+                });
+              }
+            } else {
+              await Future.delayed(Duration(seconds: 4));
+              if (mounted) {
+                setState(() {
+                  micEmojs[mic - 1] = emoji;
+                });
+              }
+              print('micEmojs[mic - 1]');
+              print(micEmojs[mic - 1]);
+
+              await Future.delayed(Duration(seconds: 5));
+              if (mounted) {
+                setState(() {
+                  micEmojs[mic - 1] = "";
+                });
+              }
+            }
+
+            print("😄 Emoji event received from user $userId: $emoji , $mic");
+          }
+
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'emoji_event',
+          ]);
+        }
+
+        if (attrs.containsKey("room_event")) {
+          final rawData = attrs["room_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            final roomId = data['room_id'];
+            if (roomId == room!.id) {
+              final message = ChatRoomMessage(
+                roomId: data['room_id'],
+                user_id: data['user_id'],
+                message: data['message'] ?? '',
+                type: data['type'] ?? 'TEXT',
+                user_name: data['user_name'] ?? '',
+                user_share_level_img: data['user_share_level_img'] ?? '',
+                user_img: data['user_img'] ?? '',
+                vip: data['vip'],
+                pubble: data['pubble'],
+                badges: data['badges'] != null
+                    ? (data['badges'] as List)
+                          .map((b) => UserBadge.fromJson(b))
+                          .toList()
+                    : null,
+              );
+
+              if (mounted) {
+                setState(() {
+                  messages.add(message);
+                  Future.delayed(Duration(seconds: 2)).then(
+                    (value) => {
+                      _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 1),
+                        curve: Curves.fastOutSlowIn,
+                      ),
+                    },
+                  );
+                });
+              }
+
+              print(
+                "✅ Room message received from user ${data['user_id']}: ${data['message']}",
+              );
+            }
+          }
+
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'room_event',
+          ]);
+        }
+
+        if (attrs.containsKey("lock_mic_event")) {
+          final rawData = attrs["lock_mic_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            print('start');
+            final data = jsonDecode(rawData);
+            final user_id = data['user_id'];
+            final mic = data['mic'];
+
+            if (user!.id.toString() == user_id) {
+              await ChatRoomService().lockMic(
+                user!.id,
+                room!.id,
+                mic,
+                AppUserServices().userGetter()!.id,
+              );
+            }
+
+            if (mic != 0) {
+              room!.mics![mic - 1] = Mic(
+                id: mic - 1,
+                room_id: data['room_id'],
+                order: mic,
+                user_id: 0,
+                isClosed: 1,
+                isMute: 0,
+                counter: 0,
+                mic_user_gender: null,
+                mic_user_img: null,
+                mic_user_name: null,
+                mic_user_tag: null,
+                mic_user_share_level: null,
+                mic_user_birth_date: null,
+                mic_user_karizma_level: null,
+                mic_user_charging_level: null,
+                frame: '',
+              );
+            } else {
+              for (int i = 0; i <= room!.mics!.length; i++) {
+                room!.mics![i] = Mic(
+                  id: i,
+                  room_id: data['room_id'],
+                  order: i + 1,
+                  user_id: 0,
+                  isClosed: 1,
+                  isMute: 0,
+                  counter: 0,
+                  mic_user_gender: null,
+                  mic_user_img: null,
+                  mic_user_name: null,
+                  mic_user_tag: null,
+                  mic_user_share_level: null,
+                  mic_user_birth_date: null,
+                  mic_user_karizma_level: null,
+                  mic_user_charging_level: null,
+                  frame: '',
+                );
+              }
+            }
+          }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'lock_mic_event',
+          ]);
+        }
+
+        if (attrs.containsKey("unlock_mic_event")) {
+          final rawData = attrs["unlock_mic_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            print('start');
+            final data = jsonDecode(rawData);
+            final user_id = data['user_id'];
+            final mic = data['mic'];
+
+            if (user!.id.toString() == user_id) {
+              await ChatRoomService().unlockMic(
+                user!.id,
+                room!.id,
+                mic,
+                AppUserServices().userGetter()!.id,
+              );
+            }
+
+            if (mic != 0) {
+              room!.mics![mic - 1] = Mic(
+                id: mic - 1,
+                room_id: data['room_id'],
+                order: mic,
+                user_id: 0,
+                isClosed: 0,
+                isMute: 0,
+                counter: 0,
+                mic_user_gender: null,
+                mic_user_img: null,
+                mic_user_name: null,
+                mic_user_tag: null,
+                mic_user_share_level: null,
+                mic_user_birth_date: null,
+                mic_user_karizma_level: null,
+                mic_user_charging_level: null,
+                frame: '',
+              );
+            } else {
+              for (int i = 0; i <= room!.mics!.length; i++) {
+                room!.mics![i] = Mic(
+                  id: i,
+                  room_id: data['room_id'],
+                  order: i + 1,
+                  user_id: 0,
+                  isClosed: 0,
+                  isMute: 0,
+                  counter: 0,
+                  mic_user_gender: null,
+                  mic_user_img: null,
+                  mic_user_name: null,
+                  mic_user_tag: null,
+                  mic_user_share_level: null,
+                  mic_user_birth_date: null,
+                  mic_user_karizma_level: null,
+                  mic_user_charging_level: null,
+                  frame: '',
+                );
+              }
+            }
+          }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'unlock_mic_event',
+            'data',
+          ]);
+        }
+
+        if (attrs.containsKey("remove_mic_event")) {
+          final rawData = attrs["remove_mic_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+            final mic = data['mic'];
+            final userIdToRemove = data['user_id'];
+            final roomId = data['room_id'];
+            final adminId = data['adminId'];
+
+            if (adminId == user!.id) {
+              await ChatRoomService().leaveMic(
+                userIdToRemove,
+                roomId,
+                mic,
+                adminId,
+              );
+            }
+            String streamId = "${userIdToRemove}_$roomId";
+            await ZegoExpressEngine.instance.stopPlayingStream(streamId);
+            print('Stopped voice stream of $userIdToRemove');
+
+            room!.mics![mic - 1] = Mic(
+              id: mic - 1,
+              room_id: roomId,
+              order: mic,
+              user_id: 0,
+              isClosed: 0,
+              isMute: 0,
+              counter: 0,
+              mic_user_gender: null,
+              mic_user_img: null,
+              mic_user_name: null,
+              mic_user_tag: null,
+              mic_user_share_level: null,
+              mic_user_birth_date: null,
+              mic_user_karizma_level: null,
+              mic_user_charging_level: null,
+              frame: '',
+            );
+
+            await ZEGOSDKManager().zimService.deleteRoomAttributes([
+              'remove_mic_event',
+            ]);
+          }
+        }
+
+        if (attrs.containsKey("kick_out_event")) {
+          final rawData = attrs["kick_out_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+            final targetUserId = data['user_id'];
+            final blockType = data['block_type'];
+            final roomId = data['room_id'];
+
+            print("🚨 kick event received for user: $targetUserId");
+
+            if (user!.id.toString() == targetUserId.toString()) {
+              await ChatRoomService().blockRoomMember(
+                targetUserId,
+                roomId,
+                blockType,
+                AppUserServices().userGetter()!.id,
+              );
+            }
+
+            final streamId = "${targetUserId}_${roomId}";
+            await ZegoExpressEngine.instance.stopPlayingStream(streamId);
+            blockRoomListener(blockType, roomId, targetUserId);
+            print('Stopped voice stream of $targetUserId');
+
+            await ZEGOSDKManager().zimService.deleteRoomAttributes([
+              'kick_out_event',
+            ]);
+          }
+        }
+      }),
+    ]);
 
     // Add all users currently in the room
     users.addAll(
@@ -305,6 +1000,125 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           .map((e) => ZegoUser(e.userID, e.userName))
           .toList(),
     );
+    print('users.length');
+    print(users.length);
+    for (var member in users) {
+      print('users');
+      print('🧍 Member ID: ${member.userID}, Name: ${member.userName}');
+      print(user!.id);
+    }
+
+    print('users.length');
+    print(users[0].userID);
+    print(user!.id);
+
+    bool exists = room!.members!.any((member) => member.user_id == user!.id);
+
+    if (exists) {
+      print('user is exist');
+    } else {
+      print('user is not exist');
+    }
+    matchedMembers = room!.members!.where((member) {
+      return users.any(
+        (zegoUser) => zegoUser.userID.toString() == member.user_id.toString(),
+      );
+    }).toList();
+
+    print(matchedMembers!.length);
+
+    print(users.length);
+
+    ZegoExpressEngine.onIMRecvBroadcastMessage =
+        (String roomID, List<ZegoBroadcastMessageInfo> messageList) {
+          if (messageList.isEmpty) {
+            debugPrint("⚠️ لا توجد رسائل مستلمة في القائمة");
+            return;
+          }
+
+          final ZegoBroadcastMessageInfo zegoMessage = messageList.last;
+
+          debugPrint("📩 استلمت رسالة نصها: ${zegoMessage.message}");
+
+          try {
+            final Map<String, dynamic> jsonMap =
+                jsonDecode(zegoMessage.message) as Map<String, dynamic>;
+
+            final ChatRoomMessage receivedMessage = ChatRoomMessage.fromJson(
+              jsonMap,
+            );
+
+            messages.insert(messages.length, receivedMessage);
+
+            debugPrint("✅ تم إضافة الرسالة لقائمة الرسائل");
+          } catch (e) {
+            debugPrint("❌ خطأ أثناء فك رسالة JSON أو التعامل معها: $e");
+          }
+        };
+  }
+
+  logoutRoom() async {
+    await ZEGOSDKManager().disconnectUser();
+
+    for (final subscription in subscriptions) {
+      subscription.cancel();
+    }
+  }
+
+  unUnitZego() async {
+    for (final subscription in subscriptions) {
+      subscription.cancel();
+    }
+    ZegoExpressEngine.onRoomStreamUpdate = null;
+    ZegoExpressEngine.onCapturedSoundLevelUpdate = null;
+    ZegoExpressEngine.onRemoteSoundLevelUpdate = null;
+    ZegoExpressEngine.onIMRecvBroadcastMessage = null;
+    ZegoExpressEngine.instance.stopSoundLevelMonitor();
+    if (audioPlayer != null) {
+      ZegoExpressEngine.instance.destroyMediaPlayer(audioPlayer!);
+      audioPlayer = null;
+    }
+    await logoutRoom();
+  }
+
+  Future<void> createMediaPlayer() async {
+    final profile = ZegoEngineProfile(
+      appID,
+      appSign: appSign,
+      ZegoScenario.Live,
+    );
+
+    await ZegoExpressEngine.createEngineWithProfile(profile);
+
+    zegoEngine = ZegoExpressEngine.instance;
+
+    print("✅ Zego Engine Initialized");
+
+    if (audioPlayer == null) {
+      print("🎵 Creating ZegoMediaPlayer...");
+
+      final player = await zegoEngine.createMediaPlayer();
+
+      if (player != null) {
+        audioPlayer = player;
+        print("🎶 ZegoMediaPlayer Created Successfully");
+      } else {
+        print("⚠️ Failed to create MediaPlayer instance");
+      }
+    } else {
+      print("ℹ️ MediaPlayer already initialized");
+    }
+  }
+
+  Future<void> startMicStream(String streamId) async {
+    try {
+      await ZegoExpressEngine.instance.muteMicrophone(false);
+      await ZegoExpressEngine.instance.startPublishingStream(streamId);
+
+      print("🎙️ تم تشغيل المايك وبدء البث الصوتي");
+    } catch (e) {
+      print("❌ فشل في تشغيل المايك: $e");
+    }
   }
 
   getLocal() async {
@@ -333,7 +1147,15 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         textColor: Colors.orange,
         fontSize: 16.0,
       );
-      exitRoom();
+      ExitRoomHelper(user!.id, room!.id);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const TabsScreen()),
+          (route) => false,
+        );
+      });
     } else {
       // not blocked
     }
@@ -380,30 +1202,30 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     });
   }
 
-  enterRoomListener() {
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'enterRoom',
-    );
-    reference.snapshots().listen((querySnapshot) async {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          int user_id = data['user_id'];
-          if (room_id == room!.id) {
-            await refreshRoom(0);
-
-            if (isNewCommer == true) {
-              userJoinRoomWelcome(user_id);
-            }
-          }
-        }
-      }
-    });
-  }
+  // enterRoomListener() {
+  //   CollectionReference reference = FirebaseFirestore.instance.collection(
+  //     'enterRoom',
+  //   );
+  //   reference.snapshots().listen((querySnapshot) async {
+  //     if (querySnapshot.docChanges.length > 0) {
+  //       DocumentChange change = querySnapshot.docChanges[0];
+  //
+  //       if (change.newIndex > 0) {
+  //         Map<String, dynamic>? data =
+  //             change.doc.data() as Map<String, dynamic>;
+  //         int room_id = data['room_id'];
+  //         int user_id = data['user_id'];
+  //         if (room_id == room!.id) {
+  //           await refreshRoom(0);
+  //
+  //           if (isNewCommer == true) {
+  //             userJoinRoomWelcome(user_id);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
   exitRoomListener() {
     CollectionReference reference = FirebaseFirestore.instance.collection(
@@ -652,49 +1474,39 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     });
   }
 
-  blockRoomListener() {
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'room-block',
-    );
-    reference.snapshots().listen((querySnapshot) {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          int user_id = data['user_id'];
-          String block_type = data['block_type'];
-          String kickout_period = "";
-          if (block_type == "HOUR") {
-            kickout_period = 'kick_out_hour'.tr;
-          } else if (block_type == "DAY") {
-            kickout_period = 'kick_out_day'.tr;
-          } else {
-            kickout_period = 'kick_out_forever'.tr;
-          }
-          if (room_id == room!.id) {
-            if (user_id == user!.id) {
-              Fluttertoast.showToast(
-                msg: 'kickout_msg'.tr + ' ' + kickout_period,
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.black26,
-                textColor: Colors.orange,
-                fontSize: 16.0,
-              );
-              exitRoom();
-            }
-            refreshRoom(0);
-          }
-        }
+  blockRoomListener(block_type, room_id, user_id) {
+    String kickout_period = "";
+    if (block_type == "HOUR") {
+      kickout_period = 'kick_out_hour'.tr;
+    } else if (block_type == "DAY") {
+      kickout_period = 'kick_out_day'.tr;
+    } else {
+      kickout_period = 'kick_out_forever'.tr;
+    }
+    if (room_id == room!.id) {
+      if (user_id == user!.id) {
+        Fluttertoast.showToast(
+          msg: 'kickout_msg'.tr + ' ' + kickout_period,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black26,
+          textColor: Colors.orange,
+          fontSize: 16.0,
+        );
+        exitRoom();
       }
-    });
+      refreshRoom(0);
+    }
   }
 
   exitRoom() async {
-    MicHelper(user_id: user!.id, room_id: room!.id, mic: 0).leaveMic();
+    MicHelper(
+      user_id: user!.id,
+      room_id: room!.id,
+      mic: 0,
+      user!,
+    ).sendMicLeaveEvent(audioPlayer, zegoEngine);
     ExitRoomHelper(user!.id, room!.id);
     await _engine.leaveChannel();
     await _engine.release();
@@ -705,215 +1517,199 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     );
   }
 
-  themesListener() {
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'themes',
-    );
-    reference.snapshots().listen((querySnapshot) {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          if (room_id == room!.id) {
-            refreshRoom(0);
-          }
-        }
-      }
-    });
-  }
+  // themesListener() {
+  //   CollectionReference reference = FirebaseFirestore.instance.collection(
+  //     'themes',
+  //   );
+  //   reference.snapshots().listen((querySnapshot) {
+  //     if (querySnapshot.docChanges.length > 0) {
+  //       DocumentChange change = querySnapshot.docChanges[0];
+  //       if (change.newIndex > 0) {
+  //         Map<String, dynamic>? data =
+  //             change.doc.data() as Map<String, dynamic>;
+  //         int room_id = data['room_id'];
+  //         if (room_id == room!.id) {
+  //           refreshRoom(0);
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
-  micEmossionListener() async {
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'emossions',
-    );
-    reference.snapshots().listen((querySnapshot) async {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          int mic = data['mic'];
-          int user = data['user'];
-          String emoj = data['emoj'];
-          if (room_id == room!.id) {
-            if (mounted) {
-              setState(() {
-                micEmojs[mic - 1] = emoj;
-              });
-            }
+  // micEmossionListener() async {
+  //   reference.snapshots().listen((querySnapshot) async {
+  //     if (querySnapshot.docChanges.length > 0) {
+  //       DocumentChange change = querySnapshot.docChanges[0];
+  //       if (change.newIndex > 0) {
+  //         Map<String, dynamic>? data =
+  //             change.doc.data() as Map<String, dynamic>;
+  //         int room_id = data['room_id'];
+  //         int mic = data['mic'];
+  //         int user = data['user'];
+  //         String emoj = data['emoj'];
+  //
+  //       }
+  //     }
+  //     // });
+  //   });
+  // }
 
-            await Future.delayed(Duration(seconds: 5));
-            if (mounted) {
-              setState(() {
-                micEmojs[mic - 1] = "";
-              });
-            }
-          }
-        }
-      }
-      // });
-    });
-  }
+  // messagesListener() async {
+  //   CollectionReference reference = FirebaseFirestore.instance.collection(
+  //     'RoomMessages',
+  //   );
+  //   reference.snapshots().listen((querySnapshot) async {
+  //     if (querySnapshot.docChanges.length > 0) {
+  //       DocumentChange change = querySnapshot.docChanges[0];
+  //
+  //       if (change.newIndex > 0) {
+  //         Map<String, dynamic>? data =
+  //             change.doc.data() as Map<String, dynamic>;
+  //         int room_id = data['room_id'];
+  //         int user_id = data['user_id'];
+  //         String msg = data['message'];
+  //         String type = data['type'];
+  //
+  //         print('room_idroom_idroom_id');
+  //         ChatRoom? res = await ChatRoomService().openRoomById(room!.id);
+  //         if (mounted) {
+  //           setState(() {
+  //             room = res;
+  //             ChatRoomService().roomSetter(room!);
+  //           });
+  //         }
+  //         RoomMember member = room!.members!
+  //             .where((element) => element.user_id == user_id)
+  //             .toList()[0];
+  //         AppUser? sender = await AppUserServices().getUser(user_id);
+  //         String pubble = "";
+  //         if (member.pubble != "") {
+  //           pubble =
+  //               ASSETSBASEURL + 'Designs/Motion/' + member.pubble.toString();
+  //         }
+  //
+  //         if (room_id == room!.id) {
+  //           ChatRoomMessage message = ChatRoomMessage(
+  //             message: msg.tr,
+  //             user_name: sender!.name.toString(),
+  //             user_share_level_img: sender.share_level_icon.toString(),
+  //             user_img: sender.img.toString(),
+  //             user_id: sender.id,
+  //             type: type,
+  //             vip: sender.vips!.length > 0 ? sender.vips![0].icon : "",
+  //             pubble: pubble,
+  //             badges: member.badges!,
+  //           );
+  //           List<ChatRoomMessage> old = [...messages];
+  //           old.add(message);
+  //           if (mounted) {
+  //             setState(() {
+  //               messages = old;
+  //             });
+  //           }
+  //
+  //           await Future.delayed(Duration(seconds: 2));
+  //           if (_scrollController.hasClients) {
+  //             _scrollController.animateTo(
+  //               _scrollController.position.maxScrollExtent,
+  //               duration: const Duration(milliseconds: 1),
+  //               curve: Curves.fastOutSlowIn,
+  //             );
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
-  messagesListener() async {
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'RoomMessages',
-    );
-    reference.snapshots().listen((querySnapshot) async {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          int user_id = data['user_id'];
-          String msg = data['message'];
-          String type = data['type'];
-
-          print('room_idroom_idroom_id');
-          ChatRoom? res = await ChatRoomService().openRoomById(room!.id);
-          if (mounted) {
-            setState(() {
-              room = res;
-              ChatRoomService().roomSetter(room!);
-            });
-          }
-          RoomMember member = room!.members!
-              .where((element) => element.user_id == user_id)
-              .toList()[0];
-          AppUser? sender = await AppUserServices().getUser(user_id);
-          String pubble = "";
-          if (member.pubble != "") {
-            pubble =
-                ASSETSBASEURL + 'Designs/Motion/' + member.pubble.toString();
-          }
-
-          if (room_id == room!.id) {
-            ChatRoomMessage message = ChatRoomMessage(
-              message: msg.tr,
-              user_name: sender!.name.toString(),
-              user_share_level_img: sender.share_level_icon.toString(),
-              user_img: sender.img.toString(),
-              user_id: sender.id,
-              type: type,
-              vip: sender.vips!.length > 0 ? sender.vips![0].icon : "",
-              pubble: pubble,
-              badges: member.badges!,
-            );
-            List<ChatRoomMessage> old = [...messages];
-            old.add(message);
-            if (mounted) {
-              setState(() {
-                messages = old;
-              });
-            }
-
-            await Future.delayed(Duration(seconds: 2));
-            if (_scrollController.hasClients) {
-              _scrollController.animateTo(
-                _scrollController.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 1),
-                curve: Curves.fastOutSlowIn,
-              );
-            }
-          }
-        }
-      }
-    });
-  }
-
-  giftListener() async {
-    //gifts
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'gifts',
-    );
-    reference.snapshots().listen((querySnapshot) async {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          int sender_id = data['sender_id'];
-          String sender_name = data['sender_name'];
-          String sender_img = data['sender_img'];
-          int receiver_id = data['receiver_id'];
-          String receiver_name = data['receiver_name'];
-          String receiver_img = data['receiver_img'];
-          String gift_name = data['gift_name'];
-          String gift_img = data['gift_img'];
-          int count = data['count'];
-          String gift_audio = data['gift_audio'];
-          String sender_share_level = data['sender_share_level'];
-          String small_gift = data['giftImgSmall'];
-          dynamic available_untill = data['available_untill'];
-          int gift_category_id = data['gift_category_id'];
-          int reward = data['reward'];
-          int gift_id = data['gift_id'];
-
-          if (checkGiftShow(available_untill)) {
-            AppUser? sender = await AppUserServices().getUser(sender_id);
-
-            if (room_id == room!.id) {
-              refreshRoom(0);
-            }
-            if (gift_img.toLowerCase().endsWith('.svga')) {
-              if (giftImg == '') {
-                svgaImagesListener(
-                  room_id,
-                  gift_img,
-                  gift_name,
-                  receiver_name,
-                  sender_name,
-                  sender_share_level,
-                  sender_img,
-                  sender_id,
-                  gift_audio,
-                  small_gift,
-                  sender,
-                  gift_category_id,
-                  reward,
-                  gift_id,
-                  receiver_id,
-                  count,
-                );
-              } else {
-                await Future.delayed(
-                  Duration(seconds: gift_category_id != 5 ? 5 : 8),
-                ).then(
-                  (value) => {
-                    svgaImagesListener(
-                      room_id,
-                      gift_img,
-                      gift_name,
-                      receiver_name,
-                      sender_name,
-                      sender_share_level,
-                      sender_img,
-                      sender_id,
-                      gift_audio,
-                      small_gift,
-                      sender,
-                      gift_category_id,
-                      reward,
-                      gift_id,
-                      receiver_id,
-                      count,
-                    ),
-                  },
-                );
-              }
-            }
-          }
-        }
-      }
-    });
-  }
+  // giftListener() async {
+  //   //gifts
+  //   CollectionReference reference = FirebaseFirestore.instance.collection(
+  //     'gifts',
+  //   );
+  //   reference.snapshots().listen((querySnapshot) async {
+  //     if (querySnapshot.docChanges.length > 0) {
+  //       DocumentChange change = querySnapshot.docChanges[0];
+  //
+  //       if (change.newIndex > 0) {
+  //         Map<String, dynamic>? data =
+  //             change.doc.data() as Map<String, dynamic>;
+  //         int room_id = data['room_id'];
+  //         int sender_id = data['sender_id'];
+  //         String sender_name = data['sender_name'];
+  //         String sender_img = data['sender_img'];
+  //         int receiver_id = data['receiver_id'];
+  //         String receiver_name = data['receiver_name'];
+  //         String receiver_img = data['receiver_img'];
+  //         String gift_name = data['gift_name'];
+  //         String gift_img = data['gift_img'];
+  //         int count = data['count'];
+  //         String gift_audio = data['gift_audio'];
+  //         String sender_share_level = data['sender_share_level'];
+  //         String small_gift = data['giftImgSmall'];
+  //         dynamic available_untill = data['available_untill'];
+  //         int gift_category_id = data['gift_category_id'];
+  //         int reward = data['reward'];
+  //         int gift_id = data['gift_id'];
+  //
+  //         if (checkGiftShow(available_untill)) {
+  //           AppUser? sender = await AppUserServices().getUser(sender_id);
+  //
+  //           if (room_id == room!.id) {
+  //             refreshRoom(0);
+  //           }
+  //           if (gift_img.toLowerCase().endsWith('.svga')) {
+  //             if (giftImg == '') {
+  //               svgaImagesListener(
+  //                 room_id,
+  //                 gift_img,
+  //                 gift_name,
+  //                 receiver_name,
+  //                 sender_name,
+  //                 sender_share_level,
+  //                 sender_img,
+  //                 sender_id,
+  //                 gift_audio,
+  //                 small_gift,
+  //                 sender,
+  //                 gift_category_id,
+  //                 reward,
+  //                 gift_id,
+  //                 receiver_id,
+  //                 count,
+  //               );
+  //             } else {
+  //               await Future.delayed(
+  //                 Duration(seconds: gift_category_id != 5 ? 5 : 8),
+  //               ).then(
+  //                 (value) => {
+  //                   svgaImagesListener(
+  //                     room_id,
+  //                     gift_img,
+  //                     gift_name,
+  //                     receiver_name,
+  //                     sender_name,
+  //                     sender_share_level,
+  //                     sender_img,
+  //                     sender_id,
+  //                     gift_audio,
+  //                     small_gift,
+  //                     sender,
+  //                     gift_category_id,
+  //                     reward,
+  //                     gift_id,
+  //                     receiver_id,
+  //                     count,
+  //                   ),
+  //                 },
+  //               );
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
   svgaImagesListener(
     room_id,
@@ -940,6 +1736,13 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       //show gift
       if (mounted) {
         setState(() {
+          giftImg = '';
+        });
+      }
+
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (mounted) {
+        setState(() {
           giftImg = '${ASSETSBASEURL}Designs/Motion/${gift_img}';
           if (gift_category_id == 5) {
             showCounterButton = true;
@@ -953,26 +1756,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           }
         });
       }
+      print('giftImg');
+      print(giftImg);
 
       await Future.delayed(Duration(seconds: 1));
       if (gift_audio != "") {
         // final duration = await player.setUrl(gift_audio);
         // player.play();
       }
-      if (gift_category_id != 5) {
-        Future.delayed(Duration(seconds: 8)).then(
-          (value) => {
-            if (mounted)
-              {
-                setState(() {
-                  giftImg = '';
-                }),
-              },
-          },
-        );
-        // await player.stop();
-      }
-
       // show on tetx
       String pubble = "";
       if (member.pubble != "") {
@@ -1041,122 +1832,119 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     );
 
     //show banner in all rooms
-    await Future.delayed(Duration(seconds: 5)).then(
-      (value) => {
-        if (mounted)
-          {
-            setState(() {
-              showBanner = false;
-              bannerState = 0;
-              bannerRoom = 0;
-              bannerMsg = "";
-              giftImgSmall = "";
-              showBannerBigWin = false;
-            }),
-          },
-      },
-    );
-  }
-
-  mp4GiftsListener(
-    room_id,
-    gift_img,
-    gift_name,
-    receiver_name,
-    sender_name,
-    sender_share_level,
-    sender_img,
-    sender_id,
-  ) async {
-    if (room_id == room!.id) {
-      //show gift
-
-      // show on tetx
-      ChatRoomMessage message = ChatRoomMessage(
-        message: 'sent a ${gift_name} to ${receiver_name}',
-        user_name: sender_name.toString(),
-        user_share_level_img: sender_share_level.toString(),
-        user_img: sender_img.toString(),
-        user_id: sender_id,
-        type: 'GIFT',
-      );
-      List<ChatRoomMessage> old = [...messages];
-      old.add(message);
-      if (mounted) {
-        setState(() {
-          messages = old;
-        });
-      }
-    }
-    //show banner in all rooms
     if (mounted) {
       setState(() {
-        showBanner = true;
-        giftImgSmall = gift_img;
-        bannerMsg = '${sender_name} sent a ${gift_name} to ${receiver_name}';
+        showBanner = false;
+        bannerState = 0;
+        bannerRoom = 0;
+        bannerMsg = "";
+        giftImgSmall = "";
+        showBannerBigWin = false;
       });
     }
-    await Future.delayed(Duration(seconds: 10)).then(
-      (value) => {
-        if (mounted)
-          {
-            setState(() {
-              showBanner = false;
-              bannerState = 0;
-              bannerMsg = "";
-              giftImgSmall = "";
-            }),
-          },
-      },
-    );
+    print('giftImg');
+    print(giftImg);
   }
 
-  smallGiftsListener(
-    room_id,
-    gift_img,
-    gift_name,
-    receiver_name,
-    sender_name,
-    sender_share_level,
-    sender_img,
-    sender_id,
-  ) async {
-    if (room_id == room!.id) {
-      //show gift
-      if (mounted) {
-        setState(() {
-          giftImg = gift_img;
-        });
-      }
-      await Future.delayed(Duration(seconds: 5)).then(
-        (value) => {
-          if (mounted)
-            {
-              setState(() {
-                giftImg = '';
-              }),
-            },
-        },
-      );
-      // show on tetx
-      ChatRoomMessage message = ChatRoomMessage(
-        message: 'sent a ${gift_name} to ${receiver_name}',
-        user_name: sender_name.toString(),
-        user_share_level_img: sender_share_level.toString(),
-        user_img: sender_img.toString(),
-        user_id: sender_id,
-        type: 'GIFT',
-      );
-      List<ChatRoomMessage> old = [...messages];
-      old.add(message);
-      if (mounted) {
-        setState(() {
-          messages = old;
-        });
-      }
-    }
-    //show banner in all rooms
-  }
+  // mp4GiftsListener(
+  //   room_id,
+  //   gift_img,
+  //   gift_name,
+  //   receiver_name,
+  //   sender_name,
+  //   sender_share_level,
+  //   sender_img,
+  //   sender_id,
+  // ) async {
+  //   if (room_id == room!.id) {
+  //     //show gift
+  //
+  //     // show on tetx
+  //     ChatRoomMessage message = ChatRoomMessage(
+  //       message: 'sent a ${gift_name} to ${receiver_name}',
+  //       user_name: sender_name.toString(),
+  //       user_share_level_img: sender_share_level.toString(),
+  //       user_img: sender_img.toString(),
+  //       user_id: sender_id,
+  //       type: 'GIFT',
+  //     );
+  //     List<ChatRoomMessage> old = [...messages];
+  //     old.add(message);
+  //     if (mounted) {
+  //       setState(() {
+  //         messages = old;
+  //       });
+  //     }
+  //   }
+  //   //show banner in all rooms
+  //   if (mounted) {
+  //     setState(() {
+  //       showBanner = true;
+  //       giftImgSmall = gift_img;
+  //       bannerMsg = '${sender_name} sent a ${gift_name} to ${receiver_name}';
+  //     });
+  //   }
+  //   await Future.delayed(Duration(seconds: 10)).then(
+  //     (value) => {
+  //       if (mounted)
+  //         {
+  //           setState(() {
+  //             showBanner = false;
+  //             bannerState = 0;
+  //             bannerMsg = "";
+  //             giftImgSmall = "";
+  //           }),
+  //         },
+  //     },
+  //   );
+  // }
+
+  // smallGiftsListener(
+  //   room_id,
+  //   gift_img,
+  //   gift_name,
+  //   receiver_name,
+  //   sender_name,
+  //   sender_share_level,
+  //   sender_img,
+  //   sender_id,
+  // ) async {
+  //   if (room_id == room!.id) {
+  //     //show gift
+  //     if (mounted) {
+  //       setState(() {
+  //         giftImg = gift_img;
+  //       });
+  //     }
+  //     await Future.delayed(Duration(seconds: 5)).then(
+  //       (value) => {
+  //         if (mounted)
+  //           {
+  //             setState(() {
+  //               giftImg = '';
+  //             }),
+  //           },
+  //       },
+  //     );
+  //     // show on tetx
+  //     ChatRoomMessage message = ChatRoomMessage(
+  //       message: 'sent a ${gift_name} to ${receiver_name}',
+  //       user_name: sender_name.toString(),
+  //       user_share_level_img: sender_share_level.toString(),
+  //       user_img: sender_img.toString(),
+  //       user_id: sender_id,
+  //       type: 'GIFT',
+  //     );
+  //     List<ChatRoomMessage> old = [...messages];
+  //     old.add(message);
+  //     if (mounted) {
+  //       setState(() {
+  //         messages = old;
+  //       });
+  //     }
+  //   }
+  //   //show banner in all rooms
+  // }
 
   RolletCreatListner() async {
     CollectionReference reference = FirebaseFirestore.instance.collection(
@@ -1188,6 +1976,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   refreshRoom(joiner_id) async {
+    print('refresh room');
     ChatRoom? res = await ChatRoomService().openRoomById(room!.id);
 
     if (mounted) {
@@ -1200,81 +1989,107 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     getRoomImage();
   }
 
-  userJoinRoomWelcome(joiner_id) async {
-    RoomMember joiner = room!.members!
-        .where((element) => element.user_id == joiner_id)
-        .toList()[0];
-    if (joiner.entery != "") {
-      if (mounted) {
-        setState(() {
-          entery =
-              ASSETSBASEURL + 'Designs/Motion/' + joiner.entery! + '?raw=true';
-        });
-      }
-      if (joiner.banner != "") {
+  Future<void> userJoinRoomWelcome(String joiner_id) async {
+    print('room!.members!.length');
+    print(room!.members!.length);
+
+    RoomMember joiner = room!.members!.firstWhere(
+      (element) => element.user_id.toString() == joiner_id.toString(),
+    );
+
+    print('enter room');
+    print(joiner.entery);
+    print(joiner.banner);
+
+    if (joiner.entery != "" || joiner.banner != "") {
+      if (joiner.entery != "") {
         if (mounted) {
           setState(() {
-            enteryBanner =
+            entery =
                 ASSETSBASEURL +
                 'Designs/Motion/' +
-                joiner.banner! +
+                joiner.entery! +
                 '?raw=true';
-            enteryMessage =
-                '${joiner.mic_user_name}  enter the room driving a ${joiner.entery_name} ';
           });
         }
-      }
-      if (joiner.entery_audio != "" && isNewCommer) {
-        // await player.setUrl(ASSETSBASEURL + 'Designs/Audio/' + joiner.entery_audio! );
-      }
+        if (joiner.banner != "") {
+          if (mounted) {
+            setState(() {
+              enteryBanner =
+                  ASSETSBASEURL +
+                  'Designs/Motion/' +
+                  joiner.banner! +
+                  '?raw=true';
+              enteryMessage = '${joiner.mic_user_name} entered the room';
+            });
+          }
+        }
 
-      await Future.delayed(Duration(seconds: 1)).then((value) {
+        if (joiner.entery_audio != "" && isNewCommer) {}
+
+        await Future.delayed(Duration(seconds: 1));
         if (joiner.entery_audio != "" && isNewCommer && entery != "") {
           showEnteryBanner = true;
-          //   player.play();
+          setState(() {});
         }
-      });
 
-      await Future.delayed(Duration(seconds: 9)).then(
-        (value) => {
-          if (mounted)
-            {
-              setState(() {
-                entery = '';
-                enteryBanner = '';
-                enteryMessage = '';
-                showEnteryBanner = false;
-              }),
-            },
-        },
-      );
-      //  await player.stop();
-    } else {
-      if (joiner.banner != "") {
+        await Future.delayed(Duration(seconds: 9));
+
         if (mounted) {
           setState(() {
-            enteryBanner =
-                ASSETSBASEURL +
-                'Designs/Motion/' +
-                joiner.banner! +
-                '?raw=true';
-            enteryMessage = '${joiner.mic_user_name}  enter the room';
+            entery = '';
+            enteryBanner = '';
+            enteryMessage = '';
+            showEnteryBanner = false;
           });
         }
+      } else {
+        if (joiner.banner != "") {
+          if (mounted) {
+            setState(() {
+              enteryBanner =
+                  ASSETSBASEURL +
+                  'Designs/Motion/' +
+                  joiner.banner! +
+                  '?raw=true';
+              enteryMessage = '${joiner.mic_user_name} entered the room';
+              showEnteryBanner = true;
+            });
+          }
 
-        await Future.delayed(Duration(seconds: 9)).then(
-          (value) => {
-            if (mounted)
-              {
-                setState(() {
-                  enteryBanner = '';
-                  enteryMessage = '';
-                  showEnteryBanner = false;
-                }),
-              },
-          },
-        );
+          await Future.delayed(Duration(seconds: 9));
+
+          if (mounted) {
+            setState(() {
+              enteryBanner = '';
+              enteryMessage = '';
+              showEnteryBanner = false;
+            });
+          }
+        }
       }
+    } else {
+      if (mounted) {
+        setState(() {
+          isVip = true;
+          enteryMessage = '${joiner.mic_user_name} entered the room';
+          showEnteryBanner = true;
+        });
+
+        await Future.delayed(Duration(seconds: 3));
+        if (mounted) {
+          setState(() {
+            enteryMessage = '';
+            showEnteryBanner = false;
+          });
+        }
+      }
+      _playNextEntry();
+
+      print('data');
+      print(enteryMessage);
+      print(isVip);
+      print(showEnteryBanner);
     }
   }
 
@@ -1314,7 +2129,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     ChatRoomService().roomBasicDataHelperSetter(helper!);
     if (mounted) {
       setState(() {
-        emossions = helper!.emossions;
+        emossions = helper.emossions;
         themes = helper.themes;
         gifts = helper.gifts;
         categories = helper.categories;
@@ -1326,146 +2141,112 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> initAgora() async {
-    //create the engine
-    print('initAgora');
-    print(AppSettingsServices().appSettingGetter()!.agora_id);
-    _engine = createAgoraRtcEngine();
-    await _engine.initialize(
-      RtcEngineContext(
-        appId: appId,
-        channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
-      ),
-    );
-    print('_engine.initialize end');
-    //audio indicator
-    await _engine.enableAudioVolumeIndication(
-      interval: 1000,
-      smooth: 5,
-      reportVad: false,
-    );
-
-    _engine.registerEventHandler(
-      RtcEngineEventHandler(
-        onJoinChannelSuccess: (RtcConnection connection, int elapsed) async {
-          if (mounted) {
-            setState(() {
-              _localUserJoined = true;
-            });
-            print('_localUserJoined');
-            print(_localUserJoined);
-          }
-
-          ChatRoomMessage message = ChatRoomMessage(
-            message: 'room_msg'.tr,
-            user_name: 'APP',
-            user_share_level_img: '',
-            user_img: '',
-            user_id: 0,
-            type: "TEXT",
-          );
-          List<ChatRoomMessage> old = [...messages];
-          old.add(message);
-          if (room!.hello_message != "") {
-            message = ChatRoomMessage(
-              message: room!.hello_message,
-              user_name: 'ROOM',
-              user_share_level_img: '',
-              user_img: '',
-              user_id: 0,
-              type: "TEXT",
-            );
-            old.add(message);
-          }
-          if (mounted) {
-            setState(() {
-              messages = old;
-            });
-          }
-          // remove await from refreshRoom
-          ChatRoomMessagesHelper(
-            room_id: room!.id,
-            user_id: user!.id,
-            message: 'user_enter_message',
-            type: 'TEXT',
-          ).handleSendRoomMessage();
-
-          // remove await from refreshRoom
-          refreshRoom(connection.localUid);
-        },
-        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-          debugPrint("remote user $remoteUid joined");
-        },
-        onUserOffline:
-            (
-              RtcConnection connection,
-              int remoteUid,
-              UserOfflineReasonType reason,
-            ) async {
-              debugPrint("remote user $remoteUid left channel");
-              try {
-                await ExitRoomHelper(remoteUid, room!.id);
-                refreshRoom(0);
-              } catch (err) {}
-              if (mounted) {
-                setState(() {
-                  // _remoteUid = null;
-                });
-              }
-            },
-        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
-          debugPrint(
-            '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token',
-          );
-        },
-
-        onAudioVolumeIndication:
-            (connection, _speakers, speakerNumber, totalVolume) {
-              List<int> sp = [];
-              if (mounted) {
-                setState(() {
-                  speakers = sp;
-                });
-              }
-              _speakers.forEach((element) {
-                sp.add(element.uid!);
-              });
-              if (mounted) {
-                setState(() {
-                  speakers = sp;
-                });
-              }
-            },
-        onAudioMixingFinished: () {
-          print('onAudioMixingFinished');
-        },
-        onAudioMixingStateChanged:
-            (AudioMixingStateType state, AudioMixingReasonType reason) {
-              print(
-                'audioMixingStateChanged state:${state.toString()}, reason: ${reason.toString()}}',
-              );
-            },
-        onAudioMixingPositionChanged: (pos) {
-          // print('onAudioMixingPositionChanged' );
-        },
-      ),
-    );
-
-    // await _engine.enableVideo();
-    // await _engine.startPreview();
-
-    await _engine.joinChannel(
-      token: token,
-      channelId: channel,
-      uid: int.parse(user!.tag),
-
-      options: const ChannelMediaOptions(
-        clientRoleType: ClientRoleType.clientRoleAudience,
-      ),
-    );
-
-    ChatRoomService.engine = _engine;
-  }
+  // Future<void> initAgora() async {
+  //   //create the engine
+  //   print('initAgora');
+  //   print(AppSettingsServices().appSettingGetter()!.agora_id);
+  //   _engine = createAgoraRtcEngine();
+  //   await _engine.initialize(
+  //     RtcEngineContext(
+  //       appId: appId,
+  //       channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+  //     ),
+  //   );
+  //   print('_engine.initialize end');
+  //   //audio indicator
+  //   await _engine.enableAudioVolumeIndication(
+  //     interval: 1000,
+  //     smooth: 5,
+  //     reportVad: false,
+  //   );
+  //
+  //   _engine.registerEventHandler(
+  //     RtcEngineEventHandler(
+  //       onJoinChannelSuccess: (RtcConnection connection, int elapsed) async {
+  //         if (mounted) {
+  //           setState(() {
+  //             _localUserJoined = true;
+  //           });
+  //           print('_localUserJoined');
+  //           print(_localUserJoined);
+  //         }
+  //
+  //         // remove await from refreshRoom
+  //         refreshRoom(connection.localUid);
+  //       },
+  //       onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+  //         debugPrint("remote user $remoteUid joined");
+  //       },
+  //       onUserOffline:
+  //           (
+  //             RtcConnection connection,
+  //             int remoteUid,
+  //             UserOfflineReasonType reason,
+  //           ) async {
+  //             debugPrint("remote user $remoteUid left channel");
+  //             try {
+  //               await ExitRoomHelper(remoteUid, room!.id);
+  //               refreshRoom(0);
+  //             } catch (err) {}
+  //             if (mounted) {
+  //               setState(() {
+  //                 // _remoteUid = null;
+  //               });
+  //             }
+  //           },
+  //       onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
+  //         debugPrint(
+  //           '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token',
+  //         );
+  //       },
+  //
+  //       onAudioVolumeIndication:
+  //           (connection, _speakers, speakerNumber, totalVolume) {
+  //             List<int> sp = [];
+  //             if (mounted) {
+  //               setState(() {
+  //                 speakers = sp;
+  //               });
+  //             }
+  //             _speakers.forEach((element) {
+  //               sp.add(element.uid!);
+  //             });
+  //             if (mounted) {
+  //               setState(() {
+  //                 speakers = sp;
+  //               });
+  //             }
+  //           },
+  //       onAudioMixingFinished: () {
+  //         print('onAudioMixingFinished');
+  //       },
+  //       onAudioMixingStateChanged:
+  //           (AudioMixingStateType state, AudioMixingReasonType reason) {
+  //             print(
+  //               'audioMixingStateChanged state:${state.toString()}, reason: ${reason.toString()}}',
+  //             );
+  //           },
+  //       onAudioMixingPositionChanged: (pos) {
+  //         // print('onAudioMixingPositionChanged' );
+  //       },
+  //     ),
+  //   );
+  //
+  //   // await _engine.enableVideo();
+  //   // await _engine.startPreview();
+  //
+  //   await _engine.joinChannel(
+  //     token: token,
+  //     channelId: channel,
+  //     uid: int.parse(user!.tag),
+  //
+  //     options: const ChannelMediaOptions(
+  //       clientRoleType: ClientRoleType.clientRoleAudience,
+  //     ),
+  //   );
+  //
+  //   ChatRoomService.engine = _engine;
+  // }
 
   @override
   void dispose() {
@@ -1479,10 +2260,25 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   Future<void> _dispose() async {
     if (ChatRoomService.savedRoom == null) {
-      MicHelper(user_id: user!.id, room_id: room!.id, mic: 0).leaveMic();
-      ExitRoomHelper(user!.id, room!.id);
-      await _engine.leaveChannel();
-      await _engine.release();
+      await ExitRoomHelper(user!.id, room!.id);
+      await unUnitZego();
+      // await _engine.leaveChannel();
+      // await _engine.release();
+      int index = room!.mics!.indexWhere((mic) => mic.user_id == user!.id);
+      MicHelper(
+        user!,
+        user_id: user!.id,
+        room_id: room!.id,
+        mic: index,
+      ).sendMicLeaveEvent(audioPlayer, zegoEngine);
+      await ZegoExpressEngine.instance.stopPublishingStream();
+      await ZegoExpressEngine.instance.muteMicrophone(true);
+      if (audioPlayer != null) {
+        await ZegoExpressEngine.instance.destroyMediaPlayer(audioPlayer!);
+        audioPlayer = null;
+      }
+      await ZegoExpressEngine.destroyEngine();
+      audioPlayer = null;
     }
   }
 
@@ -1494,38 +2290,84 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     }
   }
 
-  sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await ChatRoomMessagesHelper(
-        room_id: room!.id,
-        user_id: user!.id,
-        message: _messageController.text,
-        type: 'TEXT',
-      ).handleSendRoomMessage();
-      _messageController.clear();
-      toggleMessageInput();
-      if (!showMsgInput) {
-        if (mounted) {
-          setState(() {
-            emojiShowing = false;
-          });
-        }
-      }
-      await Future.delayed(Duration(seconds: 2));
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 1),
-        curve: Curves.fastOutSlowIn,
+  void sendChatRoomMessage() async {
+    RoomMember member = room!.members!
+        .where((element) => element.user_id == user!.id)
+        .toList()[0];
+
+    String pubble = "";
+    if (member.pubble != "") {
+      pubble = ASSETSBASEURL + 'Designs/Motion/' + member.pubble.toString();
+    }
+
+    if (_messageController.text.trim().isEmpty) {
+      showSnackBarWidget(
+        message: 'اكتب رسالة قبل الإرسال',
+        color: Colors.orange,
       );
+      return;
+    }
+
+    final ChatRoomMessage message = ChatRoomMessage(
+      message: _messageController.text.trim(),
+      user_name: user!.name,
+      user_share_level_img: user!.share_level_icon,
+      user_img: user!.img,
+      user_id: user!.id,
+      type: 'TEXT',
+      vip: user!.vips!.length > 0 ? user!.vips![0].icon : "",
+      badges: member.badges!,
+      pubble: pubble,
+    );
+
+    try {
+      final String jsonMessage = jsonEncode(message.toJson());
+
+      final result = await ZegoExpressEngine.instance.sendBroadcastMessage(
+        room!.id.toString(),
+        jsonMessage,
+      );
+
+      if (result.errorCode == 0) {
+        messages.insert(messages.length, message);
+
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.fastOutSlowIn,
+        );
+
+        _messageController.clear();
+      } else {
+        showSnackBarWidget(
+          message: 'حدث خطأ أثناء إرسال الرسالة (كود: ${result.errorCode})',
+          color: Colors.red,
+        );
+      }
+    } catch (e) {
+      showSnackBarWidget(message: 'فشل إرسال الرسالة: $e', color: Colors.red);
     }
   }
 
   Future<void> _refresh() async {
     await refreshRoom(0);
+    for (var member in room!.members!) {
+      print('🧍 Member ID: ${member.user_id}, Name: ${member.user_id}');
+      print(user!.id);
+      setState(() {
+        matchedMembers = room!.members!.where((member) {
+          return users.any(
+            (zegoUser) =>
+                zegoUser.userID.toString() == member.user_id.toString(),
+          );
+        }).toList();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor:
@@ -1788,6 +2630,21 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
                                                 GestureDetector(
                                                   onTap: () {
+                                                    setState(() {
+                                                      matchedMembers = room!
+                                                          .members!
+                                                          .where((member) {
+                                                            return users.any(
+                                                              (zegoUser) =>
+                                                                  zegoUser
+                                                                      .userID
+                                                                      .toString() ==
+                                                                  member.user_id
+                                                                      .toString(),
+                                                            );
+                                                          })
+                                                          .toList();
+                                                    });
                                                     showModalBottomSheet(
                                                       isScrollControlled: true,
                                                       context: context,
@@ -1817,7 +2674,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                         ),
                                                         SizedBox(width: 5.0),
                                                         Text(
-                                                          room!.members!.length
+                                                          users.length
                                                               .toString(),
                                                           style: TextStyle(
                                                             color: MyColors
@@ -1847,7 +2704,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                       ),
                                     ),
                                   ),
-
                                   Expanded(
                                     flex: 43,
                                     child: Row(
@@ -1860,14 +2716,21 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                               MediaQuery.sizeOf(context).width *
                                               .8,
 
-                                          child: ListView.separated(
-                                            itemBuilder: (context, index) =>
-                                                roomMessageBuilder(index),
-                                            separatorBuilder:
-                                                (context, index) =>
-                                                    roomMessageSeperator(),
-                                            itemCount: messages.length,
-                                            controller: _scrollController,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                showMsgInput = false;
+                                              });
+                                            },
+                                            child: ListView.separated(
+                                              itemBuilder: (context, index) =>
+                                                  roomMessageBuilder(index),
+                                              separatorBuilder:
+                                                  (context, index) =>
+                                                      roomMessageSeperator(),
+                                              itemCount: messages.length,
+                                              controller: _scrollController,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -1946,34 +2809,28 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                                   .toList()
                                                                   .length >
                                                               0) {
-                                                            if (_localUserMute) {
-                                                              await _engine
-                                                                  .setClientRole(
-                                                                    role: ClientRoleType
-                                                                        .clientRoleBroadcaster,
+                                                            if (!_localUserMute) {
+                                                              await ZegoExpressEngine
+                                                                  .instance
+                                                                  .muteMicrophone(
+                                                                    true,
                                                                   );
-                                                              ChatRoomService
-                                                                      .userRole =
-                                                                  'clientRoleBroadcaster';
-                                                              if (mounted) {
-                                                                setState(() {
-                                                                  _localUserMute =
-                                                                      false;
-                                                                });
-                                                              }
-                                                            } else {
-                                                              await _engine
-                                                                  .setClientRole(
-                                                                    role: ClientRoleType
-                                                                        .clientRoleAudience,
-                                                                  );
-                                                              ChatRoomService
-                                                                      .userRole =
-                                                                  'clientRoleAudience';
                                                               if (mounted) {
                                                                 setState(() {
                                                                   _localUserMute =
                                                                       true;
+                                                                });
+                                                              }
+                                                            } else {
+                                                              await ZegoExpressEngine
+                                                                  .instance
+                                                                  .muteMicrophone(
+                                                                    false,
+                                                                  );
+                                                              if (mounted) {
+                                                                setState(() {
+                                                                  _localUserMute =
+                                                                      false;
                                                                 });
                                                               }
                                                             }
@@ -2058,7 +2915,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                                   sendGiftCount:
                                                                       luckyGiftCount,
                                                                   gifts: gifts,
-                                                                ).sendGift();
+                                                                ).sendGiftEvent();
                                                               }
                                                             },
                                                             child: CircularCountDownTimer(
@@ -2262,7 +3119,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                 width: 80.0,
                                                 child: MaterialButton(
                                                   onPressed: () {
-                                                    sendMessage();
+                                                    sendChatRoomMessage();
                                                   }, //sendMessage
                                                   child: Text(
                                                     'gift_send'.tr,
@@ -2318,9 +3175,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                   ? SVGAEasyPlayer(resUrl: entery)
                                   : Container(),
                               giftImg != ""
-                                  ? SVGAEasyPlayer(resUrl: giftImg)
+                                  ? GiftSVGAWidget(
+                                      giftImg: giftImg,
+                                      onComplete: () {
+                                        playNext();
+                                      },
+                                      counter: 0,
+                                    )
                                   : Container(),
-
                               showRainLuckyCase
                                   ? Stack(
                                       alignment: Alignment.center,
@@ -2351,30 +3213,69 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                 duration: const Duration(seconds: 3),
                                 curve: Curves.slowMiddle,
                                 child: showEnteryBanner
-                                    ? Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Container(
-                                            width: 200.0,
-                                            child: SVGAEasyPlayer(
-                                              resUrl: enteryBanner,
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                              left: 70.0,
-                                              right: 10.0,
-                                            ),
-                                            width: 190.0,
-                                            child: Text(
-                                              enteryMessage,
-                                              style: TextStyle(fontSize: 10.0),
-                                              softWrap: true,
-                                              maxLines: 3,
-                                            ),
-                                          ),
-                                        ],
-                                      )
+                                    ? isVip
+                                          ? Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.width *
+                                                    0.8,
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 4,
+                                                    horizontal: 16,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topRight,
+                                                  end: Alignment.bottomLeft,
+                                                  stops: [0, 0.3],
+                                                  colors: <Color>[
+                                                    Colors.white,
+                                                    MyColors.primaryColor,
+                                                  ],
+                                                  tileMode: TileMode.mirror,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                enteryMessage,
+                                                style: Get.textTheme.bodySmall!
+                                                    .copyWith(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
+                                              ),
+                                            )
+                                          : Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Container(
+                                                  width: 200.0,
+                                                  child: SVGAEasyPlayer(
+                                                    resUrl: enteryBanner,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                    left: 70.0,
+                                                    right: 10.0,
+                                                  ),
+                                                  width: 190.0,
+                                                  child: Text(
+                                                    enteryMessage,
+                                                    style: TextStyle(
+                                                      fontSize: 10.0,
+                                                    ),
+                                                    softWrap: true,
+                                                    maxLines: 3,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
                                     : SizedBox(),
                               ),
                             ],
@@ -2390,10 +3291,11 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  SVGAEasyPlayer(
-                                    resUrl:
+                                  GiftSVGAWidget(
+                                    giftImg:
                                         ASSETSBASEURL +
                                         'AppBanners/gift_red_banner.svga?raw=true',
+                                    counter: 1,
                                   ),
                                   SizedBox(height: 100),
                                   Row(
@@ -2655,7 +3557,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     }
   }
 
-  Widget micListItem(mic) => StreamBuilder<Object>(
+  Widget micListItem(Mic mic) => StreamBuilder<Object>(
     stream: null,
     builder: (context, snapshot) {
       return Stack(
@@ -2672,7 +3574,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          mic!.mic_user_img == null
+                          mic.mic_user_img == null
                               ? CircleAvatar(
                                   backgroundColor: Colors.transparent,
                                   radius: 22,
@@ -2682,47 +3584,52 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                   backgroundColor: mic.mic_user_gender == 0
                                       ? MyColors.blueColor
                                       : MyColors.pinkColor,
-                                  backgroundImage: mic!.mic_user_img != ""
-                                      ? (mic!.mic_user_img.startsWith('https')
+                                  backgroundImage: mic.mic_user_img != ""
+                                      ? (mic.mic_user_img!.startsWith('https')
                                             ? CachedNetworkImageProvider(
-                                                mic!.mic_user_img,
+                                                mic.mic_user_img!,
                                               )
                                             : CachedNetworkImageProvider(
-                                                '${ASSETSBASEURL}AppUsers/${mic!.mic_user_img}',
+                                                '${ASSETSBASEURL}AppUsers/${mic.mic_user_img}',
                                               ))
                                       : null,
                                   radius: 22,
-                                  child: mic!.mic_user_img == ""
-                                      ? Text(
-                                          mic!.mic_user_name
-                                                  .toUpperCase()
-                                                  .substring(0, 1) +
-                                              (mic!.mic_user_name.contains(" ")
-                                                  ? mic!.mic_user_name
-                                                        .substring(
-                                                          mic!.mic_user_name
-                                                              .indexOf(" "),
-                                                        )
+                                  child: mic.mic_user_img == ""
+                                      ? mic.mic_user_name != ''
+                                            ? Text(
+                                                mic.mic_user_name!
                                                         .toUpperCase()
-                                                        .substring(1, 2)
-                                                  : ""),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 22.0,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        )
+                                                        .substring(0, 1) +
+                                                    (mic.mic_user_name!
+                                                            .contains(" ")
+                                                        ? mic.mic_user_name!
+                                                              .substring(
+                                                                mic.mic_user_name!
+                                                                    .indexOf(
+                                                                      " ",
+                                                                    ),
+                                                              )
+                                                              .toUpperCase()
+                                                              .substring(1, 2)
+                                                        : ""),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 22.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              )
+                                            : null
                                       : null,
                                 ),
                           Container(
                             height: 65.0,
                             width: 65.0,
-                            child: mic!.frame != ""
+                            child: mic.frame != ""
                                 ? SVGAEasyPlayer(
                                     resUrl:
                                         ASSETSBASEURL +
                                         'Designs/Motion/' +
-                                        mic!.frame +
+                                        mic.frame! +
                                         '?raw=true',
                                   )
                                 : null,
@@ -2748,9 +3655,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                     ],
                   ),
                   Text(
-                    mic!.mic_user_name == null
-                        ? mic!.order.toString()
-                        : mic!.mic_user_name,
+                    mic.mic_user_name == null
+                        ? mic.order.toString()
+                        : mic.mic_user_name!,
                     style: TextStyle(color: Colors.white, fontSize: 13.0),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -2760,8 +3667,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                 position: PopupMenuPosition.under,
                 shadowColor: MyColors.unSelectedColor,
                 elevation: 4.0,
-
-                color: MyColors.secondaryColor,
+                color: Colors.white,
                 icon: Container(),
                 onSelected: (int result) {
                   micActions(result, mic);
@@ -2801,36 +3707,42 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         user_id: user!.id,
         room_id: room!.id,
         mic: mic.order,
-      ).useMic();
-      await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-      ChatRoomService.userRole = 'clientRoleBroadcaster';
-      if (mounted) {
-        setState(() {
-          _localUserMute = false;
-        });
-      }
+        user!,
+      ).sendMicEvent();
     } else if (result == 2) {
       //lock_mic
-      MicHelper(user_id: user!.id, room_id: room!.id, mic: mic.order).lockMic();
+      MicHelper(
+        user_id: user!.id,
+        room_id: room!.id,
+        mic: mic.order,
+        user!,
+      ).lockMic();
     } else if (result == 3) {
       //lock_all_mics
-      MicHelper(user_id: user!.id, room_id: room!.id, mic: 0).lockMic();
+      MicHelper(user_id: user!.id, room_id: room!.id, mic: 0, user!).lockMic();
     } else if (result == 4) {
       //unlock_mic
       MicHelper(
         user_id: user!.id,
         room_id: room!.id,
         mic: mic.order,
+        user!,
       ).unlockMic();
     } else if (result == 5) {
       //unlock_all_mic
-      MicHelper(user_id: user!.id, room_id: room!.id, mic: 0).unlockMic();
+      MicHelper(
+        user_id: user!.id,
+        room_id: room!.id,
+        mic: 0,
+        user!,
+      ).unlockMic();
     } else if (result == 6) {
       //remove_from_mic
       MicHelper(
         user_id: mic!.user_id,
         room_id: room!.id,
         mic: mic.order,
+        user!,
       ).removeFromMic(user!.id);
     } else if (result == 7) {
       //un_use_mic
@@ -2838,13 +3750,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         user_id: user!.id,
         room_id: room!.id,
         mic: mic.order,
-      ).leaveMic();
-      await _engine.setClientRole(role: ClientRoleType.clientRoleAudience);
-      ChatRoomService.userRole = 'clientRoleAudience';
-      try {
-        _engine = ChatRoomService.engine!;
-        await _engine.stopAudioMixing();
-      } catch (err) {}
+        user!,
+      ).sendMicLeaveEvent(audioPlayer, zegoEngine);
       if (mounted) {
         setState(() {
           _localUserMute = true;
@@ -2853,21 +3760,19 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     } else if (result == 8) {
       //mute
       if (_localUserMute) {
-        await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-        ChatRoomService.userRole = 'clientRoleBroadcaster';
         if (mounted) {
           setState(() {
             _localUserMute = false;
           });
+          await ZegoExpressEngine.instance.muteMicrophone(false);
         }
       } else {
-        await _engine.setClientRole(role: ClientRoleType.clientRoleAudience);
-        ChatRoomService.userRole = 'clientRoleAudience';
         if (mounted) {
           setState(() {
             _localUserMute = true;
           });
         }
+        await ZegoExpressEngine.instance.muteMicrophone(true);
       }
     } else if (result == 9) {
       //showprofile
@@ -2902,7 +3807,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   MicHelper(
                     user_id: mic!.user_id,
                     room_id: room!.id,
-                    mic: 0,
+                    mic: mic.order,
+                    user!,
                   ).kickOut('HOUR');
                 },
               ),
@@ -2918,7 +3824,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   MicHelper(
                     user_id: mic!.user_id,
                     room_id: room!.id,
-                    mic: 0,
+                    mic: mic.order,
+                    user!,
                   ).kickOut('DAY');
                 },
               ),
@@ -2934,7 +3841,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   MicHelper(
                     user_id: mic!.user_id,
                     room_id: room!.id,
-                    mic: 0,
+                    mic: mic.order,
+                    user!,
                   ).kickOut('ALL');
                 },
               ),
@@ -2963,15 +3871,23 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   Widget giftBottomSheet() => GiftModal(reciverId: 0);
 
-  Widget MenuBottomSheet() => MenuModal(scrollController: _scrollController);
+  Widget MenuBottomSheet() => MenuModal(
+    scrollController: _scrollController,
+    zegoEngine: zegoEngine,
+    audioPlayer: audioPlayer!,
+  );
 
   Widget ChatBottomSheet() => ChatsScreen();
 
   Widget RoomInfoBottomSheet() => RoomInfoModal();
 
-  Widget roomCloseModal() => RoomCloseModal(pcontext: context, engine: _engine);
+  Widget roomCloseModal() => RoomCloseModal(
+    pcontext: context,
+    audioPlayer: audioPlayer!,
+    zegoEngine: zegoEngine,
+  );
 
-  Widget roomMembersModal() => RoomMembersModal();
+  Widget roomMembersModal() => RoomMembersModal(members: matchedMembers!);
 
   Widget roomRolletModal(Rollet rollet) => RolletModal(rollet: rollet);
 
@@ -3064,7 +3980,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                 value: 1,
                 child: Text(
                   'use_mic'.tr,
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
             ];
@@ -3099,7 +4015,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               value: 9,
               child: Text(
                 'show_user'.tr,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             ),
           ];
@@ -3109,14 +4025,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               value: 7,
               child: Text(
                 'un_use_mic'.tr,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             ),
             PopupMenuItem<int>(
               value: 8,
               child: _localUserMute
-                  ? Text('unmute'.tr, style: TextStyle(color: Colors.white))
-                  : Text('mute'.tr, style: TextStyle(color: Colors.white)),
+                  ? Text('unmute'.tr, style: TextStyle(color: Colors.black))
+                  : Text('mute'.tr, style: TextStyle(color: Colors.black)),
             ),
           ];
         }
@@ -3202,44 +4118,62 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image(
-                              image: CachedNetworkImageProvider(
-                                '${ASSETSBASEURL}Levels/${messages[index].user_share_level_img}',
+                            Text(
+                              '${messages[index].user_name}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13.0,
                               ),
-                              width: 30,
                             ),
-                            messages[index].vip != ""
-                                ? SizedBox(width: 5.0)
-                                : SizedBox(),
-                            messages[index].vip != ""
-                                ? Image(
-                                    image: CachedNetworkImageProvider(
-                                      '${ASSETSBASEURL}VIP/${messages[index].vip}',
-                                    ),
-                                    width: 30,
-                                  )
-                                : SizedBox(),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            for (var item in messages[index].badges!)
+                            const SizedBox(width: 5.0),
+                            if (messages[index].user_share_level_img.isNotEmpty)
                               Image(
                                 image: CachedNetworkImageProvider(
-                                  '${ASSETSBASEURL}Badges/${item.badge}',
+                                  '${ASSETSBASEURL}Levels/${messages[index].user_share_level_img}',
                                 ),
-                                width: 30,
+                                width: 25,
+                              ),
+                            const SizedBox(width: 5.0),
+                            if ((messages[index].vip ?? "").isNotEmpty)
+                              Image(
+                                image: CachedNetworkImageProvider(
+                                  '${ASSETSBASEURL}VIP/${messages[index].vip}',
+                                ),
+                                width: 25,
                               ),
                           ],
                         ),
+
+                        const SizedBox(height: 5.0),
+
+                        if ((messages[index].badges ?? []).isNotEmpty)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              for (var item in messages[index].badges ?? [])
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 3.0),
+                                  child: Image(
+                                    image: CachedNetworkImageProvider(
+                                      '${ASSETSBASEURL}Badges/${item.badge}',
+                                    ),
+                                    width: 25,
+                                  ),
+                                ),
+                            ],
+                          ),
+
+                        const SizedBox(height: 2.0),
+                        getMessageContent(messages[index]),
                       ],
                     ),
-
-                    SizedBox(width: 5.0),
-                    getMessageContent(messages[index]),
                   ],
                 ),
               ),
@@ -3250,75 +4184,61 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   Widget roomMessageSeperator() => SizedBox(height: 5.0);
 
   Widget getMessageContent(ChatRoomMessage message) {
-    if (message.type == "TEXT" || message.type == "GIFT") {
-      return Expanded(
-        child: Text(
-          message.user_name + ': ' + message.message,
-          style: TextStyle(color: Colors.white, fontSize: 13.0),
+    switch (message.type.toUpperCase()) {
+      case "TEXT":
+      case "GIFT":
+        return Text(
+          message.message,
+          style: const TextStyle(color: Colors.white, fontSize: 13.0),
           overflow: TextOverflow.ellipsis,
           maxLines: 4,
           textAlign: TextAlign.start,
-        ),
-      );
-    } else if (message.type == "NURD") {
-      return Column(
-        children: [
-          Text(
-            message.user_name,
-            style: TextStyle(color: Colors.white, fontSize: 13.0),
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 10.0),
-          Image(
-            image: CachedNetworkImageProvider(
-              ASSETSBASEURL + 'Nurd/' + message.message + '.webp',
+        );
+
+      case "NURD":
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image(
+              image: CachedNetworkImageProvider(
+                '${ASSETSBASEURL}Nurd/${message.message}.webp',
+              ),
+              width: 40.0,
             ),
-            width: 40.0,
-          ),
-        ],
-      );
-    } else if (message.type == "PAPER") {
-      return Column(
-        children: [
-          Text(
-            message.user_name,
-            style: TextStyle(color: Colors.white, fontSize: 13.0),
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 10.0),
-          Image(
-            image: CachedNetworkImageProvider(
-              ASSETSBASEURL +
-                  'rock-paper-scissors/' +
-                  message.message +
-                  '.webp',
+          ],
+        );
+
+      case "PAPER":
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image(
+              image: CachedNetworkImageProvider(
+                '${ASSETSBASEURL}rock-paper-scissors/${message.message}.webp',
+              ),
+              width: 40.0,
             ),
-            width: 40.0,
-          ),
-        ],
-      );
-    } else if (message.type == "LUCKY") {
-      return Column(
-        children: [
-          Text(
-            message.user_name,
-            style: TextStyle(color: Colors.white, fontSize: 13.0),
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 10.0),
-          Text(
-            message.message,
-            style: TextStyle(
-              color: MyColors.primaryColor,
-              fontSize: 30.0,
-              fontWeight: FontWeight.bold,
+          ],
+        );
+
+      case "LUCKY":
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message.message,
+              style: TextStyle(
+                color: MyColors.primaryColor,
+                fontSize: 30.0,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      );
-    } else {
-      return Container();
+          ],
+        );
+
+      default:
+        return const SizedBox.shrink();
     }
   }
 
@@ -3393,16 +4313,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     return duration.inSeconds;
   }
 
-  bool checkGiftShow(Timestamp available_untill) {
-    final DateTime giftAvaliable = DateTime.parse(
-      available_untill.toDate().toString(),
-    );
+  bool checkGiftShow(DateTime available_untill) {
+    final DateTime giftAvaliable = available_untill;
     final DateTime currentDate = DateTime.now();
 
     final Duration duration = giftAvaliable.difference(currentDate);
     print('checkGiftShow');
     print(duration);
-    return duration.inSeconds < 60;
+    return duration.inSeconds <= 60 && duration.inSeconds > 0;
   }
 
   bool checkLuckyCaseShow(Timestamp available_untill) {
@@ -3419,7 +4337,12 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   openBannerRoom(room_id) async {
     if (room_id != room!.id) {
-      MicHelper(user_id: user!.id, room_id: room!.id, mic: 0).leaveMic();
+      MicHelper(
+        user_id: user!.id,
+        room_id: room!.id,
+        mic: 0,
+        user!,
+      ).sendMicLeaveEvent(audioPlayer, zegoEngine);
       ExitRoomHelper(user!.id, room!.id);
       await _engine.leaveChannel();
       await _engine.release();

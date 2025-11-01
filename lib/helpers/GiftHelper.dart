@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:LikLok/helpers/zego_handler/zego_sdk_manager.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Gift.dart';
 import 'package:LikLok/shared/components/Constants.dart';
@@ -19,18 +22,63 @@ class GiftHelper {
   GiftHelper({required this.user_id , required this.receiver , required this.room_id , required this.room_owner ,  required this.gift_id , required this.sendGiftCount , required this.gifts});
 
 
-   sendGift() async{
-     if(receiver! > 0){
+   // sendGift() async{
+   //   if(receiver > 0){
+   //     int reward = await ChatRoomService().sendGift(user_id , receiver , room_owner , room_id ,  gift_id , sendGiftCount );
+   //
+   //
+   //     if(reward > -1){
+   //       AppUser? reciver_obj = await AppUserServices().getUser(receiver);
+   //       AppUser? user = await AppUserServices().getUser(user_id);
+   //
+   //
+   //       Gift gift = gifts.where((element) => element.id == gift_id).toList()[0] ;
+   //       await FirebaseFirestore.instance.collection("gifts").add({
+   //         'room_id': room_id,
+   //         'sender_id': user_id ,
+   //         'sender_name': user!.name ,
+   //         'sender_img': '${ASSETSBASEURL}AppUsers/${user.img}'  ,
+   //         'receiver_id': reciver_obj!.id ,
+   //         'receiver_name': reciver_obj.name ,
+   //         'receiver_img': '${ASSETSBASEURL}AppUsers/${reciver_obj.img}',
+   //         'gift_name':  gift.name ,
+   //         'gift_audio': gift.audio_url != "" ? '${ASSETSBASEURL}Designs/Audio/${gift.audio_url}' : "" ,
+   //         'gift_img': '${gift.motion_icon}',
+   //         'giftImgSmall':'${ASSETSBASEURL}Designs/${gift.icon}',
+   //         'count' : sendGiftCount,
+   //         'sender_share_level': user.share_level_icon,
+   //         'available_untill':DateTime.now().add(Duration(minutes: 1)) ,
+   //         'gift_category_id': gift.gift_category_id,
+   //         'reward': reward,
+   //         'gift_id': gift_id
+   //       });
+   //
+   //       AppUserServices().userSetter(user);
+   //
+   //     }
+   //   } else {
+   //     Fluttertoast.showToast(
+   //         msg: 'choose_receiver'.tr,
+   //         toastLength: Toast.LENGTH_SHORT,
+   //         gravity: ToastGravity.CENTER,
+   //         timeInSecForIosWeb: 1,
+   //         backgroundColor: Colors.black26,
+   //         textColor: Colors.orange,
+   //         fontSize: 16.0
+   //     );
+   //   }
+   // }
+
+  Future<void> sendGiftEvent() async {
+     if(receiver > 0){
        int reward = await ChatRoomService().sendGift(user_id , receiver , room_owner , room_id ,  gift_id , sendGiftCount );
-
-
-       if(reward > -1){
+       if(reward > -1) {
          AppUser? reciver_obj = await AppUserServices().getUser(receiver);
          AppUser? user = await AppUserServices().getUser(user_id);
 
 
          Gift gift = gifts.where((element) => element.id == gift_id).toList()[0] ;
-         await FirebaseFirestore.instance.collection("gifts").add({
+         final giftData = {
            'room_id': room_id,
            'sender_id': user_id ,
            'sender_name': user!.name ,
@@ -44,17 +92,24 @@ class GiftHelper {
            'giftImgSmall':'${ASSETSBASEURL}Designs/${gift.icon}',
            'count' : sendGiftCount,
            'sender_share_level': user.share_level_icon,
-           'available_untill':DateTime.now().add(Duration(minutes: 1)) ,
+           'available_untill': DateTime.now().add(Duration(minutes: 1)).toIso8601String() ,
            'gift_category_id': gift.gift_category_id,
            'reward': reward,
            'gift_id': gift_id
+         };
 
-         });
-
+         await ZEGOSDKManager().zimService.setRoomAttributes(
+           {
+             'gift_event': jsonEncode(giftData),
+           },
+           isForce: true,
+           isUpdateOwner: false,
+           isDeleteAfterOwnerLeft: false,
+         );
          AppUserServices().userSetter(user);
-
+         print('🎁 Gift event sent: $giftData');
        }
-     } else {
+     }else {
        Fluttertoast.showToast(
            msg: 'choose_receiver'.tr,
            toastLength: Toast.LENGTH_SHORT,
@@ -65,7 +120,7 @@ class GiftHelper {
            fontSize: 16.0
        );
      }
-   }
+  }
 
 
   sendGiftMicUser() async{

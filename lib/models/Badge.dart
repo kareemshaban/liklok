@@ -1,23 +1,20 @@
 class UserBadge {
+  final String badge_name;
+  final String badge;
 
-  final String badge_name ;
-  final String badge ;
-
-  UserBadge({ required this.badge_name , required this.badge});
+  UserBadge({required this.badge_name, required this.badge});
 
   factory UserBadge.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
+    return UserBadge(
+      badge_name: json['badge_name'] ?? '',
+      badge: json['badge'] ?? '',
+    );
+  }
 
-      'badge_name': String badge_name,
-      'badge': String badge,
-
-      } =>
-          UserBadge(
-            badge_name: badge_name,
-            badge: badge,
-          ),
-      _ => throw const FormatException('Failed to load album.'),
+  Map<String, dynamic> toJson() {
+    return {
+      'badge_name': badge_name,
+      'badge': badge,
     };
   }
 }

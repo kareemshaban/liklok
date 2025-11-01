@@ -66,7 +66,7 @@ class _EmojModalState extends State<EmojModal> {
 
   useEmoj(emoj) async {
     if(room!.mics!.where((element) => element.user_id == user!.id).length > 0){
-      await MicHelper(user_id: user!.id , room_id: room!.id , mic: room!.mics!.where((element) => element.user_id == user!.id).toList()[0].order ).showEmoj(emoj);
+      await MicHelper(user_id: user!.id , room_id: room!.id , mic: room!.mics!.where((element) => element.user_id == user!.id).toList()[0].order , user!).showEmoj(emoj);
     } else {
       Fluttertoast.showToast(
           msg: 'you should be on mic !',

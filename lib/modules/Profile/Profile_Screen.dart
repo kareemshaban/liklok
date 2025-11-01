@@ -114,7 +114,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   void openMyRoom() async{
-    initZego();
+    // initZego();
     ChatRoom? room =  await ChatRoomService().openMyRoom(user!.id);
     await checkForSavedRoom(room!);
     ChatRoomService().roomSetter(room);
@@ -122,13 +122,13 @@ class ProfileScreenState extends State<ProfileScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (ctx) => const RoomScreen()));
   }
 
-  initZego() async {
-    await ZEGOSDKManager()
-        .init(appID, appSign, scenario: ZegoScenario.HighQualityChatroom);
-    await ZEGOSDKManager().connectUser(user!.id.toString(), user!.name);
-    final zimService = ZEGOSDKManager().zimService;
-    final expressService = ZEGOSDKManager().expressService;
-  }
+  // initZego() async {
+  //   await ZEGOSDKManager()
+  //       .init(appID, appSign, scenario: ZegoScenario.HighQualityChatroom);
+  //   await ZEGOSDKManager().connectUser(user!.id.toString(), user!.name);
+  //   final zimService = ZEGOSDKManager().zimService;
+  //   final expressService = ZEGOSDKManager().expressService;
+  // }
 
   checkForSavedRoom(ChatRoom room) async {
     ChatRoom? savedRoom = ChatRoomService().savedRoomGetter();
@@ -140,9 +140,8 @@ class ProfileScreenState extends State<ProfileScreen> {
         ChatRoomService().savedRoomSetter(null);
         await ChatRoomService.engine!.leaveChannel();
         await ChatRoomService.engine!.release();
-        MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0).leaveMic();
+        MicHelper( user_id:  user!.id , room_id:  savedRoom.id , mic: 0 , user!).leaveMic();
         ExitRoomHelper(user!.id , savedRoom.id);
-
       }
     }
 

@@ -1,18 +1,13 @@
 import 'dart:io';
-
 import 'package:LikLok/firebase_options.dart';
 import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Intro.dart';
 import 'package:LikLok/modules/BlockedScreen/blocked_screen.dart';
-import 'package:LikLok/modules/ErrorPage/error_screen.dart';
 import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
-import 'package:LikLok/firebase_options.dart';
 import 'package:LikLok/layout/tabs_screen.dart';
-import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/modules/Login/LoginScreen.dart';
-import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/IntroServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:LikLok/translation.dart';
@@ -21,13 +16,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
-import 'package:get_ip_address/get_ip_address.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'modules/chat/chat.dart';
 
 Future<void> FirebaseBackgroundMessage(RemoteMessage message)async {
   print('on background message') ;
@@ -41,8 +33,8 @@ Future<void> FirebaseBackgroundMessage(RemoteMessage message)async {
 
 
 Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized()  );
   try{
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

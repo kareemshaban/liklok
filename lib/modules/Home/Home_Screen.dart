@@ -26,6 +26,7 @@ import 'package:LikLok/shared/network/remote/CountryService.dart';
 import 'package:LikLok/shared/network/remote/FestivalBannerServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svga/flutter_svga.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -41,8 +42,6 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
-
-
   List<BannerData> banners = [];
   List<Country> countries = [];
   List<ChatRoom> rooms = [];
@@ -54,7 +53,7 @@ class HomeScreenState extends State<HomeScreen>
     'FRIENDS',
     'QURAN',
     'GAMES',
-    'ENTERTAINMENT'
+    'ENTERTAINMENT',
   ];
   int selectedCountry = 0;
   String selectedChatRoomCategory = 'CHAT';
@@ -157,7 +156,7 @@ class HomeScreenState extends State<HomeScreen>
 
     getAppPermission();
     getBanners();
-     getAppCup();
+    getAppCup();
   }
 
   @override
@@ -176,18 +175,16 @@ class HomeScreenState extends State<HomeScreen>
     }
     if (!res) {
       Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlockedScreen(block_type: 1),
-          ),
-          (route) => false);
+        context,
+        MaterialPageRoute(builder: (context) => BlockedScreen(block_type: 1)),
+        (route) => false,
+      );
     } else if (user!.enable == 0) {
       Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlockedScreen(block_type: 0),
-          ),
-          (route) => false);
+        context,
+        MaterialPageRoute(builder: (context) => BlockedScreen(block_type: 0)),
+        (route) => false,
+      );
     }
   }
 
@@ -236,64 +233,58 @@ class HomeScreenState extends State<HomeScreen>
             indicatorColor: MyColors.primaryColor,
             labelColor: MyColors.primaryColor,
             unselectedLabelColor: MyColors.lightUnSelectedColor,
-            labelStyle:
-                const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w900),
+            labelStyle: const TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w900,
+            ),
             tabs: [
-              new Tab(
-                text: "home_party".tr,
-              ),
-              new Tab(
-                text: "home_discover".tr,
-              ),
-              new Tab(
-                text: "home_my_room".tr,
-              ),
+              new Tab(text: "home_party".tr),
+              new Tab(text: "home_discover".tr),
+              new Tab(text: "home_my_room".tr),
             ],
           ),
           actions: [
             GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                child: const Image(
-                  image: AssetImage('assets/images/chatroom_rank_ic.png'),
-                  width: 30.0,
-                  height: 30.0,
-                ),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AppCupScreen(),
-                      ));
-                }),
-            const SizedBox(
-              width: 20.0,
+              behavior: HitTestBehavior.opaque,
+              child: const Image(
+                image: AssetImage('assets/images/chatroom_rank_ic.png'),
+                width: 30.0,
+                height: 30.0,
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AppCupScreen()),
+                );
+              },
             ),
+            const SizedBox(width: 20.0),
             GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                child: const Image(
-                  image: AssetImage('assets/images/voice-message.png'),
-                  width: 30.0,
-                  height: 30.0,
-                ),
-                onTap: () {
-                  //     openMyRoom();
-                  showMyRoomOnly();
-                }),
-            const SizedBox(
-              width: 20.0,
+              behavior: HitTestBehavior.opaque,
+              child: const Image(
+                image: AssetImage('assets/images/voice-message.png'),
+                width: 30.0,
+                height: 30.0,
+              ),
+              onTap: () {
+                //     openMyRoom();
+                showMyRoomOnly();
+              },
             ),
+            const SizedBox(width: 20.0),
             GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                child: const Image(
-                  image: AssetImage('assets/images/search.png'),
-                  width: 30.0,
-                  height: 30.0,
-                ),
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (ctx) => const SearchScreen()))),
-            const SizedBox(
-              width: 10.0,
+              behavior: HitTestBehavior.opaque,
+              child: const Image(
+                image: AssetImage('assets/images/search.png'),
+                width: 30.0,
+                height: 30.0,
+              ),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (ctx) => const SearchScreen()),
+              ),
             ),
+            const SizedBox(width: 10.0),
           ],
         ),
         body: Container(
@@ -312,34 +303,41 @@ class HomeScreenState extends State<HomeScreen>
                           height: 121.0,
                           width: MediaQuery.sizeOf(context).width * .95,
                           child: CarouselSlider(
-                              items: banners
-                                  .map((banner) => GestureDetector(
-                                        onTap: () {
-                                          bannerAction(banner);
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 5.0, vertical: 10.0),
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                              image: DecorationImage(
-                                                  image: CachedNetworkImageProvider(
-                                                      '${ASSETSBASEURL}Banners/${banner.img}'),
-                                                  fit: BoxFit.cover)),
-                                          clipBehavior:
-                                              Clip.antiAliasWithSaveLayer,
+                            items: banners
+                                .map(
+                                  (banner) => GestureDetector(
+                                    onTap: () {
+                                      bannerAction(banner);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 5.0,
+                                        vertical: 10.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          10.0,
                                         ),
-                                      ))
-                                  .toList(),
-                              options: CarouselOptions(
-                                  aspectRatio: 3,
-                                  autoPlay: true,
-                                  viewportFraction: 1.0)),
+                                        image: DecorationImage(
+                                          image: CachedNetworkImageProvider(
+                                            '${ASSETSBASEURL}Banners/${banner.img}',
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            options: CarouselOptions(
+                              aspectRatio: 3,
+                              autoPlay: true,
+                              viewportFraction: 1.0,
+                            ),
+                          ),
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
+                        SizedBox(height: 10.0),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15.0),
                           height: 40.0,
@@ -351,21 +349,34 @@ class HomeScreenState extends State<HomeScreen>
                             scrollDirection: Axis.horizontal,
                           ),
                         ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
+                        const SizedBox(height: 10.0),
                         Expanded(
                           child: RefreshIndicator(
                             color: MyColors.primaryColor,
                             onRefresh: _refresh,
-                            child:ListView(
-                              padding: EdgeInsets.all(8.0),
-                              children: rooms
-                                  .where((element) =>
-                              element.country_id == selectedCountry || selectedCountry == 0)
-                                  .map((room) => chatRoomListItem(room, context))
-                                  .toList(),
-                            )
+                            child: ListView.builder(
+                              padding: const EdgeInsets.all(8.0),
+                              itemCount: rooms
+                                  .where(
+                                    (element) =>
+                                        element.country_id == selectedCountry ||
+                                        selectedCountry == 0,
+                                  )
+                                  .length,
+                              itemBuilder: (context, index) {
+                                final filteredRooms = rooms
+                                    .where(
+                                      (element) =>
+                                          element.country_id ==
+                                              selectedCountry ||
+                                          selectedCountry == 0,
+                                    )
+                                    .toList();
+
+                                final room = filteredRooms[index];
+                                return chatRoomListItem(room, context, index);
+                              },
+                            ),
                           ),
                         ),
                       ],
@@ -378,33 +389,39 @@ class HomeScreenState extends State<HomeScreen>
                                 height: 110.0,
                                 width: MediaQuery.sizeOf(context).width * .95,
                                 child: CarouselSlider(
-                                    items: festivalBanners
-                                        .map((banner) => GestureDetector(
-                                              onTap: () {
-                                                bannerFestivalAction(banner);
-                                              },
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 5.0,
-                                                        vertical: 10.0),
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
-                                                    image: DecorationImage(
-                                                        image: CachedNetworkImageProvider(
-                                                            '${ASSETSBASEURL}FestivalBanner/${banner.img}'),
-                                                        fit: BoxFit.cover)),
-                                                clipBehavior:
-                                                    Clip.antiAliasWithSaveLayer,
+                                  items: festivalBanners
+                                      .map(
+                                        (banner) => GestureDetector(
+                                          onTap: () {
+                                            bannerFestivalAction(banner);
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.symmetric(
+                                              horizontal: 5.0,
+                                              vertical: 10.0,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                              image: DecorationImage(
+                                                image: CachedNetworkImageProvider(
+                                                  '${ASSETSBASEURL}FestivalBanner/${banner.img}',
+                                                ),
+                                                fit: BoxFit.cover,
                                               ),
-                                            ))
-                                        .toList(),
-                                    options: CarouselOptions(
-                                        aspectRatio: 3,
-                                        autoPlay: true,
-                                        viewportFraction: 1.0)),
+                                            ),
+                                            clipBehavior:
+                                                Clip.antiAliasWithSaveLayer,
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                  options: CarouselOptions(
+                                    aspectRatio: 3,
+                                    autoPlay: true,
+                                    viewportFraction: 1.0,
+                                  ),
+                                ),
                               )
                             : Container(),
                         Container(
@@ -420,9 +437,7 @@ class HomeScreenState extends State<HomeScreen>
                             scrollDirection: Axis.horizontal,
                           ),
                         ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
+                        const SizedBox(height: 10.0),
                         Expanded(
                           child: RefreshIndicator(
                             color: MyColors.primaryColor,
@@ -431,34 +446,52 @@ class HomeScreenState extends State<HomeScreen>
                                 ? Center(
                                     child: Column(
                                       children: [
-                                        SizedBox(
-                                          height: 20.0,
-                                        ),
+                                        SizedBox(height: 20.0),
                                         Image(
                                           image: AssetImage(
-                                              'assets/images/sad.png'),
+                                            'assets/images/sad.png',
+                                          ),
                                           width: 100.0,
                                           height: 100.0,
                                         ),
-                                        SizedBox(
-                                          height: 30.0,
-                                        ),
+                                        SizedBox(height: 30.0),
                                         Text(
                                           'no_data'.tr,
                                           style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 18.0),
-                                        )
+                                            color: Colors.red,
+                                            fontSize: 18.0,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   )
-                                : ListView(
-                              padding: const EdgeInsets.all(8.0),
-                              children: rooms
-                                  .where((element) => element.subject == selectedChatRoomCategory)
-                                  .map((room) => chatRoomListItem(room, context))
-                                  .toList(),
-                            )
+                                : ListView.builder(
+                                    padding: const EdgeInsets.all(8.0),
+                                    itemCount: rooms
+                                        .where(
+                                          (element) =>
+                                              element.subject ==
+                                              selectedChatRoomCategory,
+                                        )
+                                        .length,
+                                    itemBuilder: (context, index) {
+                                      final filteredRooms = rooms
+                                          .where(
+                                            (element) =>
+                                                element.subject ==
+                                                selectedChatRoomCategory,
+                                          )
+                                          .toList();
+
+                                      final room = filteredRooms[index];
+
+                                      return chatRoomListItem(
+                                        room,
+                                        context,
+                                        index,
+                                      );
+                                    },
+                                  ),
                           ),
                         ),
                       ],
@@ -471,34 +504,41 @@ class HomeScreenState extends State<HomeScreen>
                           height: 121.0,
                           width: MediaQuery.sizeOf(context).width * .95,
                           child: CarouselSlider(
-                              items: banners
-                                  .map((banner) => GestureDetector(
-                                        onTap: () {
-                                          bannerAction(banner);
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 5.0, vertical: 10.0),
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                              image: DecorationImage(
-                                                  image: CachedNetworkImageProvider(
-                                                      '${ASSETSBASEURL}Banners/${banner.img}'),
-                                                  fit: BoxFit.cover)),
-                                          clipBehavior:
-                                              Clip.antiAliasWithSaveLayer,
+                            items: banners
+                                .map(
+                                  (banner) => GestureDetector(
+                                    onTap: () {
+                                      bannerAction(banner);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 5.0,
+                                        vertical: 10.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          10.0,
                                         ),
-                                      ))
-                                  .toList(),
-                              options: CarouselOptions(
-                                  aspectRatio: 3,
-                                  autoPlay: true,
-                                  viewportFraction: 1.0)),
+                                        image: DecorationImage(
+                                          image: CachedNetworkImageProvider(
+                                            '${ASSETSBASEURL}Banners/${banner.img}',
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            options: CarouselOptions(
+                              aspectRatio: 3,
+                              autoPlay: true,
+                              viewportFraction: 1.0,
+                            ),
+                          ),
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
+                        SizedBox(height: 10.0),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15.0),
                           height: 40.0,
@@ -510,9 +550,7 @@ class HomeScreenState extends State<HomeScreen>
                             scrollDirection: Axis.horizontal,
                           ),
                         ),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
+                        const SizedBox(height: 10.0),
                         Expanded(
                           child: RefreshIndicator(
                             color: MyColors.primaryColor,
@@ -520,10 +558,15 @@ class HomeScreenState extends State<HomeScreen>
                             child: ListView(
                               padding: const EdgeInsets.all(8.0),
                               children: rooms_mine
-                                  .where((element) =>
-                                      element.country_id == selectedCountry ||
-                                      selectedCountry == 0)
-                                  .map((room) => chatRoomListItem(room , context))
+                                  .where(
+                                    (element) =>
+                                        element.country_id == selectedCountry ||
+                                        selectedCountry == 0,
+                                  )
+                                  .map(
+                                    (room) =>
+                                        chatRoomListItem(room, context, 6),
+                                  )
                                   .toList(),
                             ),
                           ),
@@ -549,14 +592,16 @@ class HomeScreenState extends State<HomeScreen>
           child: Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-                border: Border.all(
-                    color: MyColors.lightUnSelectedColor.withOpacity(.2),
-                    width: 1.0,
-                    style: BorderStyle.solid),
-                borderRadius: BorderRadius.circular(25.0),
-                color: countries[index].id == selectedCountry
-                    ? MyColors.primaryColor
-                    : MyColors.lightUnSelectedColor.withOpacity(.2)),
+              border: Border.all(
+                color: MyColors.lightUnSelectedColor.withOpacity(.2),
+                width: 1.0,
+                style: BorderStyle.solid,
+              ),
+              borderRadius: BorderRadius.circular(25.0),
+              color: countries[index].id == selectedCountry
+                  ? MyColors.primaryColor
+                  : MyColors.lightUnSelectedColor.withOpacity(.2),
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -564,407 +609,465 @@ class HomeScreenState extends State<HomeScreen>
                 countries[index].id > 0
                     ? Image(
                         image: CachedNetworkImageProvider(
-                            '${ASSETSBASEURL}Countries/${countries[index].icon}'),
+                          '${ASSETSBASEURL}Countries/${countries[index].icon}',
+                        ),
                         width: 30.0,
                       )
                     : Image(
                         image: AssetImage(countries[index].icon),
                         width: 30.0,
                       ),
-                const SizedBox(
-                  width: 5.0,
-                ),
+                const SizedBox(width: 5.0),
                 Text(
                   countries[index].name,
                   style: TextStyle(
-                      color: countries[index].id == selectedCountry
-                          ? Colors.white
-                          : Colors.black,
-                      fontSize: 13.0),
-                )
+                    color: countries[index].id == selectedCountry
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 13.0,
+                  ),
+                ),
               ],
             ),
           ),
         )
       : Container();
 
-  Widget countryListSpacer() => const SizedBox(
-        width: 5.0,
-      );
+  Widget countryListSpacer() => const SizedBox(width: 5.0);
 
   Widget chatRoomEmptyListItem() => GestureDetector(
-        onTap: () {
-          openMyRoom();
-        },
-        child: Container(
-          width: MediaQuery.of(context).size.width / 2,
-          margin: const EdgeInsets.all(5.0),
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width / 2,
-                    height: (MediaQuery.of(context).size.width / 2) * 1.15,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                                '${ASSETSBASEURL}Defaults/room_default.png'),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                                Colors.grey.withOpacity(.7),
-                                BlendMode.darken))),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                        start: 15.0, bottom: 20.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text("create_room".tr,
-                                textAlign: TextAlign.end,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_pin,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                                Text("---",
-                                    textAlign: TextAlign.end,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11.0,
-                                      fontWeight: FontWeight.bold,
-                                    )),
-                              ],
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      width: ((MediaQuery.of(context).size.width / 2) - 50),
-                      child: Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: MyColors.lightgrey.withOpacity(.7),
-                                borderRadius: BorderRadiusDirectional.only(
-                                    topStart: Radius.circular(15.0))),
-                            width: MediaQuery.sizeOf(context).width / 4,
-                            height: 32.0,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                    flex: 7,
-                                    child: Image(
-                                      image:
-                                          AssetImage('assets/images/rank.webp'),
-                                      height: 20,
-                                    )),
-                                Expanded(
-                                  flex: 3,
-                                  child: Padding(
-                                    padding: const EdgeInsetsDirectional.only(
-                                        start: 5.0),
-                                    child: Text(
-                                      "0",
-                                      style: TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      );
-
-  Widget chatRoomListItem(ChatRoom room, BuildContext context) => GestureDetector(
     onTap: () {
-      openRoom(room.id);
+      openMyRoom();
     },
-    child: Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-        side: BorderSide(
-          color: Colors.white,
-          width: 1.0,
-        ),
-      ),
-      elevation: 3.0,
-      child: Container(
-        height: MediaQuery.of(context).size.width / 3 ,
-        child: Stack(
-          alignment: AlignmentDirectional.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width / 3.2,
-                    height: MediaQuery.of(context).size.width / 3.2,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image(
-                            image: getRoomImage(room),
-                            fit: BoxFit.cover,
-                            color: Colors.grey.withOpacity(0.7),
-                            colorBlendMode: BlendMode.darken,
-                          ),
-                        ],
-                      ),
+    child: Container(
+      width: MediaQuery.of(context).size.width / 2,
+      margin: const EdgeInsets.all(5.0),
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width / 2,
+                height: (MediaQuery.of(context).size.width / 2) * 1.15,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.0),
+                  image: DecorationImage(
+                    image: CachedNetworkImageProvider(
+                      '${ASSETSBASEURL}Defaults/room_default.png',
+                    ),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.grey.withOpacity(.7),
+                      BlendMode.darken,
                     ),
                   ),
-                  SizedBox(width: 12.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  start: 15.0,
+                  bottom: 20.0,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          room.name,
+                          "create_room".tr,
+                          textAlign: TextAlign.end,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
+                            color: Colors.white,
+                            fontSize: 15.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'ID:' + room.tag,
-                          style: TextStyle(
-                              color: MyColors.unSelectedColor,
-                              fontSize: 13.0
-                          ),
-                        ),
-                        SizedBox(height: 10.0),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.location_pin, color: Colors.black, size: 20),
-                            SizedBox(width: 4.0),
-                            Expanded(
-                              child: Text(
-                                room.country_name,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            Icon(
+                              Icons.location_pin,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            Text(
+                              "---",
+                              textAlign: TextAlign.end,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11.0,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            // 🟨 Positioned widget: لوضع الـ rank badge أسفل يمين الكارد
-            Positioned(
-              bottom: 8,
-              right: 12,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
-                decoration: BoxDecoration(
-                  color: MyColors.lightgrey.withOpacity(.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image(
-                      image: AssetImage('assets/images/rank.webp'),
-                      height: 15,
-                    ),
-                    SizedBox(width: 6),
-                    Text(
-                      room.memberCount.toString(),
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
                   ],
                 ),
               ),
+            ],
+          ),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  width: ((MediaQuery.of(context).size.width / 2) - 50),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.lightgrey.withOpacity(.7),
+                          borderRadius: BorderRadiusDirectional.only(
+                            topStart: Radius.circular(15.0),
+                          ),
+                        ),
+                        width: MediaQuery.sizeOf(context).width / 4,
+                        height: 32.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 7,
+                              child: Image(
+                                image: AssetImage('assets/images/rank.webp'),
+                                height: 20,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.only(
+                                  start: 5.0,
+                                ),
+                                child: Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );
 
-  Widget chatRoomListItem1(room) => GestureDetector(
-        onTap: () {
-          openRoom(room.id);
-        },
-        child: Container(
-          width: MediaQuery.of(context).size.width / 2,
-          margin: const EdgeInsets.all(5.0),
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width / 2,
-                    height: (MediaQuery.of(context).size.width / 2) * 1.15,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image(
-                            image: getRoomImage(room),
-                            fit: BoxFit.cover,
-                            color: Colors.grey.withOpacity(0.7),
-                            colorBlendMode: BlendMode.darken,
+  Widget chatRoomListItem(
+    ChatRoom room,
+    BuildContext context,
+    int? index,
+  ) => GestureDetector(
+    onTap: () {
+      print('isTrend');
+      print(room.isTrend);
+      openRoom(room.id);
+    },
+    child: Stack(
+      children: [
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            side: BorderSide(color: Colors.white, width: 1.0),
+          ),
+          elevation: 3.0,
+          child: Container(
+            height: MediaQuery.of(context).size.width / 3,
+            child: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width / 3.2,
+                        height: MediaQuery.of(context).size.width / 3.2,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [getRoomImage(room)],
                           ),
-                          // Add any overlay content here
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                        start: 15.0, bottom: 20.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(room.name,
-                                  textAlign: TextAlign.end,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_pin,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                  Text(room.country_name,
-                                      textAlign: TextAlign.end,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11.0,
-                                        fontWeight: FontWeight.bold,
-                                      )),
-                                ],
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      width: ((MediaQuery.of(context).size.width / 2) - 50),
-                      child: Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                color: MyColors.lightgrey.withOpacity(.7),
-                                borderRadius: BorderRadiusDirectional.only(
-                                    topStart: Radius.circular(15.0))),
-                            width: MediaQuery.sizeOf(context).width / 4,
-                            height: 32.0,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                      SizedBox(width: 12.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 14.0),
+                            Text(
+                              room.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'ID:' + room.tag,
+                              style: TextStyle(
+                                color: MyColors.unSelectedColor,
+                                fontSize: 13.0,
+                              ),
+                            ),
+                            SizedBox(height: 10.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
+                                Icon(
+                                  Icons.location_pin,
+                                  color: Colors.black,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 4.0),
                                 Expanded(
-                                    flex: 7,
-                                    child: Image(
-                                      image:
-                                          AssetImage('assets/images/rank.webp'),
-                                      height: 20,
-                                    )),
-                                Expanded(
-                                  flex: 3,
-                                  child: Padding(
-                                    padding: const EdgeInsetsDirectional.only(
-                                        start: 5.0),
-                                    child: Text(
-                                      room.memberCount.toString(),
-                                      style: TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
+                                  child: Text(
+                                    room.country_name,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 🟨 Positioned widget: لوضع الـ rank badge أسفل يمين الكارد
+                Positioned(
+                  bottom: 8,
+                  right: 12,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 4.0,
+                      horizontal: 10.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: MyColors.lightgrey.withOpacity(.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image(
+                          image: AssetImage('assets/images/rank.webp'),
+                          height: 15,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          room.memberCount.toString(),
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (index == 0)
+          Positioned.fill(
+            child: Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              child: SVGAEasyPlayer(
+                resUrl: '${ASSETSBASEURL}/Defaults/top1.svga',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        if (index == 1)
+          Positioned.fill(
+            child: Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              child: SVGAEasyPlayer(
+                resUrl: '${ASSETSBASEURL}/Defaults/top2.svga',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        if (index == 2)
+          Positioned.fill(
+            child: Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              child: SVGAEasyPlayer(
+                resUrl: '${ASSETSBASEURL}/Defaults/top3.svga',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
+
+  Widget chatRoomListItem1(room) => GestureDetector(
+    onTap: () {
+      openRoom(room.id);
+    },
+    child: Container(
+      width: MediaQuery.of(context).size.width / 2,
+      margin: const EdgeInsets.all(5.0),
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width / 2,
+                height: (MediaQuery.of(context).size.width / 2) * 1.15,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15.0),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      getRoomImage(room),
+                      // Add any overlay content here
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  start: 15.0,
+                  bottom: 20.0,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            room.name,
+                            textAlign: TextAlign.end,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_pin,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              Text(
+                                room.country_name,
+                                textAlign: TextAlign.end,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-        ),
-      );
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  width: ((MediaQuery.of(context).size.width / 2) - 50),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.lightgrey.withOpacity(.7),
+                          borderRadius: BorderRadiusDirectional.only(
+                            topStart: Radius.circular(15.0),
+                          ),
+                        ),
+                        width: MediaQuery.sizeOf(context).width / 4,
+                        height: 32.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 7,
+                              child: Image(
+                                image: AssetImage('assets/images/rank.webp'),
+                                height: 20,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsetsDirectional.only(
+                                  start: 5.0,
+                                ),
+                                child: Text(
+                                  room.memberCount.toString(),
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   Widget chatRoomCategoryListItem(index) => chatRoomCats.isNotEmpty
       ? GestureDetector(
@@ -978,14 +1081,16 @@ class HomeScreenState extends State<HomeScreen>
           child: Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-                border: Border.all(
-                    color: Colors.transparent,
-                    width: 1.0,
-                    style: BorderStyle.solid),
-                borderRadius: BorderRadius.circular(25.0),
-                color: chatRoomCats[index] == selectedChatRoomCategory
-                    ? MyColors.primaryColor
-                    : MyColors.lightUnSelectedColor),
+              border: Border.all(
+                color: Colors.transparent,
+                width: 1.0,
+                style: BorderStyle.solid,
+              ),
+              borderRadius: BorderRadius.circular(25.0),
+              color: chatRoomCats[index] == selectedChatRoomCategory
+                  ? MyColors.primaryColor
+                  : MyColors.lightUnSelectedColor,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -993,11 +1098,12 @@ class HomeScreenState extends State<HomeScreen>
                 Text(
                   '#${chatRoomCats[index].toLowerCase()}',
                   style: TextStyle(
-                      color: chatRoomCats[index] == selectedChatRoomCategory
-                          ? MyColors.darkColor
-                          : MyColors.whiteColor,
-                      fontSize: 15.0),
-                )
+                    color: chatRoomCats[index] == selectedChatRoomCategory
+                        ? MyColors.darkColor
+                        : MyColors.whiteColor,
+                    fontSize: 15.0,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1027,7 +1133,9 @@ class HomeScreenState extends State<HomeScreen>
     await checkForSavedRoom(room!);
     ChatRoomService().roomSetter(room);
     Navigator.push(
-        context, MaterialPageRoute(builder: (ctx) => const RoomScreen()));
+      context,
+      MaterialPageRoute(builder: (ctx) => const RoomScreen()),
+    );
   }
 
   void showMyRoomOnly() {
@@ -1036,7 +1144,9 @@ class HomeScreenState extends State<HomeScreen>
 
   void openSearch() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+      context,
+      MaterialPageRoute(builder: (context) => const SearchScreen()),
+    );
   }
 
   void openRoom(id) async {
@@ -1046,10 +1156,9 @@ class HomeScreenState extends State<HomeScreen>
       if (res.password.isEmpty || res.userId == user!.id) {
         ChatRoomService().roomSetter(res);
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RoomScreen(),
-            ));
+          context,
+          MaterialPageRoute(builder: (context) => RoomScreen()),
+        );
       } else {
         //showPassword popup
         _displayTextInputDialog(context, res);
@@ -1058,7 +1167,9 @@ class HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _displayTextInputDialog(
-      BuildContext context, ChatRoom room) async {
+    BuildContext context,
+    ChatRoom room,
+  ) async {
     return showDialog(
       context: context,
       builder: (context) {
@@ -1082,13 +1193,16 @@ class HomeScreenState extends State<HomeScreen>
                     maxLength: 20,
                     keyboardType: TextInputType.visiblePassword,
                     decoration: InputDecoration(
-                        hintText: "XXXXXXX",
-                        hintStyle: TextStyle(color: Colors.black),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: MyColors.whiteColor)),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0))),
+                      hintText: "XXXXXXX",
+                      hintStyle: TextStyle(color: Colors.black),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: MyColors.whiteColor),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -1096,8 +1210,9 @@ class HomeScreenState extends State<HomeScreen>
             actions: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                    color: MyColors.whiteColor,
-                    borderRadius: BorderRadius.circular(15.0)),
+                  color: MyColors.whiteColor,
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
                 child: MaterialButton(
                   child: Text(
                     'edit_profile_cancel'.tr,
@@ -1110,8 +1225,9 @@ class HomeScreenState extends State<HomeScreen>
               ),
               Container(
                 decoration: BoxDecoration(
-                    color: MyColors.primaryColor,
-                    borderRadius: BorderRadius.circular(15.0)),
+                  color: MyColors.primaryColor,
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
                 child: MaterialButton(
                   child: Text(
                     'OK',
@@ -1121,19 +1237,19 @@ class HomeScreenState extends State<HomeScreen>
                     if (passwordController.text == room.password) {
                       ChatRoomService().roomSetter(room);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RoomScreen(),
-                          ));
+                        context,
+                        MaterialPageRoute(builder: (context) => RoomScreen()),
+                      );
                     } else {
                       Fluttertoast.showToast(
-                          msg: "room_password_wrong".tr,
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.black26,
-                          textColor: Colors.orange,
-                          fontSize: 16.0);
+                        msg: "room_password_wrong".tr,
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.black26,
+                        textColor: Colors.orange,
+                        fontSize: 16.0,
+                      );
                     }
                   },
                 ),
@@ -1145,7 +1261,7 @@ class HomeScreenState extends State<HomeScreen>
     );
   }
 
-  ImageProvider getRoomImage(room) {
+  CachedNetworkImage getRoomImage(room) {
     String room_img = '';
 
     if (room!.img == room!.admin_img) {
@@ -1161,7 +1277,26 @@ class HomeScreenState extends State<HomeScreen>
         room_img = '${ASSETSBASEURL}Defaults/room_default.png';
       }
     }
-    return CachedNetworkImageProvider(room_img);
+    return CachedNetworkImage(
+      imageUrl: room_img,
+      fit: BoxFit.cover,
+      errorWidget: (context, url, error) => CachedNetworkImage(
+        imageUrl: '${ASSETSBASEURL}Defaults/room_default.png',
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  Widget roomImage(String roomImg) {
+    return CachedNetworkImage(
+      imageUrl: roomImg,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+      errorWidget: (context, url, error) => Image.asset(
+        'assets/images/default_room.png', // صورة افتراضية لو حصل خطأ
+        fit: BoxFit.cover,
+      ),
+    );
   }
 
   checkForSavedRoom(ChatRoom room) async {
@@ -1173,7 +1308,12 @@ class HomeScreenState extends State<HomeScreen>
         ChatRoomService().savedRoomSetter(null);
         await ChatRoomService.engine!.leaveChannel();
         await ChatRoomService.engine!.release();
-        MicHelper(user_id: user!.id, room_id: savedRoom.id, mic: 0).leaveMic();
+        MicHelper(
+          user_id: user!.id,
+          room_id: savedRoom.id,
+          mic: 0,
+          user!,
+        ).leaveMic();
         ExitRoomHelper(user!.id, savedRoom.id);
       }
     }
@@ -1182,10 +1322,11 @@ class HomeScreenState extends State<HomeScreen>
   bannerAction(banner) {
     if (banner.action == 0) {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BannerDetailsScreen(url: banner.url),
-          ));
+        context,
+        MaterialPageRoute(
+          builder: (context) => BannerDetailsScreen(url: banner.url),
+        ),
+      );
     } else if (banner.action == 1) {
       //open Room
       if (banner.room_id > 0) {
@@ -1195,10 +1336,11 @@ class HomeScreenState extends State<HomeScreen>
       //open User Profile
       if (banner.user_id > 0) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (ctx) =>
-                    InnerProfileScreen(visitor_id: banner.user_id)));
+          context,
+          MaterialPageRoute(
+            builder: (ctx) => InnerProfileScreen(visitor_id: banner.user_id),
+          ),
+        );
       }
     }
   }

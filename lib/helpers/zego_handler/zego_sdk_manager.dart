@@ -1,5 +1,7 @@
+import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../shared/constants/Contants.dart';
 import 'internal/internal.dart';
 
 export 'internal/internal.dart';
@@ -21,8 +23,11 @@ class ZEGOSDKManager {
 
   Future<void> connectUser(String userID, String userName,
       {String? token}) async {
-    await expressService.connectUser(userID, userName, token: token);
-    await zimService.connectUser(userID, userName, token: token);
+    final token = await ChatRoomService().generateToken(userID);
+    print('token');
+    print(token.token);
+    await expressService.connectUser(userID, userName, token: token.token);
+    await zimService.connectUser(userID, userName, token: token.token);
   }
 
   Future<void> disconnectUser() async {

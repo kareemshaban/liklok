@@ -28,7 +28,7 @@ Future<List<Chat>> getuserChats(user_id)async{
   }
 }
 
-Future<void> send_Message(user_id,reciver_id,message)async{
+Future<void> send_Message(user_id,reciver_id,message , type)async{
   var response = await http.post(
      Uri.parse('${BASEURL}chats/sendMsg'),
     headers: <String,String>{
@@ -38,6 +38,7 @@ Future<void> send_Message(user_id,reciver_id,message)async{
       "user_id": user_id.toString(),
       "reciver_id": reciver_id.toString(),
       "message": message.toString(),
+      'type': type ,
       }
   )
   );

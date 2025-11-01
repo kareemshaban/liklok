@@ -1,8 +1,8 @@
 
 //production
-const  BASEURL = 'https://liklok.thebeltagy.com/api/';
-const  ASSETSBASEURL = 'https://liklok.thebeltagy.com/images/';
-const LOCALPATH ='/data/user/0/com.chat.apps.chat.chat/app_flutter';
+const  BASEURL = 'https://dashboard.liklok.live/api/' ;
+const  ASSETSBASEURL = 'https://dashboard.liklok.live/images/' ;
+const LOCALPATH ='/data/user/0/com.chatScreen.apps.chatScreen.chatScreen/app_flutter' ;
 
 
 
@@ -10,7 +10,7 @@ const LOCALPATH ='/data/user/0/com.chat.apps.chat.chat/app_flutter';
 //dev
 // const  BASEURL = 'https://dev.liklok.live/api/';
 // const  ASSETSBASEURL = 'https://dev.liklok.live/images/';
-// const LOCALPATH ='/data/user/0/com.chat.apps.chat.chat/app_flutter';
+// const LOCALPATH ='/data/user/0/com.chatScreen.apps.chatScreen.chatScreen/app_flutter';
 
 
 

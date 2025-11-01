@@ -1,27 +1,59 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Message {
-  final int senderId ;
-  final String senderEmail ;
+  int? id;
+  int? chatId;
+  final int senderId;
   final int receiverId;
-  final String message ;
-  final Timestamp timestamp ;
+  String? messageDate;
+  final String message;
+  String? img;
+  int? type;
+  int? isSeen;
+  String? createdAt;
+  String? updatedAt;
+
   Message({
+    this.id,
+    this.chatId,
     required this.senderId,
-    required this.senderEmail ,
-    required this.receiverId ,
+    required this.receiverId,
+    this.messageDate,
     required this.message,
-    required this.timestamp
+    this.img,
+    this.type,
+    this.isSeen,
+    this.createdAt,
+    this.updatedAt,
   });
-  //convert to a map
-  Map<String,dynamic> toMap(){
-    return{
-      'senderId' :senderId,
-      'senderEmail' :senderEmail,
-      'receiverId' :receiverId,
-      'message' :message,
-      'timestamp' :timestamp,
-    } ;
+
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      id: json['id'] ?? 0,
+      chatId: json['chat_id'] ?? 0,
+      senderId: json['sender_id'] ?? 0,
+      receiverId: json['reciver_id'] ?? 0,
+      messageDate: json['message_date'] ?? '',
+      message: json['message'] ?? '',
+      img: json['img'] ?? '',
+      type: json['type'] ?? 0,
+      isSeen: json['isSeen'] ?? 0,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'chat_id': chatId,
+      'sender_id': senderId,
+      'reciver_id': receiverId,
+      'message_date': messageDate,
+      'message': message,
+      'img': img,
+      'type': type,
+      'isSeen': isSeen,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+    };
   }
 }

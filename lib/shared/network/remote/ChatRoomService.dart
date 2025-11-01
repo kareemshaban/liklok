@@ -567,7 +567,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
       }
 
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load album ${response.statusCode}');
     }
   }
   Future<ChatRoom?> unlockMic(user_id , room_id , mic , admin_id) async {
@@ -1467,9 +1467,10 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
   }
 
   Future<TokenModel> generateToken(id) async {
-    final response = await  http.get(Uri.parse('${BASEURL}chatRooms/rollet/loser/zego/token?user_id=$id'));
+    final response = await  http.get(Uri.parse('${BASEURL}zekoToken?user_id=$id'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
+      print(response.body);
       return TokenModel.fromJson(data);
     } else {
       throw Exception('Failed to fetch token: ${response.statusCode}');

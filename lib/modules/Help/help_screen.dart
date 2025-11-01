@@ -85,7 +85,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
                 GestureDetector(
                   onTap: () async{
-                    final Uri url = Uri.parse('https://chat.apps/en');
+                    final Uri url = Uri.parse('https://chatScreen.apps/en');
                     if (!await launchUrl(url)) {
                       throw Exception('Could not launch $url');
                     }
@@ -112,7 +112,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
                 GestureDetector(
                   onTap: () async{
-                    await launch('https://chat.apps');
+                    await launch('https://chatScreen.apps');
                   },
                   child: Container(
                     color: Colors.white,
@@ -126,7 +126,7 @@ class _HelpScreenState extends State<HelpScreen> {
                           children: [
                             Text("help_center_email".tr ,style:TextStyle(color: MyColors.unSelectedColor,fontSize: 16.0) ,),
                             SizedBox(height: 10.0,),
-                            Text("support@chat.apps".tr ,style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
+                            Text("support@chatScreen.apps".tr ,style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
 
                           ],
                         )

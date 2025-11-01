@@ -193,7 +193,7 @@ class _FriendsModalScreenState extends State<FriendsModalScreen> {
   }
 
   sendRelationRequest(reciver_id , msg) async {
-    await ChatApiService().send_Message(user!.id, reciver_id, msg);
+    await ChatApiService().send_Message(user!.id, reciver_id, msg , 0);
     await ChatService().sendMessage( reciver_id, msg , 1);
     AppUser? rec = await AppUserServices().getUser(reciver_id) ;
     if(rec != null){

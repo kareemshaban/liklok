@@ -228,7 +228,7 @@ class _Privacy_Policy_ScreenState extends State<Privacy_Policy_Screen> {
           Contact Us
           If you have any questions about this Privacy Policy, You can contact us:
           
-          By email: support@chat.apps ''' , style: TextStyle(color: Colors.grey),)
+          By email: support@chatScreen.apps ''' , style: TextStyle(color: Colors.grey),)
                     : Text(style: TextStyle(color: Colors.grey) , ''' سياسة الخصوصية LikLok
           
            سياسة الخصوصية
@@ -403,7 +403,7 @@ class _Privacy_Policy_ScreenState extends State<Privacy_Policy_Screen> {
            اتصل بنا
            إذا كانت لديك أي أسئلة حول سياسة الخصوصية هذه، يمكنك الاتصال بنا:
           
-           عبر البريد الإلكتروني: support@chat.apps ''')
+           عبر البريد الإلكتروني: support@chatScreen.apps ''')
               ],
             ),
           ),

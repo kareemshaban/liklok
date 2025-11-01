@@ -56,26 +56,36 @@ class _ThemesModalState extends State<ThemesModal> {
   }
 
   Widget themeListItem(theme) => Container(
+    height: 140, // مثلا
     child: Stack(
       alignment: Alignment.bottomCenter,
       children: [
         Column(
           children: [
-            GestureDetector(
+            Flexible(
+              child: GestureDetector(
                 onTap: () {
-                   changeTheme(theme.id);
-
+                  changeTheme(theme.id);
                 },
-                child: Image(image: CachedNetworkImageProvider(ASSETSBASEURL + 'Themes/' + theme.img) , width: 100.0,))
+                child: Image(
+                  image: CachedNetworkImageProvider(ASSETSBASEURL + 'Themes/' + theme.img),
+                  width: 100.0,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ],
         ),
-        theme.id == room!.themeId ? Icon(Icons.check_circle , color: MyColors.primaryColor , size: 30,) : SizedBox(height: 1,)
+        theme.id == room!.themeId
+            ? Icon(Icons.check_circle, color: MyColors.primaryColor, size: 30)
+            : SizedBox(height: 1),
       ],
     ),
   );
 
+
   changeTheme(theme_id) async{
-    await RoomHelper(room_id: room!.id , bg: theme_id).changeTheme();
+    await RoomHelper(room_id: room!.id , bg: theme_id).sendThemeChangeEvent(user!.id);
 
   }
   Widget musicListItem(theme) => Container(

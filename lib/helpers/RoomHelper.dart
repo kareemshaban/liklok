@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:LikLok/helpers/zego_handler/zego_sdk_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 
@@ -15,5 +18,23 @@ class RoomHelper {
 
   }
 
+  Future<void> sendThemeChangeEvent(user_id) async {
+    final themeData = {
+      'room_id': room_id,
+      'theme_id': bg,
+      'user_id': user_id,
+    };
+
+    await ZEGOSDKManager().zimService.setRoomAttributes(
+      {
+        'theme_change_event': jsonEncode(themeData),
+      },
+      isForce: true,
+      isUpdateOwner: false,
+      isDeleteAfterOwnerLeft: false,
+    );
+
+    print('🎨 Theme change event sent: $themeData');
+  }
 
 }

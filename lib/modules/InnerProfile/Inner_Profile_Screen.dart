@@ -11,7 +11,6 @@ import 'package:LikLok/modules/EditProfile/Edit_Profile_Screen.dart';
 import 'package:LikLok/modules/Mall/Mall_Screen.dart';
 import 'package:LikLok/modules/MyGifts/My_Gifts_Screen.dart';
 import 'package:LikLok/modules/Room/Room_Screen.dart';
-import 'package:LikLok/modules/chat/chat.dart';
 import 'package:LikLok/shared/components/Constants.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
@@ -28,6 +27,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_svga/flutter_svga.dart';
 
 import '../Loading/loadig_screen.dart';
+import '../chatScreen/chat_screen.dart';
 
 class InnerProfileScreen extends StatefulWidget {
   final int visitor_id ;
@@ -796,7 +796,7 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
     print('visitor');
     print(user);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(receiverUserEmail: user!.email, receiverUserID: user!.id , receiver: user!,),));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(receiverUserEmail: user!.email, receiverUserID: user!.id , receiver: user!, messages: [],),));
   }
   openUserRoom() async{
 
@@ -863,7 +863,7 @@ class _InnerProfileScreenState extends State<InnerProfileScreen> {
         ChatRoomService().savedRoomSetter(null);
         await ChatRoomService.engine!.leaveChannel();
         await ChatRoomService.engine!.release();
-        MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0).leaveMic();
+        MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0 , user!).leaveMic();
         ExitRoomHelper(user!.id , savedRoom.id);
 
       }

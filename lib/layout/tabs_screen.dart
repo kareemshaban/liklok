@@ -195,12 +195,11 @@ class TabsScreenState extends State<TabsScreen> {
          onPressed: () async {
            await ChatRoomService.engine!.leaveChannel();
            await ChatRoomService.engine!.release();
-            MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0).leaveMic();
+            MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0 , user).leaveMic();
             ExitRoomHelper(user.id , savedRoom!.id);
             setState(() {
               showDelete = false ;
               savedRoom = null ;
-
             });
 
             ChatRoomService().savedRoomSetter(null);

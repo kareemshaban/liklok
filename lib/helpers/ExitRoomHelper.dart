@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:LikLok/helpers/zego_handler/live_audio_room_manager.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 
 class ExitRoomHelper {
@@ -9,9 +9,10 @@ class ExitRoomHelper {
   }
   handleExitRoom() async{
     await ChatRoomService().exitRoom(user_id, room_id);
-    await FirebaseFirestore.instance.collection("exitRoom").add({
-      'room_id': room_id,
-      'user_id': user_id,
-    });
+    ZegoLiveAudioRoomManager().logoutRoom();
+    // await FirebaseFirestore.instance.collection("exitRoom").add({
+    //   'room_id': room_id,
+    //   'user_id': user_id,
+    // });
   }
 }

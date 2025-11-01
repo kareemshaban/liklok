@@ -87,11 +87,12 @@ dependencies:
   root_checker_plus: ^0.0.4
   wakelock_plus: ^1.1.1
   flutter_exif_rotation: ^0.5.1
-  flutter_svga: ^0.0.6
+  flutter_svga: ^0.0.8
   zego_express_engine: ^3.17.1
-  zego_zim: ^2.17.1+1
+  zego_zim: ^2.23.0
   build_runner: ^2.9.0
   json_serializable: ^6.11.1
+  x_overlay: ^1.0.0
 
 
 

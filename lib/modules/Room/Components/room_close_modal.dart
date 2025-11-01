@@ -11,10 +11,13 @@ import 'package:LikLok/shared/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../helpers/zego_handler/internal/internal.dart';
+
 class RoomCloseModal extends StatefulWidget {
   final BuildContext pcontext ;
-  final RtcEngine engine ;
-  const RoomCloseModal({super.key , required this.pcontext , required this.engine});
+  final ZegoExpressEngine zegoEngine;
+  final ZegoMediaPlayer audioPlayer ;
+  const RoomCloseModal({super.key , required this.pcontext ,required this.zegoEngine, required this.audioPlayer});
 
   @override
   State<RoomCloseModal> createState() => _RoomCloseModalState();
@@ -86,21 +89,23 @@ class _RoomCloseModalState extends State<RoomCloseModal> {
   }
 
   keepRoom(){
-    ChatRoomService().savedRoomSetter(room!);
-    ChatRoomService.engine = widget.engine ;
-   // ChatRoomService().savedRoomSetter(null);
-    Navigator.pushAndRemoveUntil(
-        context ,
-        MaterialPageRoute(builder: (context) => const TabsScreen()) ,   (route) => false
-    );
+   //  ChatRoomService().savedRoomSetter(room!);
+   //  // ChatRoomService.engine = widget.engine ;
+   // // ChatRoomService().savedRoomSetter(null);
+   //  Navigator.pushAndRemoveUntil(
+   //      context ,
+   //      MaterialPageRoute(builder: (context) => const TabsScreen()) ,   (route) => false
+   //  );
 
   }
   exitRoom() async {
     ChatRoomService().savedRoomSetter(null);
-    MicHelper( user_id:  user!.id , room_id:  room!.id , mic: 0).leaveMic();
+    MicHelper(user!, user_id: user!.id, room_id: room!.id, mic:0).sendMicLeaveEvent(widget.audioPlayer , widget.zegoEngine);
     ExitRoomHelper(user!.id , room!.id);
-    await widget.engine.leaveChannel();
-    await widget.engine.release();
+    String streamId = "${user!.id}_${room!.id}";
+    await ZegoExpressEngine.instance.stopPlayingStream(streamId);
+    // Logout from room
+    await ZegoExpressEngine.instance.logoutRoom(room!.id.toString());
     Navigator.pushAndRemoveUntil(
         context ,
         MaterialPageRoute(builder: (context) => const TabsScreen()) ,   (route) => false

@@ -1,26 +1,24 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
-import 'package:audio_duration/audio_duration.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:path/path.dart' as path;
-
 import 'package:file_manager/file_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:device_info_plus/device_info_plus.dart';
+import '../../../helpers/zego_handler/internal/internal.dart';
 import '../../../shared/styles/colors.dart';
 import 'music2_modal.dart';
 
 class MusicsModal extends StatefulWidget {
-  const MusicsModal({super.key});
+  final ZegoExpressEngine zegoEngine;
+  final ZegoMediaPlayer audioPlayer ;
+
+  const MusicsModal({super.key, required this.zegoEngine, required this.audioPlayer});
 
   @override
   State<MusicsModal> createState() => _MusicsModalState();
@@ -32,14 +30,16 @@ class _MusicsModalState extends State<MusicsModal> {
 
   late RtcEngine _engine;
   bool _isStartedAudioMixing = false;
-  bool _loopback = false;
-  bool _replace = false;
-  double _cycle = 1.0;
-  double _startPos = 1000;
+  // bool _loopback = true;
+  // bool _replace = false;
+  // int  _cycle = 1;
+  // double _startPos = 1000;
   int playedIndex = -1;
   double progress = 1000 ;
   double min = 1000 ;
   double max = 1000 ;
+  late double adjustedProgress = progress.clamp(min, max);
+
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _MusicsModalState extends State<MusicsModal> {
         _engine = ChatRoomService.engine!;
       }
     });
-    getProgress();
+    // getProgress();
     getData();
     _engine.registerEventHandler(
         RtcEngineEventHandler(
@@ -83,40 +83,74 @@ class _MusicsModalState extends State<MusicsModal> {
         )
     );
   }
-  requestPermissions() async{
-    // Request permission to access the device's storage
-    var status = await Permission.storage.request();
-    var status2 =  await  Permission.manageExternalStorage.request();
-    var status3 = await Permission.audio.request();
-    if (status.isGranted || status2.isGranted || status3.isGranted) {
-      // Permission granted, you can now proceed with file access
-
-    } else {
-      Fluttertoast.showToast(
-          msg: 'music_error_permissions'.tr,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black26,
-          textColor: Colors.orange,
-          fontSize: 16.0);
-           Navigator.pop(context);
-      // Permission denied
-      // Handle the situation where the user denied permission
+  Future<void> requestPermissions() async {
+    if (!Platform.isAndroid) {
+      print('Not running on Android');
+      return;
     }
 
+    final deviceInfo = DeviceInfoPlugin();
+    final androidInfo = await deviceInfo.androidInfo;
+    final sdkInt = androidInfo.version.sdkInt;
+
+    PermissionStatus? storageStatus;
+    PermissionStatus? manageStorageStatus;
+    PermissionStatus? audioStatus;
+    PermissionStatus? mediaImagesStatus;
+    PermissionStatus? mediaVideoStatus;
+    PermissionStatus? mediaAudioStatus;
+
+    if (sdkInt >= 33) {
+      mediaImagesStatus = await Permission.photos.request();
+      mediaVideoStatus = await Permission.videos.request();
+      mediaAudioStatus = await Permission.audio.request();
+    }
+    else if (sdkInt >= 30) {
+      manageStorageStatus = await Permission.manageExternalStorage.request();
+      audioStatus = await Permission.audio.request();
+    }
+    else {
+      storageStatus = await Permission.storage.request();
+      audioStatus = await Permission.audio.request();
+    }
+
+    final granted = [
+      storageStatus?.isGranted,
+      manageStorageStatus?.isGranted,
+      audioStatus?.isGranted,
+      mediaImagesStatus?.isGranted,
+      mediaVideoStatus?.isGranted,
+      mediaAudioStatus?.isGranted,
+    ].where((x) => x == true).isNotEmpty;
+
+    if (granted) {
+      print('Permissions granted ✅');
+    } else {
+      print('Some permissions denied ❌');
+
+      if (await Permission.storage.isPermanentlyDenied ||
+          await Permission.manageExternalStorage.isPermanentlyDenied ||
+          await Permission.photos.isPermanentlyDenied ||
+          await Permission.videos.isPermanentlyDenied ||
+          await Permission.audio.isPermanentlyDenied) {
+        print("User permanently denied permission. Opening app settings...");
+        openAppSettings();
+      }
+    }
   }
-  getProgress() async {
-    int mm = await _engine.getAudioMixingCurrentPosition()  ;
-    int mx = await _engine.getAudioMixingDuration()  ;
+
+  Future<void> getProgress() async {
+    final current = await widget.audioPlayer.getCurrentProgress();
+    final total = await widget.audioPlayer.getTotalDuration();
+
+    if (!mounted) return;
 
     setState(() {
-      if(mounted){
-        progress = mm > 0 ?  double.parse(mm.toString()) : 1000;
-        max = mx > 0 ? double.parse(mx.toString()) : 1000;
-        _isStartedAudioMixing =  mm > 0 ;
-        playedIndex = mm > 0 ? ChatRoomService.musicPlayedIndex : -1 ;
-      }
+      progress = current.toDouble().clamp(0, total.toDouble());
+      max = total.toDouble();
+      min = 0;
+      _isStartedAudioMixing = current > 0;
+      playedIndex = current > 0 ? ChatRoomService.musicPlayedIndex : -1;
     });
   }
 
@@ -140,10 +174,7 @@ class _MusicsModalState extends State<MusicsModal> {
           file.path.toLowerCase().endsWith('.mp3') ||
           file.path.toLowerCase().endsWith('.m4a'))
     ];
-    
 
-    
-    
     if (this.mounted){
       setState(() {
         musicFiles = MF;
@@ -153,91 +184,92 @@ class _MusicsModalState extends State<MusicsModal> {
 
   }
 
-  Future<void> _startAudioMixing(p, index) async {
-    await _engine.startAudioMixing(
-      filePath: p,
-      loopback: _loopback,
-      cycle: _cycle.toInt(),
-      startPos: _startPos.toInt(),
-    );
+  Future<void> startAudioMixing(String path, int index) async {
+    try {
+      await widget.audioPlayer.stop();
 
-    int mm = await _engine.getAudioMixingDuration() ;
-    if (this.mounted){
+      await widget.audioPlayer.loadResource(path);
+
+      widget.audioPlayer.enableAux(true);
+
+      widget.audioPlayer.setVolume(100);
+
+      await widget.audioPlayer.start();
+
+      print("🎶 BGM started for all users: $path");
+
       setState(() {
         _isStartedAudioMixing = true;
         playedIndex = index;
-        ChatRoomService.musicPlayedIndex = index ;
-        max = mm > 0 ? double.parse(mm.toString()) : 10000;
       });
-      await Future.delayed(Duration(seconds: 2)) ;
-       mm = await _engine.getAudioMixingDuration() ;
-      max = mm > 0 ? double.parse(mm.toString()) : 10000;
 
+    } catch (e) {
+      print("⚠️ Error starting BGM: $e");
     }
-
-
-
   }
 
-  Future<void> _stopAudioMixing() async {
-    await _engine.stopAudioMixing();
-    if (this.mounted) {
+  Future<void> stopAudioMixing() async {
+    await widget.audioPlayer.stop();
+
+    if (mounted) {
       setState(() {
         _isStartedAudioMixing = false;
       });
     }
-  }
 
-  Future<void> _pauseAudioMixing() async {
-    await _engine.pauseAudioMixing();
-    if (this.mounted) {
+    print("⏹️ BGM stopped for all users");
+  }
+  Future<void> pauseAudioMixing() async {
+    await widget.audioPlayer.pause();
+
+    if (mounted) {
       setState(() {
         _isStartedAudioMixing = false;
-
-
       });
     }
+
+    print("⏸️ BGM paused");
   }
 
-  Future<void> _resumeAudioMixing() async {
-    await _engine.resumeAudioMixing();
-    if (this.mounted) {
+  Future<void> resumeAudioMixing() async {
+    await widget.audioPlayer.resume();
+
+    if (mounted) {
       setState(() {
         _isStartedAudioMixing = true;
       });
     }
 
+    print("▶️ BGM resumed");
   }
 
 
-  Future<void> _nextAudioMixing() async {
-    await _engine.stopAudioMixing();
-    if (this.mounted) {
-      setState(() {
-        _isStartedAudioMixing = false;
-      });
-    }
 
+  Future<void> nextAudioMixing() async {
+    if (musicFiles.isEmpty) return;
 
-    if (musicFiles.length > playedIndex + 1) {
-      print('_startAudioMixing');
-      _startAudioMixing(musicFiles[playedIndex + 1].path, playedIndex + 1);
+    await stopAudioMixing();
+
+    if (playedIndex + 1 < musicFiles.length) {
+      await startAudioMixing(musicFiles[playedIndex + 1].path, playedIndex + 1);
+    } else {
+      print("🚫 No next track");
     }
   }
 
-  Future<void> _prevAudioMixing() async {
-    await _engine.stopAudioMixing();
-    if (this.mounted) {
-      setState(() {
-        _isStartedAudioMixing = false;
-      });
-    }
+
+  Future<void> prevAudioMixing() async {
+    if (musicFiles.isEmpty) return;
+
+    await stopAudioMixing();
 
     if (playedIndex - 1 >= 0) {
-      print('_startAudioMixing');
-      _startAudioMixing(musicFiles[playedIndex - 1].path, playedIndex - 1);
+      await startAudioMixing(musicFiles[playedIndex - 1].path, playedIndex - 1);
+    } else {
+      print("🚫 No previous track");
     }
   }
+
 
 
   @override
@@ -285,18 +317,19 @@ class _MusicsModalState extends State<MusicsModal> {
                 itemCount: musicFiles.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () {
-                      if(playedIndex == index){
-                        if(_isStartedAudioMixing){
-                          _pauseAudioMixing();
+                    onTap: () async {
+                      if (playedIndex == index) {
+                        if (_isStartedAudioMixing) {
+                          await pauseAudioMixing();
                         } else {
-                          _resumeAudioMixing();
+                          await resumeAudioMixing();
                         }
-      
                       } else {
-                        _startAudioMixing(musicFiles[index].path, index);
+                        if (_isStartedAudioMixing) {
+                          await stopAudioMixing();
+                        }
+                        await startAudioMixing(musicFiles[index].path, index);
                       }
-      
                     },
                     child: Container(
                       color: Colors.white.withAlpha(50),
@@ -383,7 +416,7 @@ class _MusicsModalState extends State<MusicsModal> {
                           ),
                           Expanded(child: IconButton(icon: Icon(Icons.delete_forever_sharp , color: Colors.red,), onPressed: () {
                               File(musicFiles[index].path).deleteSync();
-                              _stopAudioMixing();
+                              stopAudioMixing();
                               setState(() {
                                 _isStartedAudioMixing = false;
                                 playedIndex = -1 ;
@@ -422,7 +455,7 @@ class _MusicsModalState extends State<MusicsModal> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                _stopAudioMixing();
+                                stopAudioMixing();
                                 Navigator.pop(context);
                               },
                               icon: Icon(
@@ -439,7 +472,7 @@ class _MusicsModalState extends State<MusicsModal> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                _prevAudioMixing();
+                                prevAudioMixing();
                               },
                               icon: Icon(
                                 Icons.skip_previous,
@@ -456,7 +489,7 @@ class _MusicsModalState extends State<MusicsModal> {
                             _isStartedAudioMixing
                                 ? IconButton(
                                     onPressed: () {
-                                      _pauseAudioMixing();
+                                      pauseAudioMixing();
                                     },
                                     icon: Icon(
                                       Icons.pause,
@@ -466,7 +499,7 @@ class _MusicsModalState extends State<MusicsModal> {
                                   )
                                 : IconButton(
                                     onPressed: () {
-                                      _resumeAudioMixing();
+                                      resumeAudioMixing();
                                     },
                                     icon: Icon(
                                       Icons.play_arrow,
@@ -482,7 +515,7 @@ class _MusicsModalState extends State<MusicsModal> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                _nextAudioMixing();
+                                nextAudioMixing();
                               },
                               icon: Icon(
                                 Icons.skip_next_rounded,
@@ -498,7 +531,7 @@ class _MusicsModalState extends State<MusicsModal> {
                           children: [
                             IconButton(
                               onPressed: () {
-      
+
                               },
                               icon: Icon(
                                 Icons.volume_down,
@@ -510,11 +543,11 @@ class _MusicsModalState extends State<MusicsModal> {
                               position: PopupMenuPosition.over,
                               shadowColor: MyColors.unSelectedColor,
                               elevation: 4.0,
-      
+
                               color: MyColors.darkColor,
                               icon: Container(),
                               onSelected: (int result) async {
-      
+
                                  await _engine.adjustAudioMixingPlayoutVolume(result);
                                  await _engine.adjustAudioMixingPublishVolume(result);
                               },
@@ -532,17 +565,17 @@ class _MusicsModalState extends State<MusicsModal> {
                         child: Column(
                           children: [
                             // Text(progress.toString() , style: TextStyle(color: MyColors.primaryColor),),
-                            Slider(value:  progress , min: min , max: max, onChanged:  (val) async{
+                            Slider(value:   adjustedProgress , min: min , max: max, onChanged:  (val) async{
                               await _engine.setAudioMixingPosition( (val - 1000).toInt() );
                               setState(() {
                                    progress = val ;
-      
+
                               });
                             } , thumbColor: MyColors.secondaryColor, activeColor: MyColors.secondaryColor,)
                           ],
                         ),
                       ),
-      
+
                     ],
                   ),
                 ],
@@ -553,9 +586,9 @@ class _MusicsModalState extends State<MusicsModal> {
       ),
     );
   }
+  Widget Music2BottomSheet() => MusicsModal2(zegoEngine:widget.zegoEngine , audioPlayer: widget.audioPlayer,);
 }
 
-Widget Music2BottomSheet() => MusicsModal2();
 
 getDate(file) {
    return File(file).lastModifiedSync().toString();

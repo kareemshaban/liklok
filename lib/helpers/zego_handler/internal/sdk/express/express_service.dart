@@ -82,12 +82,12 @@ class ExpressService {
     await ZegoExpressEngine.destroyEngine();
   }
 
-  Future<void> connectUser(String id, String name, {String? token}) async {
-    currentUser = ZegoSDKUser(userID: id, userName: name);
-  }
+    Future<void> connectUser(String id, String name, {String? token}) async {
+      currentUser = ZegoSDKUser(userID: id, userName: name);
+    }
 
-  Future<void> disconnectUser() async {
-    currentUser = null;
+    Future<void> disconnectUser() async {
+      currentUser = null;
   }
 
   ZegoSDKUser? getUser(String userID) {
@@ -152,17 +152,17 @@ class ExpressService {
   }
 
   void clearLocalUserData() {
-    currentUser!.streamID = null;
-    currentUser!.isCameraOnNotifier.value = false;
-    currentUser!.isMicOnNotifier.value = false;
-    currentUser!.isUsingFrontCameraNotifier.value = true;
-    currentUser!.isUsingSpeaker.value = true;
-    currentUser!.videoViewNotifier.value = null;
-    currentUser!.viewID = -1;
+    currentUser?.streamID = null;
+    currentUser?.isCameraOnNotifier.value = false;
+    currentUser?.isMicOnNotifier.value = false;
+    currentUser?.isUsingFrontCameraNotifier.value = true;
+    currentUser?.isUsingSpeaker.value = true;
+    currentUser?.videoViewNotifier.value = null;
+    currentUser?.viewID = -1;
   }
 
   void useFrontCamera(bool isFrontFacing) {
-    currentUser!.isUsingFrontCameraNotifier.value = isFrontFacing;
+    currentUser?.isUsingFrontCameraNotifier.value = isFrontFacing;
     ZegoExpressEngine.instance.useFrontCamera(isFrontFacing);
   }
 
@@ -181,7 +181,7 @@ class ExpressService {
   }
 
   void setAudioRouteToSpeaker(bool useSpeaker) {
-    currentUser!.isUsingSpeaker.value = useSpeaker;
+    currentUser?.isUsingSpeaker.value = useSpeaker;
     if (kIsWeb) {
       muteAllPlayStreamAudio(!useSpeaker);
     } else {
@@ -190,13 +190,13 @@ class ExpressService {
   }
 
   void turnCameraOn(bool isOn) {
-    currentUser!.isCameraOnNotifier.value = isOn;
+    currentUser?.isCameraOnNotifier.value = isOn;
     updateStreamExtraInfo();
     ZegoExpressEngine.instance.enableCamera(isOn);
   }
 
   void turnMicrophoneOn(bool isOn, {String? roomId}) {
-    currentUser!.isMicOnNotifier.value = isOn;
+    currentUser?.isMicOnNotifier.value = isOn;
     updateStreamExtraInfo();
     ZegoExpressEngine.instance.mutePublishStreamAudio(!isOn);
   }

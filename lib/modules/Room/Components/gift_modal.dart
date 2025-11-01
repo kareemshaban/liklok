@@ -54,7 +54,6 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
       _tabController = new TabController(vsync: this, length: categories.length);
       getGiftCatsTabs();
       getGiftViewTabs();
-
     });
   }
   @override
@@ -78,7 +77,7 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
                   position: PopupMenuPosition.under,
                   shadowColor: MyColors.whiteColor,
                   elevation: 4.0,
-      
+
                   color: Colors.white,
                   icon: Icon(Icons.expand_circle_down , color: MyColors.primaryColor,),
                   onSelected: (String result) {
@@ -98,15 +97,15 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
                     PopupMenuItem<String>(
                       value: 'all_room_members',
                       child: Text('gift_all_room_users'.tr , style: TextStyle(color:  sendGiftReceiverType == 'all_room_members' ?  MyColors.primaryColor  : Colors.black),),
-      
+
                     )
                   ],
                 ),
-      
+
                 Expanded(child:
                 sendGiftReceiverType == "select_one_ore_more" ?
                 ListView.separated(itemBuilder: (ctx , index) => giftBoxMicUserListItem(index),
-                  separatorBuilder:  (ctx , index) => giftBoxMicUserSperator() , itemCount: room!.members!.where((e) => e.user_id >0).length ,
+                  separatorBuilder:  (ctx , index) => giftBoxMicUserSperator() , itemCount: room!.members!.where((e) => e.user_id > 0 ).length ,
                   scrollDirection: Axis.horizontal,) :
                 sendGiftReceiverType == "all_room_members" ?
                 Column(
@@ -141,7 +140,7 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
             ),
             SizedBox(height: 5.0,),
             Expanded(child: TabBarView(children: giftViews ,   controller: _tabController,)),
-      
+
           ],
         ),
       ),
@@ -373,58 +372,7 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
 
 
   sendGiftToSingleUser() async{
-    GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: receiver! , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGift();
-
-    // if(receiver! > 0){
-    //   int reward = await ChatRoomService().sendGift(user!.id , receiver , room!.userId , room!.id ,  selectedGift , sendGiftCount );
-    //
-    //
-    //   if(reward > -1){
-    //     AppUser? reciver_obj = await AppUserServices().getUser(receiver);
-    //
-    //
-    //     Gift gift = gifts.where((element) => element.id == selectedGift).toList()[0] ;
-    //     await FirebaseFirestore.instance.collection("gifts").add({
-    //       'room_id': room!.id,
-    //       'sender_id': user!.id ,
-    //       'sender_name': user!.name ,
-    //       'sender_img': '${ASSETSBASEURL}AppUsers/${user!.img}'  ,
-    //       'receiver_id': reciver_obj!.id ,
-    //       'receiver_name': reciver_obj.name ,
-    //       'receiver_img': '${ASSETSBASEURL}AppUsers/${reciver_obj.img}',
-    //       'gift_name':  gift.name ,
-    //       'gift_audio': gift.audio_url != "" ? '${ASSETSBASEURL}Designs/Audio/${gift.audio_url}' : "" ,
-    //       'gift_img': '${gift.motion_icon}',
-    //       'giftImgSmall':'${ASSETSBASEURL}Designs/${gift.icon}',
-    //       'count' : sendGiftCount,
-    //       'sender_share_level': user!.share_level_icon,
-    //       'available_untill':DateTime.now().add(Duration(minutes: 1)) ,
-    //       'gift_category_id': gift.gift_category_id,
-    //       'reward': reward
-    //
-    //     });
-    //
-    //     AppUser? ress = await AppUserServices().getUser(user!.id);
-    //    if(mounted){
-    //      setState(() {
-    //        user = ress ;
-    //
-    //      });
-    //    }
-    //     AppUserServices().userSetter(ress!);
-    //
-    //   }
-    // } else {
-    //   Fluttertoast.showToast(
-    //       msg: 'choose_receiver'.tr,
-    //       toastLength: Toast.LENGTH_SHORT,
-    //       gravity: ToastGravity.CENTER,
-    //       timeInSecForIosWeb: 1,
-    //       backgroundColor: Colors.black26,
-    //       textColor: Colors.orange,
-    //       fontSize: 16.0
-    //   );
-    // }
+    GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: receiver! , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftEvent();
   }
   sendGiftToAllMicUsers() async{
     GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: 0 , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftMicUser();

@@ -1,34 +1,17 @@
-import 'package:LikLok/helpers/zego_handler/live_audio_room_manager.dart';
 import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
+import 'package:flutter/material.dart';
 
 class EnterRoomHelper {
   final int user_id ;
   final int room_id ;
-  final String token ;
-  EnterRoomHelper( this.user_id ,  this.room_id, this.token){
+  final BuildContext context; // ✅ أضفنا الكونتكست
+  EnterRoomHelper( this.user_id ,  this.room_id, this.context,){
     handleEnterRoom();
   }
   handleEnterRoom() async{
     print('handleEnterRoom1');
+    // final token = await ChatRoomService().generateToken(user_id);
     await ChatRoomService().enterRoom(user_id, room_id);
-    print('object');
-    await ZegoLiveAudioRoomManager()
-        .loginRoom(
-      room_id.toString(),
-      ZegoLiveAudioRoomRole.audience,
-      token: token.toString(),
-    )
-        .then((result) {
-      if (result.errorCode == 0) {
-        print('Login Room Success');
-        // log("Login Room Success");
-      }
-    }).onError(
-          (error, stackTrace) {
-            print('Login Room Error: $error');
-        // log('error $error $stackTrace');
-      },
-    );
-    print('handleEnterRoom2');
+    print('✅ دخل الروم $room_id');
   }
 }

@@ -19,22 +19,20 @@ class ChatService extends ChangeNotifier {
     //create a new message
     Message newMessage = Message(
         senderId: isRelation == 0 ? currentUserId :receiverId ,
-        senderEmail: currentUserEmail,
         receiverId: isRelation == 0 ? receiverId : currentUserId,
         message: message,
-        timestamp: timestamp
     );
 
-    //construct chat rood id from current user id and receiver id (sorted to ensure uniqueness)
+    //construct chatScreen rood id from current user id and receiver id (sorted to ensure uniqueness)
     List<int> ids = [currentUserId , receiverId];
-    ids.sort() ; //sort the id (this ensures the chat room id is always the same for any pair of people)
+    ids.sort() ; //sort the id (this ensures the chatScreen room id is always the same for any pair of people)
     String chatRoomId = ids.join("_"); // combine the ids into a sigle string to use as a chatroomID
     // add new message to database
     await _firestore
         .collection('chat_rooms')
         .doc(chatRoomId)
         .collection('messages')
-        .add(newMessage.toMap()
+        .add(newMessage.toJson()
     );
     print('chatRoomId');
     print(chatRoomId);
@@ -45,7 +43,7 @@ class ChatService extends ChangeNotifier {
   }
 //get messages
   Stream<QuerySnapshot> getMessages(int userId , int otherUserId){
-    // construct chat room id from user id (sorted to ensure it matches the id used when sending message
+    // construct chatScreen room id from user id (sorted to ensure it matches the id used when sending message
     List<int> ids = [userId , otherUserId] ;
     ids.sort() ;
     String chatRoomId = ids.join("_");

@@ -310,7 +310,7 @@ class SearchScreenState extends State<SearchScreen> {
         ChatRoomService().savedRoomSetter(null);
         await ChatRoomService.engine!.leaveChannel();
         await ChatRoomService.engine!.release();
-        MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0).leaveMic();
+        MicHelper( user_id:  user!.id , room_id:  savedRoom.id , mic: 0 , user!).leaveMic();
         ExitRoomHelper(user!.id , savedRoom.id);
 
       }
