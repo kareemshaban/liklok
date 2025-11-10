@@ -60,7 +60,10 @@ class ExpressService {
   }) async {
     initEventHandle();
     ZegoExpressEngine.setEngineConfig(
-        ZegoEngineConfig(advancedConfig: {'vcap_external_mem_class': '1'}));
+        ZegoEngineConfig(advancedConfig: {
+          'vcap_external_mem_class': '1',
+          'region': 'Global',
+        }));
     final profile = ZegoEngineProfile(appID, scenario, appSign: appSign);
     // if (Platform.isIOS) {
     profile.enablePlatformView = true;
@@ -74,6 +77,7 @@ class ExpressService {
       'notify_remote_device_unknown_status': 'true',
       'notify_remote_device_init_status': 'true',
       'keep_audio_session_active': 'true',
+      'region': 'Global',
     }));
   }
 

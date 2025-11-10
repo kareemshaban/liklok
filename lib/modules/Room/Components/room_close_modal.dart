@@ -89,16 +89,16 @@ class _RoomCloseModalState extends State<RoomCloseModal> {
   }
 
   keepRoom(){
-   //  ChatRoomService().savedRoomSetter(room!);
-   //  // ChatRoomService.engine = widget.engine ;
-   // // ChatRoomService().savedRoomSetter(null);
-   //  Navigator.pushAndRemoveUntil(
-   //      context ,
-   //      MaterialPageRoute(builder: (context) => const TabsScreen()) ,   (route) => false
-   //  );
-
+    ChatRoomService().savedRoomSetter(room!);
+    // ChatRoomService.engine = widget.engine ;
+   // ChatRoomService().savedRoomSetter(null);
+    Navigator.pushAndRemoveUntil(
+        context ,
+        MaterialPageRoute(builder: (context) => const TabsScreen()) ,   (route) => false
+    );
   }
   exitRoom() async {
+    ChatRoomService().clearMessages();
     ChatRoomService().savedRoomSetter(null);
     MicHelper(user!, user_id: user!.id, room_id: room!.id, mic:0).sendMicLeaveEvent(widget.audioPlayer , widget.zegoEngine);
     ExitRoomHelper(user!.id , room!.id);

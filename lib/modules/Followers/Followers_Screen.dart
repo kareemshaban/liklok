@@ -84,7 +84,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
   }
   Widget itemListBuilder(index) => GestureDetector(
     onTap: (){
-      Navigator.push(context, MaterialPageRoute(builder: (ctx) =>  InnerProfileScreen(visitor_id: followers![index]!.user_id )));
+      Navigator.push(context, MaterialPageRoute(builder: (ctx) =>  InnerProfileScreen(visitor_id: followers![index].user_id )));
     },
     child: Column(
       children: [

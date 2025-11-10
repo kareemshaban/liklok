@@ -42,13 +42,39 @@ Future<void> send_Message(user_id,reciver_id,message , type)async{
       }
   )
   );
-  print('response.body') ;
-  print(response.body) ;
   if (response.statusCode == 200) {
-
+    print('response.body') ;
+    print(response.body) ;
   } else {
     throw Exception('Failed to load album');
   }
-
 }
+
+static Future<Chat> getChat(int userId, int receiverId) async {
+  final response = await http.post(
+    Uri.parse('${BASEURL}chats/conversation'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, dynamic>{
+      "user_id": userId,
+      "reciver_id": receiverId,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> jsonData = json.decode(response.body);
+
+    if (jsonData['state'] == 'success') {
+      Chat chat = Chat.fromJson(jsonData['chat']);
+      return chat;
+    } else {
+      throw Exception('Failed to get chat: ${jsonData['state']}');
+    }
+  } else {
+    throw Exception('Failed to fetch chat from server');
+  }
+}
+
+
 }

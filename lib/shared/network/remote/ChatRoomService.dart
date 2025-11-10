@@ -29,18 +29,29 @@ import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:x_overlay/x_overlay.dart';
+
+import '../../../models/ChatRoomMessage.dart';
 
 
 
 class ChatRoomService {
-
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final XOverlayController overlayController = XOverlayController();
+  static final ChatRoomService _instance = ChatRoomService._internal();
+  factory ChatRoomService() => _instance;
+  ChatRoomService._internal();
+  static bool isShow = false ;
+  final List<ChatRoomMessage> _messages = [];
+  List<ChatRoomMessage> get messages => _messages;
   static ChatRoom? room  ;
   static ChatRoom? savedRoom  ;
   static RtcEngine? engine ;
-static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clientRoleAudience
+  static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clientRoleAudience
   static int musicPlayedIndex = - 1 ;
   static bool showMsgInput = false ;
   static RoomBasicDataHelper? roomBasicDataHelper  ;
+  static Set<String> displayedUsers = {};
   roomSetter(ChatRoom u){
     room = u ;
   }
@@ -76,6 +87,36 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
   }
   List<ChatRoom> userRoomGetter(){
     return userRoom ;
+  }
+  void addMessage(ChatRoomMessage message) {
+    _messages.add(message);
+    debugPrint('📩 تم حفظ الرسالة في ChatRoomService');
+  }
+
+  void clearMessages() {
+    _messages.clear();
+  }
+
+  static void showOverlay() {
+    overlayController.overlay(
+      navigatorKey.currentContext!,
+      data: XOverlayData(),
+      rootNavigator: false,
+    );
+    isShow = true ;
+  }
+
+  static void restoreOverlay() {
+    overlayController.restore(
+      navigatorKey.currentContext!,
+      rootNavigator: true,
+      withSafeArea: false,
+    );
+    isShow = false ;
+  }
+
+  static void hideOverlay() {
+    overlayController.hide();
   }
 
   Future<List<ChatRoom>> getAllChatRooms() async {
@@ -661,6 +702,7 @@ static String userRole = "clientRoleAudience" ; // clientRoleBroadcaster , clien
     if (response.statusCode == 200) {
       final Map jsonData = json.decode(response.body);
       if (jsonData['state'] == "success") {
+        print('leave mic success');
         return mapRoom(jsonData);
       } else {
         // Fluttertoast.showToast(

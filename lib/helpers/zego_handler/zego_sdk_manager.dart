@@ -23,11 +23,8 @@ class ZEGOSDKManager {
 
   Future<void> connectUser(String userID, String userName,
       {String? token}) async {
-    final token = await ChatRoomService().generateToken(userID);
-    print('token');
-    print(token.token);
-    await expressService.connectUser(userID, userName, token: token.token);
-    await zimService.connectUser(userID, userName, token: token.token);
+    await expressService.connectUser(userID, userName, token: token);
+    await zimService.connectUser(userID, userName, token: token);
   }
 
   Future<void> disconnectUser() async {

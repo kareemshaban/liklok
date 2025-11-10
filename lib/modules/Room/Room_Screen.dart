@@ -6,7 +6,6 @@ import 'package:LikLok/models/Badge.dart';
 import 'package:LikLok/models/Mic.dart';
 import 'package:LikLok/models/token_model.dart';
 import 'package:LikLok/modules/Room/Components/gift_image.dart';
-import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -29,6 +28,7 @@ import 'package:LikLok/models/LuckyCase.dart';
 import 'package:LikLok/models/Rollet.dart';
 import 'package:LikLok/models/RoomMember.dart';
 import 'package:LikLok/models/RoomTheme.dart';
+import 'package:crypto/crypto.dart';
 import 'package:LikLok/modules/Chats/Chats_Screen.dart';
 import 'package:LikLok/modules/Loading/loadig_screen.dart';
 import 'package:LikLok/modules/Room/Components/emoj_modal.dart';
@@ -52,12 +52,13 @@ import 'package:flutter_svga/flutter_svga.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/services.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../helpers/zego_handler/live_audio_room_manager.dart';
-import '../../shared/constants/Contants.dart';
 import 'Components/app_utils/app_snack_bar.dart';
 
 //const appId = "f26e793582cb48359a4cb36dba3a9d3f";
@@ -70,7 +71,9 @@ class RoomScreen extends StatefulWidget {
   State<RoomScreen> createState() => _RoomScreenState();
 }
 
-class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
+class _RoomScreenState extends State<RoomScreen>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  Timer? _leaveTimer;
   late final SVGAAnimationController _controller;
   bool isSending = false;
   AppUser? user;
@@ -184,10 +187,15 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   List<String> entryQueue = [];
   bool isShowingEntry = false;
 
+  String appId = '';
+
+  TokenModel? tokenModel ;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (mounted) {
       _controller = SVGAAnimationController(vsync: this);
       setState(() {
@@ -195,6 +203,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         sendGiftReceiverType = "select_one_ore_more";
         user = AppUserServices().userGetter();
         room = ChatRoomService().roomGetter();
+        print('room!.roomCup');
+        print(room!.members!.length);
+        print(room!.roomCup);
         setState(() {
           channel = room!.tag;
         });
@@ -222,44 +233,19 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     });
 
     EnterRoomHelper(user!.id, room!.id, context);
-    initZego();
+
+    messages = ChatRoomService().messages;
+
+    if (ChatRoomService.savedRoom == null) {
+      initZego();
+    } else {
+      ChatRoomService().savedRoomSetter(null);
+      initZego();
+    }
     getRoomImage();
     print('room!.id');
     print(room!.id);
     geAdminDesigns();
-
-    //listeners//
-    // RolletCreatListner();
-    // enterRoomListener();
-    // exitRoomListener();
-    // micListener();
-    // micUsageListener();
-    // themesListener();
-    // micEmossionListener();
-    // giftListener();
-    // micCounterListener();
-    // micRemoveListener();
-    // blockRoomListener();
-    // luckyCaseListener();
-    // RoomAdminsListener();
-    // messagesListener();
-
-    // if (ChatRoomService.savedRoom == null) {
-    //   setState(() {
-    //     isNewCommer = true;
-    //   });
-    //   // initAgora();
-    // } else {
-    //   ChatRoomService().savedRoomSetter(null);
-    //   String role = ChatRoomService.userRole;
-    //   if (mounted) {
-    //     setState(() {
-    //       _localUserJoined = true;
-    //       isNewCommer = false;
-    //     });
-    //   }
-    // }
-
     getRoomBasicData();
     focusNode.addListener(() {
       if (!focusNode.hasFocus) {
@@ -273,8 +259,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         toggleMessageInput();
       }
     });
-
     luckyCaseForNewComers();
+    Future.delayed(Duration(seconds: 5)).then((_){
+      refreshRoom(user!.id);
+    });
   }
 
   void playNext() async {
@@ -322,6 +310,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   void addUserToEntryQueue(String userId) {
     entryQueue.add(userId);
+    print('entryQueue[0]');
+    print(entryQueue[0]);
     _playNextEntry();
   }
 
@@ -332,6 +322,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
     while (entryQueue.isNotEmpty) {
       final nextUserId = entryQueue.removeAt(0);
+      print('next id');
+      print(nextUserId);
       Future.delayed(Duration(milliseconds: 350));
       await userJoinRoomWelcome(nextUserId);
     }
@@ -341,12 +333,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Future<void> initZego() async {
-    room = ChatRoomService().roomGetter();
-
-    for (var member in room!.members!) {
-      print('🧍 Member ID: ${member.user_id}, Name: ${member.user_id}');
-      print(user!.id);
-    }
+    final token = await ChatRoomService().generateToken(user!.id);
+    print('token');
+    print(token.token);
 
     await ZEGOSDKManager().init(
       appID,
@@ -356,18 +345,18 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     print('All Data');
     print(user!.id);
     print(user!.name);
-    await ZEGOSDKManager().connectUser(user!.id.toString(), user!.name);
+    await ZEGOSDKManager()
+        .connectUser(user!.id.toString(), user!.name , token: token.token);
 
     final zimService = ZEGOSDKManager().zimService;
     final expressService = ZEGOSDKManager().expressService;
 
     createMediaPlayer();
 
-    final token = await ChatRoomService().generateToken(user!.id);
-    print('token');
-    print(token.token);
+
 
     ZegoLiveAudioRoomManager().logoutRoom();
+
 
     await ZegoLiveAudioRoomManager()
         .loginRoom(
@@ -381,45 +370,58 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           });
           if (result.errorCode == 0) {
             print("✅ Login Room Success");
-            ChatRoomMessage message = ChatRoomMessage(
-              message: 'room_msg'.tr,
-              user_name: 'APP',
-              user_share_level_img: '',
-              user_img: '',
-              user_id: 0,
-              type: "TEXT",
-            );
-            List<ChatRoomMessage> old = [...messages];
-            old.add(message);
-            if (room!.hello_message != "") {
-              message = ChatRoomMessage(
-                message: room!.hello_message,
-                user_name: 'ROOM',
+            refreshMicState();
+            if (messages.isEmpty) {
+              ChatRoomMessage message = ChatRoomMessage(
+                message: 'room_msg'.tr,
+                user_name: 'APP',
                 user_share_level_img: '',
                 user_img: '',
                 user_id: 0,
                 type: "TEXT",
               );
+              List<ChatRoomMessage> old = [...messages];
               old.add(message);
+              if (mounted) {
+                setState(() {
+                  ChatRoomService().addMessage(message);
+                });
+              }
+              if (room!.hello_message != "") {
+                message = ChatRoomMessage(
+                  message: room!.hello_message,
+                  user_name: 'ROOM',
+                  user_share_level_img: '',
+                  user_img: '',
+                  user_id: 0,
+                  type: "TEXT",
+                );
+                old.add(message);
+                if (mounted) {
+                  setState(() {
+                    ChatRoomService().addMessage(message);
+                  });
+                }
+              }
+              if (mounted) {
+                setState(() {
+                  messages = old;
+                });
+              }
+              // remove await from refreshRoom
+              ChatRoomMessagesHelper(
+                room_id: room!.id,
+                user_id: user!.id,
+                message: 'user_enter_message'.tr,
+                type: 'TEXT',
+                user_name: user!.name,
+                user_share_level_img: user!.share_level_icon,
+                user_img: user!.img,
+                vip: user!.vips!.length > 0 ? user!.vips![0].icon : "",
+                pubble: '',
+                badges: [],
+              ).sendRoomEvent();
             }
-            if (mounted) {
-              setState(() {
-                messages = old;
-              });
-            }
-            // remove await from refreshRoom
-            ChatRoomMessagesHelper(
-              room_id: room!.id,
-              user_id: user!.id,
-              message: 'user_enter_message'.tr,
-              type: 'TEXT',
-              user_name: user!.name,
-              user_share_level_img: user!.share_level_icon,
-              user_img: user!.img,
-              vip: user!.vips!.length > 0 ? user!.vips![0].icon : "",
-              pubble: '',
-              badges: [],
-            ).sendRoomEvent();
           } else {
             print("❌ Login Room Failed: ${result.errorCode}");
             Navigator.pushAndRemoveUntil(
@@ -438,7 +440,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           );
         });
 
-    users.add(ZegoUser(user!.id.toString(), user!.name));
+    addUserUnique(ZegoUser(user!.id.toString(), user!.name));
 
     ZegoExpressEngine.onRoomStreamUpdate =
         (
@@ -448,31 +450,29 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           Map<String, dynamic> extendedData,
         ) {
           if (updateType == ZegoUpdateType.Add) {
-            for (var stream in streamList) {
-              print("📡 New stream added: ${stream.streamID}");
+            for (final stream in streamList) {
               ZegoExpressEngine.instance.startPlayingStream(stream.streamID);
+              print("▶️ بدأ تشغيل الصوت: ${stream.streamID}");
             }
           } else if (updateType == ZegoUpdateType.Delete) {
-            for (var stream in streamList) {
-              print("❌ Stream removed: ${stream.streamID}");
+            for (final stream in streamList) {
               ZegoExpressEngine.instance.stopPlayingStream(stream.streamID);
+              print("⏹️ تم إيقاف الصوت: ${stream.streamID}");
             }
           }
         };
-
     // Listen to room user updates
     subscriptions.addAll([
       expressService.roomUserListUpdateStreamCtrl.stream.listen((event) async {
         if (event.updateType == ZegoUpdateType.Add) {
-          print('User(s) entered: ${event.userList.length}');
-          users.addAll(event.userList);
-
+          addUserUnique(event.userList.first);
           for (var newUser in event.userList) {
-            await ChatRoomService().enterRoom(newUser.userID, room!.id);
-
-            await refreshRoom(0);
-
-            addUserToEntryQueue(newUser.userID);
+            if (ChatRoomService.savedRoom == null) {
+              addUserToEntryQueue(newUser.userID);
+            }
+          }
+          for (var e in expressService.userInfoList) {
+            addUserUnique(ZegoUser(e.userID, e.userName));
           }
         } else if (event.updateType == ZegoUpdateType.Delete) {
           print('User(s) exited: ${event.userList.length}');
@@ -486,20 +486,59 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       zimService.roomAttributeUpdateStreamCtrl.stream.listen((event) async {
         final attrs = event.updateInfo.roomAttributes;
 
-        if (attrs.containsKey("theme_change_event")) {
-          final rawData = attrs["theme_change_event"];
+        if (attrs.containsKey("theme_event")) {
+          final rawData = attrs["theme_event"];
           if (rawData != null && rawData.isNotEmpty) {
             final data = jsonDecode(rawData);
 
             final eventRoomId = data['room_id'];
             final user_id = data['user_id'];
-            final theme_id = data['bg'];
+            final theme_id = data['theme_id'];
 
             if (user_id == user!.id) {
               await ChatRoomService().changeTheme(theme_id, eventRoomId);
             }
-            refreshRoom(0);
+            if (mounted) {
+              setState(() {
+                refreshRoom(user!.id);
+              });
+            }
+            print('room!.themeId');
+            print(room!.themeId);
           }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'theme_event',
+          ]);
+        }
+
+        if (attrs.containsKey("lucky_event")) {
+          final rawData = attrs["lucky_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+
+            final eventRoomId = data['room_id'];
+            final eventUserId = data['user_id'];
+            final eventUserImg = data['user_img'];
+            final eventLuckyId = data['lucky_id'];
+            final eventType = data['type'];
+            final eventRoomName = data['room_name'];
+            final eventUserName = data['user_name'];
+            final eventAvailableUntil = data['available_until'];
+            DateTime dateTime = DateTime.parse(eventAvailableUntil);
+
+            luckyCaseListener(
+              dateTime,
+              eventLuckyId,
+              eventRoomId,
+              eventUserImg,
+              eventType,
+              eventRoomName,
+              eventUserName,
+            );
+          }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'lucky_event',
+          ]);
         }
 
         if (attrs.containsKey("mic_event")) {
@@ -523,26 +562,25 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             final targetUserName = data['mic_user_name'];
             final targetUserImg = data['mic_user_img'];
             final targetUserGender = data['mic_user_gender'];
+            String streamId = "${targetUserId}_${targetRoomId}";
 
-            if (targetUserId == user!.id) {
-              String streamId = "${user!.id}_${targetRoomId}";
+            if (targetUserId.toString() == user!.id.toString()) {
               await startMicStream(streamId);
               ChatRoomService().useMic(targetUserId, targetRoomId, targetOrder);
               if (mounted) {
                 _localUserMute = false;
               }
             } else {
-              String streamId = "${targetUserId}_${targetRoomId}";
               ZegoExpressEngine.instance.startPlayingStream(streamId);
               print('Voice done');
             }
-            if(mounted){
+            if (mounted) {
               setState(() {
                 // refreshRoom(user!.id);
                 print(room!.mics.toString());
 
                 int index = room!.mics!.indexWhere(
-                      (mic) => mic.user_id == targetUserId,
+                  (mic) => mic.user_id == targetUserId,
                 );
                 if (index != -1) {
                   room!.mics![index] = Mic(
@@ -581,11 +619,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   mic_user_birth_date: targetBirthDate,
                   mic_user_karizma_level: targetKarizmaLevel,
                   mic_user_charging_level: targetChargingLevel,
-                  frame: '',
+                  frame: frame,
                 );
               });
             }
           }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'mic_event',
+          ]);
         }
 
         if (attrs.containsKey("mic_leave_event")) {
@@ -598,7 +639,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             final targetOrder = data['order'];
             final targetUserId = data['user_id'];
 
-            if (targetUserId == user!.id) {
+            if (targetUserId.toString() == user!.id.toString()) {
               await ZegoExpressEngine.instance.stopPublishingStream();
               await ZegoExpressEngine.instance.muteMicrophone(true);
               ChatRoomService().leaveMic(
@@ -607,14 +648,15 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                 targetOrder,
                 user!.id,
               );
+              await audioPlayer?.stop();
             } else {
               final streamId = "${targetUserId}_${targetRoomId}";
               ZegoExpressEngine.instance.stopPlayingStream(streamId);
             }
-            if(mounted){
+            if (mounted) {
               setState(() {
                 int index = room!.mics!.indexWhere(
-                      (mic) => mic.user_id == targetUserId,
+                  (mic) => mic.user_id == targetUserId,
                 );
                 if (index != -1) {
                   room!.mics![index] = Mic(
@@ -639,6 +681,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               });
             }
           }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'mic_leave_event',
+          ]);
         }
 
         if (attrs.containsKey("gift_event")) {
@@ -731,7 +776,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
             print("😄 Emoji event received from user $userId: $emoji , $mic");
           }
-
           await ZEGOSDKManager().zimService.deleteRoomAttributes([
             'emoji_event',
           ]);
@@ -764,6 +808,11 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               if (mounted) {
                 setState(() {
                   messages.add(message);
+                  if (mounted) {
+                    setState(() {
+                      ChatRoomService().addMessage(message);
+                    });
+                  }
                   Future.delayed(Duration(seconds: 2)).then(
                     (value) => {
                       _scrollController.animateTo(
@@ -781,118 +830,184 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               );
             }
           }
-
           await ZEGOSDKManager().zimService.deleteRoomAttributes([
             'room_event',
           ]);
         }
 
-        if (attrs.containsKey("lock_mic_event")) {
-          final rawData = attrs["lock_mic_event"];
+        if (attrs.containsKey("lock_event")) {
+          final rawData = attrs["lock_event"];
           if (rawData != null && rawData.isNotEmpty) {
             print('start');
             final data = jsonDecode(rawData);
             final user_id = data['user_id'];
             final mic = data['mic'];
 
-            if (user!.id.toString() == user_id) {
-              await ChatRoomService().lockMic(
-                user!.id,
-                room!.id,
-                mic,
-                AppUserServices().userGetter()!.id,
-              );
-            }
+            print('user_id');
+            print(user_id);
+            print(user!.id);
 
-            if (mic != 0) {
-              room!.mics![mic - 1] = Mic(
-                id: mic - 1,
-                room_id: data['room_id'],
-                order: mic,
-                user_id: 0,
-                isClosed: 1,
-                isMute: 0,
-                counter: 0,
-                mic_user_gender: null,
-                mic_user_img: null,
-                mic_user_name: null,
-                mic_user_tag: null,
-                mic_user_share_level: null,
-                mic_user_birth_date: null,
-                mic_user_karizma_level: null,
-                mic_user_charging_level: null,
-                frame: '',
-              );
-            } else {
-              for (int i = 0; i <= room!.mics!.length; i++) {
-                room!.mics![i] = Mic(
-                  id: i,
-                  room_id: data['room_id'],
-                  order: i + 1,
-                  user_id: 0,
-                  isClosed: 1,
-                  isMute: 0,
-                  counter: 0,
-                  mic_user_gender: null,
-                  mic_user_img: null,
-                  mic_user_name: null,
-                  mic_user_tag: null,
-                  mic_user_share_level: null,
-                  mic_user_birth_date: null,
-                  mic_user_karizma_level: null,
-                  mic_user_charging_level: null,
-                  frame: '',
-                );
-              }
+            if (mounted) {
+              setState(() {
+                if (user!.id.toString() == user_id.toString()) {
+                  ChatRoomService().lockMic(
+                    user!.id,
+                    room!.id,
+                    mic,
+                    AppUserServices().userGetter()!.id,
+                  );
+                }
+
+                print('micmic');
+                print(mic);
+
+                if (mic != 0) {
+                  room!.mics![mic - 1] = Mic(
+                    id: mic - 1,
+                    room_id: data['room_id'],
+                    order: mic,
+                    user_id: 0,
+                    isClosed: 1,
+                    isMute: 0,
+                    counter: 0,
+                    mic_user_gender: null,
+                    mic_user_img: null,
+                    mic_user_name: null,
+                    mic_user_tag: null,
+                    mic_user_share_level: null,
+                    mic_user_birth_date: null,
+                    mic_user_karizma_level: null,
+                    mic_user_charging_level: null,
+                    frame: '',
+                  );
+                } else {
+                  for (int i = 0; i <= room!.mics!.length - 1; i++) {
+                    room!.mics![i] = Mic(
+                      id: i,
+                      room_id: data['room_id'],
+                      order: i + 1,
+                      user_id: 0,
+                      isClosed: 1,
+                      isMute: 0,
+                      counter: 0,
+                      mic_user_gender: null,
+                      mic_user_img: null,
+                      mic_user_name: null,
+                      mic_user_tag: null,
+                      mic_user_share_level: null,
+                      mic_user_birth_date: null,
+                      mic_user_karizma_level: null,
+                      mic_user_charging_level: null,
+                      frame: '',
+                    );
+                  }
+                }
+              });
             }
           }
           await ZEGOSDKManager().zimService.deleteRoomAttributes([
-            'lock_mic_event',
+            'lock_event',
           ]);
         }
 
-        if (attrs.containsKey("unlock_mic_event")) {
-          final rawData = attrs["unlock_mic_event"];
+        if (attrs.containsKey("unlock_event")) {
+          final rawData = attrs["unlock_event"];
           if (rawData != null && rawData.isNotEmpty) {
             print('start');
             final data = jsonDecode(rawData);
             final user_id = data['user_id'];
             final mic = data['mic'];
 
-            if (user!.id.toString() == user_id) {
-              await ChatRoomService().unlockMic(
-                user!.id,
-                room!.id,
-                mic,
-                AppUserServices().userGetter()!.id,
-              );
-            }
+            if (mounted) {
+              setState(() {
+                if (user!.id.toString() == user_id.toString()) {
+                  ChatRoomService().unlockMic(
+                    user!.id,
+                    room!.id,
+                    mic,
+                    AppUserServices().userGetter()!.id,
+                  );
+                }
 
-            if (mic != 0) {
-              room!.mics![mic - 1] = Mic(
-                id: mic - 1,
-                room_id: data['room_id'],
-                order: mic,
-                user_id: 0,
-                isClosed: 0,
-                isMute: 0,
-                counter: 0,
-                mic_user_gender: null,
-                mic_user_img: null,
-                mic_user_name: null,
-                mic_user_tag: null,
-                mic_user_share_level: null,
-                mic_user_birth_date: null,
-                mic_user_karizma_level: null,
-                mic_user_charging_level: null,
-                frame: '',
-              );
-            } else {
-              for (int i = 0; i <= room!.mics!.length; i++) {
-                room!.mics![i] = Mic(
-                  id: i,
-                  room_id: data['room_id'],
-                  order: i + 1,
+                if (mic != 0) {
+                  room!.mics![mic - 1] = Mic(
+                    id: mic - 1,
+                    room_id: data['room_id'],
+                    order: mic,
+                    user_id: 0,
+                    isClosed: 0,
+                    isMute: 0,
+                    counter: 0,
+                    mic_user_gender: null,
+                    mic_user_img: null,
+                    mic_user_name: null,
+                    mic_user_tag: null,
+                    mic_user_share_level: null,
+                    mic_user_birth_date: null,
+                    mic_user_karizma_level: null,
+                    mic_user_charging_level: null,
+                    frame: '',
+                  );
+                } else {
+                  for (int i = 0; i <= room!.mics!.length - 1; i++) {
+                    room!.mics![i] = Mic(
+                      id: i,
+                      room_id: data['room_id'],
+                      order: i + 1,
+                      user_id: 0,
+                      isClosed: 0,
+                      isMute: 0,
+                      counter: 0,
+                      mic_user_gender: null,
+                      mic_user_img: null,
+                      mic_user_name: null,
+                      mic_user_tag: null,
+                      mic_user_share_level: null,
+                      mic_user_birth_date: null,
+                      mic_user_karizma_level: null,
+                      mic_user_charging_level: null,
+                      frame: '',
+                    );
+                  }
+                }
+              });
+            }
+          }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'unlock_event',
+          ]);
+        }
+
+        if (attrs.containsKey("remove_event")) {
+          final rawData = attrs["remove_event"];
+          if (rawData != null && rawData.isNotEmpty) {
+            final data = jsonDecode(rawData);
+            final mic = data['mic'];
+            final userIdToRemove = data['user_id'];
+            final roomId = data['room_id'];
+            final adminId = data['admin_id'];
+
+            print(adminId);
+            print(userIdToRemove);
+
+            if (mounted) {
+              setState(() {
+                if (adminId.toString() == user!.id.toString()) {
+                  ChatRoomService().leaveMic(
+                    userIdToRemove,
+                    roomId,
+                    mic,
+                    adminId,
+                  );
+                }
+                String streamId = "${userIdToRemove}_$roomId";
+                ZegoExpressEngine.instance.stopPlayingStream(streamId);
+                print('Stopped voice stream of $userIdToRemove');
+
+                room!.mics![mic - 1] = Mic(
+                  id: mic - 1,
+                  room_id: roomId,
+                  order: mic,
                   user_id: 0,
                   isClosed: 0,
                   isMute: 0,
@@ -907,99 +1022,52 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   mic_user_charging_level: null,
                   frame: '',
                 );
-              }
+              });
             }
           }
           await ZEGOSDKManager().zimService.deleteRoomAttributes([
-            'unlock_mic_event',
-            'data',
+            'remove_event',
           ]);
         }
 
-        if (attrs.containsKey("remove_mic_event")) {
-          final rawData = attrs["remove_mic_event"];
-          if (rawData != null && rawData.isNotEmpty) {
-            final data = jsonDecode(rawData);
-            final mic = data['mic'];
-            final userIdToRemove = data['user_id'];
-            final roomId = data['room_id'];
-            final adminId = data['adminId'];
-
-            if (adminId == user!.id) {
-              await ChatRoomService().leaveMic(
-                userIdToRemove,
-                roomId,
-                mic,
-                adminId,
-              );
-            }
-            String streamId = "${userIdToRemove}_$roomId";
-            await ZegoExpressEngine.instance.stopPlayingStream(streamId);
-            print('Stopped voice stream of $userIdToRemove');
-
-            room!.mics![mic - 1] = Mic(
-              id: mic - 1,
-              room_id: roomId,
-              order: mic,
-              user_id: 0,
-              isClosed: 0,
-              isMute: 0,
-              counter: 0,
-              mic_user_gender: null,
-              mic_user_img: null,
-              mic_user_name: null,
-              mic_user_tag: null,
-              mic_user_share_level: null,
-              mic_user_birth_date: null,
-              mic_user_karizma_level: null,
-              mic_user_charging_level: null,
-              frame: '',
-            );
-
-            await ZEGOSDKManager().zimService.deleteRoomAttributes([
-              'remove_mic_event',
-            ]);
-          }
-        }
-
-        if (attrs.containsKey("kick_out_event")) {
-          final rawData = attrs["kick_out_event"];
+        if (attrs.containsKey("kick_event")) {
+          final rawData = attrs["kick_event"];
           if (rawData != null && rawData.isNotEmpty) {
             final data = jsonDecode(rawData);
             final targetUserId = data['user_id'];
             final blockType = data['block_type'];
             final roomId = data['room_id'];
+            if (mounted) {
+              setState(() {
+                print("🚨 kick event received for user: $targetUserId");
 
-            print("🚨 kick event received for user: $targetUserId");
+                if (user!.id.toString() == targetUserId.toString()) {
+                  ChatRoomService().blockRoomMember(
+                    targetUserId,
+                    roomId,
+                    blockType,
+                    AppUserServices().userGetter()!.id,
+                  );
+                }
 
-            if (user!.id.toString() == targetUserId.toString()) {
-              await ChatRoomService().blockRoomMember(
-                targetUserId,
-                roomId,
-                blockType,
-                AppUserServices().userGetter()!.id,
-              );
+                final streamId = "${targetUserId}_${roomId}";
+                ZegoExpressEngine.instance.stopPlayingStream(streamId);
+                blockRoomListener(blockType, roomId, targetUserId);
+                print('Stopped voice stream of $targetUserId');
+              });
             }
-
-            final streamId = "${targetUserId}_${roomId}";
-            await ZegoExpressEngine.instance.stopPlayingStream(streamId);
-            blockRoomListener(blockType, roomId, targetUserId);
-            print('Stopped voice stream of $targetUserId');
-
-            await ZEGOSDKManager().zimService.deleteRoomAttributes([
-              'kick_out_event',
-            ]);
           }
+          await ZEGOSDKManager().zimService.deleteRoomAttributes([
+            'kick_event',
+          ]);
         }
       }),
     ]);
 
     // Add all users currently in the room
-    users.addAll(
-      expressService.userInfoList
-          .map((e) => ZegoUser(e.userID, e.userName))
-          .toList(),
-    );
+    for (var e in expressService.userInfoList) {
+      addUserUnique(ZegoUser(e.userID, e.userName));
+    }
     print('users.length');
     print(users.length);
     for (var member in users) {
@@ -1049,12 +1117,49 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             );
 
             messages.insert(messages.length, receivedMessage);
+            if (mounted) {
+              setState(() {
+                ChatRoomService().addMessage(receivedMessage);
+              });
+            }
 
             debugPrint("✅ تم إضافة الرسالة لقائمة الرسائل");
           } catch (e) {
             debugPrint("❌ خطأ أثناء فك رسالة JSON أو التعامل معها: $e");
           }
         };
+  }
+
+  void addUserUnique(ZegoUser newUser) {
+    if (!users.any((u) => u.userID == newUser.userID)) {
+      users.add(newUser);
+    }
+  }
+
+  Future<void> refreshMicState() async {
+    print('🎤 start refresh mic state');
+    try {
+      if (!mounted || room == null) return;
+
+      setState(() {
+        for (int i = 0; i < room!.mics!.length; i++) {
+          final mic = room!.mics![i];
+          print(
+            "🎙️ Mic ${mic.order}: user_id=${mic.user_id}, mute=${mic.isMute}, closed=${mic.isClosed}",
+          );
+
+          if (mic.user_id == user!.id && mic.isMute == 0 && mic.isClosed == 0) {
+            String streamId = "${mic.user_id}_${room!.id}";
+            startMicStream(streamId);
+            print("✅ User ${user!.name} should re-enable mic stream");
+            print("🎧 Mic stream re-enabled successfully!");
+          }
+        }
+      });
+    } catch (e, s) {
+      print("❌ Error refreshing mic state: $e");
+      print(s);
+    }
   }
 
   logoutRoom() async {
@@ -1266,94 +1371,82 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     });
   }
 
-  luckyCaseListener() {
-    CollectionReference reference = FirebaseFirestore.instance.collection(
-      'luckyCase',
-    );
-    reference.snapshots().listen((querySnapshot) async {
-      if (querySnapshot.docChanges.length > 0) {
-        DocumentChange change = querySnapshot.docChanges[0];
-        print('luckyCaseListener');
-        if (change.newIndex > 0) {
-          Map<String, dynamic>? data =
-              change.doc.data() as Map<String, dynamic>;
-          int room_id = data['room_id'];
-          int lucky = data['lucky_id'];
-          String type = data['type'];
-          String user_name = data['user_name'];
-          String room_name = data['room_name'];
-          String user_img = data['user_img'];
-          dynamic available_untill = data['available_untill'];
-          if (checkLuckyCaseShow(available_untill)) {
-            LuckyCase? luckyCase = await ChatRoomService().getLuckyCase(lucky);
-            if (luckyCase != null) {
-              int duration = getLuckyCaseDuration(luckyCase, available_untill);
+  luckyCaseListener(
+    available_untill,
+    lucky,
+    room_id,
+    user_img,
+    type,
+    room_name,
+    user_name,
+  ) async {
+    if (checkLuckyCaseShow(available_untill)) {
+      LuckyCase? luckyCase = await ChatRoomService().getLuckyCase(lucky);
+      if (luckyCase != null) {
+        int duration = getLuckyCaseDuration(luckyCase, available_untill);
 
-              if (duration > 0) {
-                if (room!.id == room!.id) {
-                  if (mounted) {
-                    setState(() {
-                      if (room_id == room!.id) {
-                        showLuckyCase = true;
-                        showRainLuckyCase = true;
-                        lucky_id = lucky;
-                      }
-                    });
-                  }
-
-                  Future.delayed(Duration(seconds: duration)).then(
-                    (value) => setState(() {
-                      showLuckyCase = false;
-                      lucky_id = 0;
-                      canOpenLuckyCase = true;
-                    }),
-                  );
+        if (duration > 0) {
+          if (room!.id == room!.id) {
+            if (mounted) {
+              setState(() {
+                if (room_id == room!.id) {
+                  showLuckyCase = true;
+                  showRainLuckyCase = true;
+                  lucky_id = lucky;
                 }
+              });
+            }
 
-                if (type == "1") {
-                  if (mounted) {
-                    setState(() {
-                      bannerRoom = room_id;
-                      showLuckyBanner = true;
-                      luckySenderimg = user_img;
-                      lucky_id = lucky;
-                      bannerMsg =
-                          '${user_name} sent a Lucky Case inside  ${room_name}';
-                    });
-                  }
-                }
+            Future.delayed(Duration(seconds: duration)).then(
+              (value) => setState(() {
+                showLuckyCase = false;
+                lucky_id = 0;
+                canOpenLuckyCase = true;
+              }),
+            );
+          }
 
-                Future.delayed(Duration(seconds: 20)).then((value) {
-                  if (type == "1") {
-                    if (mounted) {
-                      setState(() {
-                        showLuckyBanner = false;
-                        luckySenderimg = "";
-                        bannerRoom = 0;
-                        giftImgSmall = '';
-                        bannerMsg = '';
-                      });
-                    }
-                  }
-                  if (mounted) {
-                    setState(() {
-                      showRainLuckyCase = false;
-                    });
-                  }
+          if (type == "1") {
+            if (mounted) {
+              setState(() {
+                bannerRoom = room_id;
+                showLuckyBanner = true;
+                luckySenderimg = user_img;
+                lucky_id = lucky;
+                bannerMsg =
+                    '${user_name} sent a Lucky Case inside  ${room_name}';
+              });
+            }
+          }
+
+          Future.delayed(Duration(seconds: 20)).then((value) {
+            if (type == "1") {
+              if (mounted) {
+                setState(() {
+                  showLuckyBanner = false;
+                  luckySenderimg = "";
+                  bannerRoom = 0;
+                  giftImgSmall = '';
+                  bannerMsg = '';
                 });
-              } else {
-                if (mounted) {
-                  setState(() {
-                    showLuckyCase = false;
-                    showRainLuckyCase = false;
-                  });
-                }
               }
             }
+            if (mounted) {
+              setState(() {
+                showRainLuckyCase = false;
+              });
+            }
+          });
+        } else {
+          if (mounted) {
+            setState(() {
+              showLuckyCase = false;
+              showRainLuckyCase = false;
+            });
           }
         }
       }
-    });
+    }
   }
 
   luckyCaseForNewComers() async {
@@ -1787,6 +1880,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         setState(() {
           messages = old;
         });
+          setState(() {
+            ChatRoomService().addMessage(message);
+          });
       }
     }
 
@@ -1990,6 +2086,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Future<void> userJoinRoomWelcome(String joiner_id) async {
+    refreshRoom(user!.id);
     print('room!.members!.length');
     print(room!.members!.length);
 
@@ -2118,6 +2215,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       if (mounted) {
         setState(() {
           frame = ASSETSBASEURL + 'Designs/Motion/' + icon + '?raw=true';
+          print('frame22222');
           print(frame);
         });
       }
@@ -2251,6 +2349,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     _tabController!.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _leaveTimer?.cancel();
     super.dispose();
     _dispose();
     try {
@@ -2258,7 +2358,48 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     } catch (err) {}
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("📱 App state changed to: $state");
+
+    if (state == AppLifecycleState.paused) {
+      print("⏳ Starting 1-minute timer...");
+      _leaveTimer = Timer(const Duration(minutes: 1), () {
+        print("🚪 1 minutes passed, leaving room...");
+        int index = room!.mics!.indexWhere((mic) => mic.user_id == user!.id);
+        MicHelper(
+          user!,
+          user_id: user!.id,
+          room_id: room!.id,
+          mic: index,
+        ).sendMicLeaveEvent(audioPlayer, zegoEngine);
+        ChatRoomService().leaveMic(user!.id, room!.id, index, 0);
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      if (_leaveTimer?.isActive ?? false) {
+        print("✅ User returned, canceling leave timer.");
+        _leaveTimer?.cancel();
+      }
+    } else if (state == AppLifecycleState.detached) {
+      print("⏳ Starting 1-minute timer...");
+      _leaveTimer = Timer(const Duration(minutes: 1), () {
+        print("🚪 1 minutes passed, leaving room...");
+        int index = room!.mics!.indexWhere((mic) => mic.user_id == user!.id);
+        MicHelper(
+          user!,
+          user_id: user!.id,
+          room_id: room!.id,
+          mic: index,
+        ).sendMicLeaveEvent(audioPlayer, zegoEngine);
+        ChatRoomService().leaveMic(user!.id, room!.id, index, 0);
+      });
+    }
+  }
+
+  bool get wantKeepAlive => true;
+
   Future<void> _dispose() async {
+    print('start dispose');
     if (ChatRoomService.savedRoom == null) {
       await ExitRoomHelper(user!.id, room!.id);
       await unUnitZego();
@@ -2271,6 +2412,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         room_id: room!.id,
         mic: index,
       ).sendMicLeaveEvent(audioPlayer, zegoEngine);
+      await ChatRoomService().leaveMic(user!.id, room!.id, index, 0);
+      users.clear();
       await ZegoExpressEngine.instance.stopPublishingStream();
       await ZegoExpressEngine.instance.muteMicrophone(true);
       if (audioPlayer != null) {
@@ -2329,7 +2472,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       );
 
       if (result.errorCode == 0) {
-        messages.insert(messages.length, message);
+        ChatRoomService().addMessage(message);
+        setState(() {
+          messages = ChatRoomService().messages ;
+        });
 
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -2346,6 +2492,52 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       }
     } catch (e) {
       showSnackBarWidget(message: 'فشل إرسال الرسالة: $e', color: Colors.red);
+    }
+  }
+
+  Future<void> sendGlobalMessage(String messageBody, String fromUserId) async {
+    const String appId = '1364585881';
+    const String serverSecret = 'f17120be21fb4342160ff49228c42475';
+
+    try {
+      final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+
+      final plainText = '$appId$serverSecret$timestamp';
+      final signature = sha256.convert(utf8.encode(plainText)).toString();
+
+      final uri = Uri.https('zim-api.zego.im', '/', {
+        'Action': 'SendMessageToAllUsers',
+        'AppId': appId,
+        'Signature': signature,
+        'Timestamp': timestamp.toString(),
+        'SignatureVersion': '1',
+      });
+
+      final body = {
+        "FromUserId": fromUserId,
+        "MessageType": 1,
+        "MessageBody": {
+          "Message": messageBody,
+          "ExtendedData": "optional"
+        },
+        "SubMsgType": 0
+      };
+
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ تم إرسال الرسالة بنجاح!');
+        print(response.body);
+      } else {
+        print('❌ فشل الإرسال: ${response.statusCode}');
+        print(response.body);
+      }
+    } catch (e) {
+      print('⚠️ خطأ أثناء الإرسال: $e');
     }
   }
 
@@ -2581,6 +2773,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                       ),
                                                       GestureDetector(
                                                         onTap: () {
+                                                          ChatRoomService()
+                                                              .roomSetter(
+                                                                room!,
+                                                              );
                                                           showModalBottomSheet(
                                                             isScrollControlled:
                                                                 true,
@@ -3018,6 +3214,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                     SizedBox(height: 5.0),
                                                     GestureDetector(
                                                       onTap: () {
+                                                        ChatRoomService().roomSetter(room!);
                                                         showModalBottomSheet(
                                                           context: context,
                                                           builder: (ctx) =>
@@ -3120,6 +3317,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                                 child: MaterialButton(
                                                   onPressed: () {
                                                     sendChatRoomMessage();
+                                                 //   sendGlobalMessage('fgbuif' , user!.id.toString());
                                                   }, //sendMessage
                                                   child: Text(
                                                     'gift_send'.tr,
@@ -3743,7 +3941,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         room_id: room!.id,
         mic: mic.order,
         user!,
-      ).removeFromMic(user!.id);
+      ).removeFromMic(room!.userId);
     } else if (result == 7) {
       //un_use_mic
       MicHelper(
@@ -4286,12 +4484,12 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   Widget RolletBottomSheet() => CreateRolletModal();
 
-  int getLuckyCaseDuration(LuckyCase luckyCase, Timestamp available_untill) {
+  int getLuckyCaseDuration(LuckyCase luckyCase, DateTime available_untill) {
     final DateTime luckyCaseCreatedDate = DateTime.parse(
       luckyCase.created_date,
     );
 
-    var dateTwo = DateTime.parse(available_untill.toDate().toString());
+    var dateTwo = available_untill;
     print(luckyCaseCreatedDate);
     print(dateTwo);
 
@@ -4323,10 +4521,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     return duration.inSeconds <= 60 && duration.inSeconds > 0;
   }
 
-  bool checkLuckyCaseShow(Timestamp available_untill) {
-    final DateTime giftAvaliable = DateTime.parse(
-      available_untill.toDate().toString(),
-    );
+  bool checkLuckyCaseShow(DateTime available_untill) {
+    final DateTime giftAvaliable = available_untill;
     final DateTime currentDate = DateTime.now();
 
     final Duration duration = giftAvaliable.difference(currentDate);

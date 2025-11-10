@@ -9,14 +9,14 @@ class RoomHelper {
   final int bg ;
   RoomHelper({required this.room_id , required this.bg});
 
-  changeTheme() async{
-    await ChatRoomService().changeTheme(bg, room_id);
-    await FirebaseFirestore.instance.collection("themes").add({
-      'room_id': room_id,
-      'theme': bg,
-    });
-
-  }
+  // changeTheme() async{
+  //   await ChatRoomService().changeTheme(bg, room_id);
+  //   await FirebaseFirestore.instance.collection("themes").add({
+  //     'room_id': room_id,
+  //     'theme': bg,
+  //   });
+  //
+  // }
 
   Future<void> sendThemeChangeEvent(user_id) async {
     final themeData = {
@@ -27,7 +27,7 @@ class RoomHelper {
 
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {
-        'theme_change_event': jsonEncode(themeData),
+        'theme_event': jsonEncode(themeData),
       },
       isForce: true,
       isUpdateOwner: false,

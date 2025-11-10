@@ -12,7 +12,6 @@ import 'package:LikLok/modules/EditLanguage/Edit_Language_Screen.dart';
 import 'package:LikLok/modules/NetworkDiagnosis/Network_Diagnosis_screen.dart';
 import 'package:LikLok/modules/NotificationSetting/Notification_Setting_Screen.dart';
 import 'package:LikLok/modules/PrivacyPolicy/Privacy_Policy_Screen.dart';
-import 'package:LikLok/modules/Verification/verification_screen.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,7 @@ import 'package:get/get.dart';
 import '../../models/AppUser.dart';
 import '../JoinHostAgency/join_host_agency_screen.dart';
 import '../Loading/loadig_screen.dart';
+import '../SelfWithdrawal/self_withdrawal.dart';
 
 
 
@@ -459,7 +459,32 @@ class _SettingScreenState extends State<SettingScreen> {
                   ),
                 ) : Container(),
                 SizedBox(height: 10.0,),
-        
+                // Container(
+                //   decoration: BoxDecoration(color:  Colors.white, borderRadius: BorderRadius.circular(15.0)),
+                //   padding: EdgeInsets.all(15.0) ,
+                //   margin: EdgeInsetsDirectional.only(bottom: 10.0 , start: 10.0 , end: 10.0),
+                //   child: GestureDetector(
+                //     behavior: HitTestBehavior.opaque,
+                //     onTap: (){
+                //       Navigator.push(context, MaterialPageRoute(builder: (ctx) => const SelfWithdrawal(),),);
+                //     },
+                //     child: Row(
+                //       children: [
+                //         Text("self_withdrawal".tr ,style:TextStyle(color: MyColors.whiteColor,fontSize: 15.0) ,),
+                //         Expanded(
+                //           child:Row(
+                //               mainAxisAlignment: MainAxisAlignment.end,
+                //               children: [
+                //                 Icon(Icons.arrow_forward_ios_outlined , color: MyColors.whiteColor , size: 20.0,)
+                //               ]
+                //             //change your color here
+                //           ),
+                //         ),
+                //       ],
+                //
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

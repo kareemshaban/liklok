@@ -16,9 +16,13 @@ import 'music2_modal.dart';
 
 class MusicsModal extends StatefulWidget {
   final ZegoExpressEngine zegoEngine;
-  final ZegoMediaPlayer audioPlayer ;
+  final ZegoMediaPlayer audioPlayer;
 
-  const MusicsModal({super.key, required this.zegoEngine, required this.audioPlayer});
+  const MusicsModal({
+    super.key,
+    required this.zegoEngine,
+    required this.audioPlayer,
+  });
 
   @override
   State<MusicsModal> createState() => _MusicsModalState();
@@ -30,59 +34,39 @@ class _MusicsModalState extends State<MusicsModal> {
 
   late RtcEngine _engine;
   bool _isStartedAudioMixing = false;
+
   // bool _loopback = true;
   // bool _replace = false;
   // int  _cycle = 1;
   // double _startPos = 1000;
   int playedIndex = -1;
-  double progress = 1000 ;
-  double min = 1000 ;
-  double max = 1000 ;
-  late double adjustedProgress = progress.clamp(min, max);
-
+  Timer? positionTimer;
+  double progress = 0.0;
+  double max = 0.0;
+  double min = 0.0;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    requestPermissions();
-    setState(() {
+    widget.audioPlayer.getTotalDuration().then((duration) {
+      setState(() {
+        max = duration.toDouble();
+      });
+    });
+    positionTimer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
+      final currentPos = await widget.audioPlayer.getCurrentProgress();
       if(mounted){
-        _engine = ChatRoomService.engine!;
+        setState(() {
+          progress = currentPos.toDouble();
+        });
       }
     });
-    // getProgress();
+
+    requestPermissions();
     getData();
-    _engine.registerEventHandler(
-        RtcEngineEventHandler(
-            onAudioMixingFinished: () {
-              print('onAudioMixingFinished');
-              print(min);
-              print(max);
-              if (this.mounted) {
-                setState(() {
-                  progress = 1000 ;
-
-                  _isStartedAudioMixing = false;
-
-                });
-              }
-
-            },
-            onAudioMixingPositionChanged: (val) {
-              if (this.mounted) {
-                setState(() {
-                  progress = double.parse(val.toString()) ;
-                });
-              }
-
-            },
-            onAudioMixingStateChanged: (AudioMixingStateType stateType , AudioMixingReasonType reasonType){
-
-          }
-        )
-    );
   }
+
   Future<void> requestPermissions() async {
     if (!Platform.isAndroid) {
       print('Not running on Android');
@@ -93,33 +77,19 @@ class _MusicsModalState extends State<MusicsModal> {
     final androidInfo = await deviceInfo.androidInfo;
     final sdkInt = androidInfo.version.sdkInt;
 
-    PermissionStatus? storageStatus;
-    PermissionStatus? manageStorageStatus;
     PermissionStatus? audioStatus;
-    PermissionStatus? mediaImagesStatus;
-    PermissionStatus? mediaVideoStatus;
     PermissionStatus? mediaAudioStatus;
 
     if (sdkInt >= 33) {
-      mediaImagesStatus = await Permission.photos.request();
-      mediaVideoStatus = await Permission.videos.request();
       mediaAudioStatus = await Permission.audio.request();
-    }
-    else if (sdkInt >= 30) {
-      manageStorageStatus = await Permission.manageExternalStorage.request();
+    } else if (sdkInt >= 30) {
       audioStatus = await Permission.audio.request();
-    }
-    else {
-      storageStatus = await Permission.storage.request();
+    } else {
       audioStatus = await Permission.audio.request();
     }
 
     final granted = [
-      storageStatus?.isGranted,
-      manageStorageStatus?.isGranted,
       audioStatus?.isGranted,
-      mediaImagesStatus?.isGranted,
-      mediaVideoStatus?.isGranted,
       mediaAudioStatus?.isGranted,
     ].where((x) => x == true).isNotEmpty;
 
@@ -128,11 +98,7 @@ class _MusicsModalState extends State<MusicsModal> {
     } else {
       print('Some permissions denied ❌');
 
-      if (await Permission.storage.isPermanentlyDenied ||
-          await Permission.manageExternalStorage.isPermanentlyDenied ||
-          await Permission.photos.isPermanentlyDenied ||
-          await Permission.videos.isPermanentlyDenied ||
-          await Permission.audio.isPermanentlyDenied) {
+      if (await Permission.audio.isPermanentlyDenied) {
         print("User permanently denied permission. Opening app settings...");
         openAppSettings();
       }
@@ -145,23 +111,24 @@ class _MusicsModalState extends State<MusicsModal> {
 
     if (!mounted) return;
 
+    if (current <= 0) return;
+
     setState(() {
       progress = current.toDouble().clamp(0, total.toDouble());
       max = total.toDouble();
       min = 0;
-      _isStartedAudioMixing = current > 0;
-      playedIndex = current > 0 ? ChatRoomService.musicPlayedIndex : -1;
+      _isStartedAudioMixing = true;
     });
   }
 
   @override
+  @override
   void dispose() {
+    positionTimer?.cancel();
     super.dispose();
-    //_engine.stopAudioMixing();
   }
 
   getData() async {
-
     Directory? appDocDir = await getApplicationDocumentsDirectory();
     List<FileSystemEntity> allFiles;
     List<FileSystemEntity> files;
@@ -170,18 +137,18 @@ class _MusicsModalState extends State<MusicsModal> {
     files = [...allFiles.where((element) => FileManager.isFile(element))];
     List<FileSystemEntity> MF = [];
     MF = [
-      ...files.where((file) =>
-          file.path.toLowerCase().endsWith('.mp3') ||
-          file.path.toLowerCase().endsWith('.m4a'))
+      ...files.where(
+        (file) =>
+            file.path.toLowerCase().endsWith('.mp3') ||
+            file.path.toLowerCase().endsWith('.m4a'),
+      ),
     ];
 
-    if (this.mounted){
+    if (this.mounted) {
       setState(() {
         musicFiles = MF;
       });
-
     }
-
   }
 
   Future<void> startAudioMixing(String path, int index) async {
@@ -202,7 +169,7 @@ class _MusicsModalState extends State<MusicsModal> {
         _isStartedAudioMixing = true;
         playedIndex = index;
       });
-
+      getProgress();
     } catch (e) {
       print("⚠️ Error starting BGM: $e");
     }
@@ -219,6 +186,7 @@ class _MusicsModalState extends State<MusicsModal> {
 
     print("⏹️ BGM stopped for all users");
   }
+
   Future<void> pauseAudioMixing() async {
     await widget.audioPlayer.pause();
 
@@ -243,8 +211,6 @@ class _MusicsModalState extends State<MusicsModal> {
     print("▶️ BGM resumed");
   }
 
-
-
   Future<void> nextAudioMixing() async {
     if (musicFiles.isEmpty) return;
 
@@ -256,7 +222,6 @@ class _MusicsModalState extends State<MusicsModal> {
       print("🚫 No next track");
     }
   }
-
 
   Future<void> prevAudioMixing() async {
     if (musicFiles.isEmpty) return;
@@ -270,20 +235,21 @@ class _MusicsModalState extends State<MusicsModal> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
         height: MediaQuery.of(context).size.height * .7,
         decoration: BoxDecoration(
-            color: Colors.white.withAlpha(180),
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(20.0), topLeft: Radius.circular(15.0)),
-            border: Border(
-              top: BorderSide(width: 4.0, color: MyColors.secondaryColor),
-            )),
+          color: Colors.white.withAlpha(180),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20.0),
+            topLeft: Radius.circular(15.0),
+          ),
+          border: Border(
+            top: BorderSide(width: 4.0, color: MyColors.secondaryColor),
+          ),
+        ),
         child: Column(
           children: [
             Row(
@@ -300,16 +266,15 @@ class _MusicsModalState extends State<MusicsModal> {
                   ),
                 ),
                 IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (ctx) => Music2BottomSheet());
-                    },
-                    icon: Icon(
-                      Icons.add_circle_outline,
-                      color: Colors.black,
-                    ))
+                  onPressed: () {
+                    Navigator.pop(context);
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (ctx) => Music2BottomSheet(),
+                    );
+                  },
+                  icon: Icon(Icons.add_circle_outline, color: Colors.black),
+                ),
               ],
             ),
             Expanded(
@@ -364,9 +329,10 @@ class _MusicsModalState extends State<MusicsModal> {
                                       child: Text(
                                         FileManager.basename(musicFiles[index]),
                                         style: TextStyle(
-                                            color: index == playedIndex
-                                                ? MyColors.primaryColor
-                                                : Colors.black),
+                                          color: index == playedIndex
+                                              ? MyColors.primaryColor
+                                              : Colors.black,
+                                        ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -376,17 +342,21 @@ class _MusicsModalState extends State<MusicsModal> {
                               Row(
                                 children: [
                                   Icon(
-                                     Icons.save_outlined,
+                                    Icons.save_outlined,
                                     size: 15.0,
                                     color: Colors.black,
                                   ),
                                   Padding(
                                     padding: const EdgeInsetsDirectional.only(
-                                        start: 5.0, end: 5.0),
-                                    child: Text(getLength(musicFiles[index].path)
-                                      ,
+                                      start: 5.0,
+                                      end: 5.0,
+                                    ),
+                                    child: Text(
+                                      getLength(musicFiles[index].path),
                                       style: TextStyle(
-                                          fontSize: 12.0, color: Colors.black),
+                                        fontSize: 12.0,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -396,7 +366,9 @@ class _MusicsModalState extends State<MusicsModal> {
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.only(
-                                        start: 5.0, end: 5.0),
+                                      start: 5.0,
+                                      end: 5.0,
+                                    ),
                                     child: Icon(
                                       CupertinoIcons.time,
                                       size: 15.0,
@@ -406,23 +378,33 @@ class _MusicsModalState extends State<MusicsModal> {
                                   Text(
                                     getDate(musicFiles[index].path),
                                     style: TextStyle(
-                                        fontSize: 12.0, color: Colors.black),
-                                  )
+                                      fontSize: 12.0,
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                 ],
-                              )
+                              ),
                             ],
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                           ),
-                          Expanded(child: IconButton(icon: Icon(Icons.delete_forever_sharp , color: Colors.red,), onPressed: () {
-                              File(musicFiles[index].path).deleteSync();
-                              stopAudioMixing();
-                              setState(() {
-                                _isStartedAudioMixing = false;
-                                playedIndex = -1 ;
-                              });
-                              getData();
-                          }, ))
+                          Expanded(
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.delete_forever_sharp,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                File(musicFiles[index].path).deleteSync();
+                                stopAudioMixing();
+                                setState(() {
+                                  _isStartedAudioMixing = false;
+                                  playedIndex = -1;
+                                });
+                                getData();
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -442,7 +424,9 @@ class _MusicsModalState extends State<MusicsModal> {
                 color: Colors.white.withAlpha(100),
                 border: Border(
                   top: BorderSide(
-                      width: 2.0, color: MyColors.lightUnSelectedColor),
+                    width: 2.0,
+                    color: MyColors.lightUnSelectedColor,
+                  ),
                 ),
               ),
               padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -463,7 +447,7 @@ class _MusicsModalState extends State<MusicsModal> {
                                 size: 30.0,
                               ),
                               color: Colors.black,
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -474,12 +458,9 @@ class _MusicsModalState extends State<MusicsModal> {
                               onPressed: () {
                                 prevAudioMixing();
                               },
-                              icon: Icon(
-                                Icons.skip_previous,
-                                size: 30.0,
-                              ),
+                              icon: Icon(Icons.skip_previous, size: 30.0),
                               color: Colors.black,
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -491,22 +472,16 @@ class _MusicsModalState extends State<MusicsModal> {
                                     onPressed: () {
                                       pauseAudioMixing();
                                     },
-                                    icon: Icon(
-                                      Icons.pause,
-                                      size: 30.0,
-                                    ),
+                                    icon: Icon(Icons.pause, size: 30.0),
                                     color: Colors.black,
                                   )
                                 : IconButton(
                                     onPressed: () {
                                       resumeAudioMixing();
                                     },
-                                    icon: Icon(
-                                      Icons.play_arrow,
-                                      size: 30.0,
-                                    ),
+                                    icon: Icon(Icons.play_arrow, size: 30.0),
                                     color: Colors.black,
-                                  )
+                                  ),
                           ],
                         ),
                       ),
@@ -517,12 +492,9 @@ class _MusicsModalState extends State<MusicsModal> {
                               onPressed: () {
                                 nextAudioMixing();
                               },
-                              icon: Icon(
-                                Icons.skip_next_rounded,
-                                size: 30.0,
-                              ),
+                              icon: Icon(Icons.skip_next_rounded, size: 30.0),
                               color: Colors.black,
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -530,29 +502,22 @@ class _MusicsModalState extends State<MusicsModal> {
                         child: Stack(
                           children: [
                             IconButton(
-                              onPressed: () {
-
-                              },
-                              icon: Icon(
-                                Icons.volume_down,
-                                size: 30.0,
-                              ),
+                              onPressed: () {},
+                              icon: Icon(Icons.volume_down, size: 30.0),
                               color: Colors.black,
                             ),
-                              PopupMenuButton(
+                            PopupMenuButton(
                               position: PopupMenuPosition.over,
                               shadowColor: MyColors.unSelectedColor,
                               elevation: 4.0,
-
                               color: MyColors.darkColor,
                               icon: Container(),
                               onSelected: (int result) async {
-
-                                 await _engine.adjustAudioMixingPlayoutVolume(result);
-                                 await _engine.adjustAudioMixingPublishVolume(result);
+                                widget.audioPlayer.setVolume(result);
                               },
-                              itemBuilder: (BuildContext context) => volumeBuilder()
-                              )
+                              itemBuilder: (BuildContext context) =>
+                                  volumeBuilder(),
+                            ),
                           ],
                         ),
                       ),
@@ -565,77 +530,80 @@ class _MusicsModalState extends State<MusicsModal> {
                         child: Column(
                           children: [
                             // Text(progress.toString() , style: TextStyle(color: MyColors.primaryColor),),
-                            Slider(value:   adjustedProgress , min: min , max: max, onChanged:  (val) async{
-                              await _engine.setAudioMixingPosition( (val - 1000).toInt() );
-                              setState(() {
-                                   progress = val ;
-
-                              });
-                            } , thumbColor: MyColors.secondaryColor, activeColor: MyColors.secondaryColor,)
+                            Slider(
+                              value: progress.clamp(min, max),
+                              min: min,
+                              max: max,
+                              onChanged: (val) async {
+                                await widget.audioPlayer.seekTo((val - 1000).toInt());
+                                setState(() {
+                                  progress = val;
+                                });
+                              },
+                              thumbColor: MyColors.secondaryColor,
+                              activeColor: MyColors.secondaryColor,
+                            ),
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
-  Widget Music2BottomSheet() => MusicsModal2(zegoEngine:widget.zegoEngine , audioPlayer: widget.audioPlayer,);
-}
 
+  Widget Music2BottomSheet() => MusicsModal2(
+    zegoEngine: widget.zegoEngine,
+    audioPlayer: widget.audioPlayer,
+  );
+}
 
 getDate(file) {
-   return File(file).lastModifiedSync().toString();
-
+  return File(file).lastModifiedSync().toString();
 }
+
 getLength(file) {
-  int bytes =  File(file).lengthSync();
+  int bytes = File(file).lengthSync();
   if (bytes <= 0) return "0 B";
   const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   var i = (log(bytes) / log(1024)).floor();
   return ((bytes / pow(1024, i)).toStringAsFixed(2)) + ' ' + suffixes[i];
-
 }
 
 List<PopupMenuEntry<int>> volumeBuilder() {
-  return
-    [
-      PopupMenuItem<int>(
-        value: 100,
-        child: Text('100%' , style: TextStyle(color: Colors.black),),
-      ),
-      PopupMenuItem<int>(
-        value: 70,
-        child: Text('70%' , style: TextStyle(color: Colors.black),),
-      ),
-      PopupMenuItem<int>(
-        value: 50,
-        child: Text('50%', style: TextStyle(color: Colors.black),),
-      ),
-      PopupMenuItem<int>(
-        value: 30,
-        child: Text('30%', style: TextStyle(color: Colors.black),),
-      ),
-      PopupMenuItem<int>(
-        value: 20,
-        child: Text('20%', style: TextStyle(color: Colors.black),),
-      ),
-      PopupMenuItem<int>(
-        value: 10,
-        child: Text('10%', style: TextStyle(color: Colors.black),),
-      ),
-      PopupMenuItem<int>(
-        value: 0,
-        child: Text('0%', style: TextStyle(color: Colors.black),),
-      ),
-    ];
-
-
-
+  return [
+    PopupMenuItem<int>(
+      value: 100,
+      child: Text('100%', style: TextStyle(color: Colors.black)),
+    ),
+    PopupMenuItem<int>(
+      value: 70,
+      child: Text('70%', style: TextStyle(color: Colors.black)),
+    ),
+    PopupMenuItem<int>(
+      value: 50,
+      child: Text('50%', style: TextStyle(color: Colors.black)),
+    ),
+    PopupMenuItem<int>(
+      value: 30,
+      child: Text('30%', style: TextStyle(color: Colors.black)),
+    ),
+    PopupMenuItem<int>(
+      value: 20,
+      child: Text('20%', style: TextStyle(color: Colors.black)),
+    ),
+    PopupMenuItem<int>(
+      value: 10,
+      child: Text('10%', style: TextStyle(color: Colors.black)),
+    ),
+    PopupMenuItem<int>(
+      value: 0,
+      child: Text('0%', style: TextStyle(color: Colors.black)),
+    ),
+  ];
 }

@@ -56,7 +56,7 @@ class _ThemesModalState extends State<ThemesModal> {
   }
 
   Widget themeListItem(theme) => Container(
-    height: 140, // مثلا
+    height: 140,
     child: Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -65,6 +65,8 @@ class _ThemesModalState extends State<ThemesModal> {
             Flexible(
               child: GestureDetector(
                 onTap: () {
+                  print(theme.id);
+                  print(room!.themeId);
                   changeTheme(theme.id);
                 },
                 child: Image(
@@ -86,7 +88,6 @@ class _ThemesModalState extends State<ThemesModal> {
 
   changeTheme(theme_id) async{
     await RoomHelper(room_id: room!.id , bg: theme_id).sendThemeChangeEvent(user!.id);
-
   }
   Widget musicListItem(theme) => Container(
     child: Text('mmmmmm')

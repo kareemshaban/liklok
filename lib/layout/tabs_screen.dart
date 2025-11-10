@@ -130,16 +130,13 @@ class TabsScreenState extends State<TabsScreen> {
             },
             child: GestureDetector(
               onTap: (){
+                print(savedRoom!.mics);
                 ChatRoomService().roomSetter(savedRoom!);
-
                 setState(() {
                   showDelete = false ;
                   savedRoom = null ;
-
                 });
                 Navigator.push(context, MaterialPageRoute(builder: (context) => RoomScreen(),));
-
-
               },
               child: Container(
                 width: 90.0,
@@ -193,8 +190,8 @@ class TabsScreenState extends State<TabsScreen> {
        Widget okButton = TextButton(
          child: Text("edit_ok".tr , style: TextStyle(color: MyColors.primaryColor),),
          onPressed: () async {
-           await ChatRoomService.engine!.leaveChannel();
-           await ChatRoomService.engine!.release();
+           // await ChatRoomService.engine!.leaveChannel();
+           // await ChatRoomService.engine!.release();
             MicHelper( user_id:  user!.id , room_id:  savedRoom!.id , mic: 0 , user).leaveMic();
             ExitRoomHelper(user.id , savedRoom!.id);
             setState(() {

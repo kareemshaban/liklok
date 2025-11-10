@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/ChatRoom.dart';
@@ -7,6 +9,8 @@ import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../helpers/zego_handler/zego_sdk_manager.dart';
 
 class LuckyCaseModal extends StatefulWidget {
   const LuckyCaseModal({super.key});
@@ -439,19 +443,48 @@ class _LuckyCaseModalState extends State<LuckyCaseModal> with TickerProviderStat
       ),
     );
   }
-  createLuckyBag() async{
-    LuckyCase? luckyCase =  await ChatRoomService().createLuckyCase(room!.id , user!.id , type , selectedValue);
-    if(luckyCase!.id > 0){
-      await FirebaseFirestore.instance.collection("luckyCase").add({
+  // createLuckyBag() async{
+  //   LuckyCase? luckyCase =  await ChatRoomService().createLuckyCase(room!.id , user!.id , type , selectedValue);
+  //   if(luckyCase!.id > 0){
+  //     await FirebaseFirestore.instance.collection("luckyCase").add({
+  //       'room_id': room!.id,
+  //       'user_id': user!.id,
+  //       'user_img':user!.img,
+  //       'lucky_id': luckyCase.id,
+  //       'type': luckyCase.type,
+  //       'room_name': room!.name ,
+  //       'user_name': user!.name,
+  //       'available_untill':DateTime.now().add(Duration(minutes: 2))
+  //     });
+  //   }
+  // }
+  createLuckyBag() async {
+    LuckyCase? luckyCase = await ChatRoomService()
+        .createLuckyCase(room!.id, user!.id, type, selectedValue);
+
+    if (luckyCase != null && luckyCase.id > 0) {
+      final luckyData = {
         'room_id': room!.id,
         'user_id': user!.id,
-        'user_img':user!.img,
+        'user_img': user!.img,
         'lucky_id': luckyCase.id,
         'type': luckyCase.type,
         'room_name': room!.name ,
-        'user_name': user!.name,
-        'available_untill':DateTime.now().add(Duration(minutes: 2))
-      });
+        'user_name': user!.name ,
+        'available_until': DateTime.now()
+            .add(const Duration(minutes: 2)).toString()
+      };
+
+      await ZEGOSDKManager().zimService.setRoomAttributes(
+        {
+          'lucky_event': jsonEncode(luckyData),
+        },
+        isForce: true,
+        isUpdateOwner: false,
+        isDeleteAfterOwnerLeft: false,
+      );
+
+      print('🎁 Lucky bag event sent via Zego: $luckyData');
     }
   }
 

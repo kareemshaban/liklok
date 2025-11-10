@@ -8,6 +8,7 @@ import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/layout/tabs_screen.dart';
 import 'package:LikLok/modules/Login/LoginScreen.dart';
+import 'package:LikLok/shared/network/remote/ChatRoomService.dart';
 import 'package:LikLok/shared/network/remote/IntroServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:LikLok/translation.dart';
@@ -19,6 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:x_overlay/x_overlay.dart';
+
+import 'modules/Room/Components/room_overlay_widget.dart';
 
 
 Future<void> FirebaseBackgroundMessage(RemoteMessage message)async {
@@ -226,8 +230,19 @@ class _MyAppState extends State<MyApp> {
       ),
       debugShowCheckedModeBanner: false,
       home: startPage,
+      navigatorKey: ChatRoomService.navigatorKey,
       translations:  Translation(),
-       locale:Locale(local_lang),
+      locale:Locale(local_lang),
+      builder: (context, child) {
+        return XOverlayPopScope(
+          child: Stack(
+            children: [
+              child!,
+              const RoomOverlayWidget(),
+            ],
+          ),
+        );
+      },
     );
   }
 

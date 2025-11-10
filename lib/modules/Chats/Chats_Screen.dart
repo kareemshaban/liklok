@@ -413,6 +413,7 @@ class ChatsScreenState extends State<ChatsScreen> {
       AppUser? rec = await AppUserServices().getUser(id);
       print(rec!.id);
       print(user!.id);
+      print(article.messages.length);
       Navigator.push(context, MaterialPageRoute(builder: (ctx) =>  ChatScreen(
         receiverUserEmail:  rec.email ,
         receiverUserID: rec.id,

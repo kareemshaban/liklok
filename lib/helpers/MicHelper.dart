@@ -41,7 +41,7 @@ class MicHelper {
     };
 
     await ZEGOSDKManager().zimService.setRoomAttributes(
-      {'lock_mic_event': jsonEncode(micData)},
+      {'lock_event': jsonEncode(micData)},
       isForce: true,
       isUpdateOwner: false,
       isDeleteAfterOwnerLeft: false,
@@ -58,7 +58,7 @@ class MicHelper {
     };
 
     await ZEGOSDKManager().zimService.setRoomAttributes(
-      {'unlock_mic_event': jsonEncode(micData)},
+      {'unlock_event': jsonEncode(micData)},
       isForce: true,
       isUpdateOwner: false,
       isDeleteAfterOwnerLeft: false,
@@ -131,9 +131,14 @@ class MicHelper {
       isUpdateOwner: false,
       isDeleteAfterOwnerLeft: false,
     );
+    final state = await audioPlayer!.getCurrentState();
 
-    await audioPlayer.stop();
-
+    if (state == ZegoMediaPlayerState.Playing) {
+      await audioPlayer!.stop();
+      print("🛑 Media player stopped successfully");
+    } else {
+      print("ℹ️ No media currently playing");
+    }
     print('📴 Mic leave event sent: $micLeaveData');
   }
 
@@ -159,6 +164,8 @@ class MicHelper {
   // }
 
   removeFromMic(adminId) async {
+    print('adminId');
+    print(adminId);
     final removeData = {
       'room_id': room_id,
       'admin_id': adminId,
@@ -169,7 +176,7 @@ class MicHelper {
 
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {
-        'remove_mic_event': jsonEncode(removeData),
+        'remove_event': jsonEncode(removeData),
       },
       isForce: true,
       isUpdateOwner: false,
@@ -204,7 +211,7 @@ class MicHelper {
 
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {
-        'kick_out_event': jsonEncode(kickData),
+        'kick_event': jsonEncode(kickData),
       },
       isForce: true,
       isUpdateOwner: false,

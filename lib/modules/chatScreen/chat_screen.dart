@@ -64,8 +64,12 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     setState(() {
       user = AppUserServices().userGetter();
-      messages = widget.messages ;
+      if(widget.messages != null){
+        messages = widget.messages ;
+      }
     });
+    print('messages.length');
+    print(messages.length);
 
     initZego();
 
@@ -74,6 +78,15 @@ class _ChatScreenState extends State<ChatScreen> {
     //   _controller.animateTo(_controller.position.maxScrollExtent,
     //       duration: Duration(milliseconds: 300), curve: Curves.linear)
     // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   getId() async {
@@ -259,6 +272,7 @@ class _ChatScreenState extends State<ChatScreen> {
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
+            ZegoLiveAudioRoomManager().logoutRoom();
           },
           icon: Icon(Icons.arrow_back_ios_outlined, color: Colors.black),
         ),
@@ -527,7 +541,7 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Row(
-          mainAxisAlignment: ( message.senderId == widget.receiver.id)
+          mainAxisAlignment: ( message.receiverId == user!.id)
               ? MainAxisAlignment.start
               : MainAxisAlignment.end,
           children: [
@@ -649,5 +663,11 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    ZegoLiveAudioRoomManager().logoutRoom();
   }
 }

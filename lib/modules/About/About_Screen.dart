@@ -50,7 +50,7 @@ class _About_ScreenState extends State<About_Screen> {
                     SizedBox(height: 5.0,),
                     Text("LikLok",style: TextStyle(color: MyColors.whiteColor,fontSize: 18.0)),
                     SizedBox(height: 3.0,),
-                    Text("about_us_version".tr + "1.9.0",style: TextStyle(color: MyColors.whiteColor,fontSize: 14.0)),
+                    Text("about_us_version".tr + "1.0.1",style: TextStyle(color: MyColors.whiteColor,fontSize: 14.0)),
         
                   ],
                 ),

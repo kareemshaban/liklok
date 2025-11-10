@@ -107,6 +107,7 @@ const Map<String, String> ar = {
   'search_label_search': 'البحث عن المستخدمين حسب ID / الإسم',
   'setting_title': 'الإعدادات ',
   'setting_language': 'اللغة',
+  'self_withdrawal': 'السحب الذاتي',
   'setting_notification': 'الإشعارات',
   'setting_blocked_list': 'قائمة المحظورين',
   'setting_identity_verification': 'التحقق من الهوية',

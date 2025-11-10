@@ -42,13 +42,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final picker = ImagePicker();
   bool _isLoading = false ;
 
-  void ChangeProfilePhoto(img , userid){
-    FirebaseFirestore.instance.collection('users')
-        .where("id" , isEqualTo: userid).get()
-        .then((value) => {
-          value.docs.map((doc) => doc.reference.update({'img': img}))
-    });
-  }
+  // void ChangeProfilePhoto(img , userid){
+  //   FirebaseFirestore.instance.collection('users')
+  //       .where("id" , isEqualTo: userid).get()
+  //       .then((value) => {
+  //         value.docs.map((doc) => doc.reference.update({'img': img}))
+  //   });
+  // }
   void ChangeUserName(name , userid){
     FirebaseFirestore.instance.collection('users')
         .where("id" , isEqualTo: userid).get()
@@ -945,7 +945,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     await AppUserServices().updateProfileImg(user!.id, _image);
     AppUser? res = await AppUserServices().getUser(user!.id);
     AppUserServices().userSetter(res!);
-    ChangeProfilePhoto(res.img , res.id) ;
+    // ChangeProfilePhoto(res.img , res.id) ;
     setState(() {
       user = res;
     });
