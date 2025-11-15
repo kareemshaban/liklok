@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:LikLok/helpers/GiftHelper.dart';
-import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/Badge.dart';
 import 'package:LikLok/models/Mic.dart';
 import 'package:LikLok/models/token_model.dart';
@@ -58,8 +57,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/services.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../helpers/zego_handler/live_audio_room_manager.dart';
+import '../../models/AppSettings.dart';
 import '../../shared/network/remote/AppSettingsServices.dart';
 import 'Components/app_utils/app_snack_bar.dart';
 
@@ -198,6 +197,11 @@ class _RoomScreenState extends State<RoomScreen>
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    AppSettings? res = AppSettingsServices().appSettingGetter();
+    setState(() {
+      appID = int.parse(res!.zegoAppId);
+      appSign = res.zegoAppSign;
+      });
     if (mounted) {
       _controller = SVGAAnimationController(vsync: this);
       setState(() {
