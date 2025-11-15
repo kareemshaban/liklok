@@ -30,7 +30,7 @@ class RoomHelper {
         'theme_event': jsonEncode(themeData),
       },
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
 

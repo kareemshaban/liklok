@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:LikLok/helpers/GiftHelper.dart';
+import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/Badge.dart';
 import 'package:LikLok/models/Mic.dart';
 import 'package:LikLok/models/token_model.dart';
@@ -59,6 +60,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/services.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import '../../helpers/zego_handler/live_audio_room_manager.dart';
+import '../../shared/network/remote/AppSettingsServices.dart';
 import 'Components/app_utils/app_snack_bar.dart';
 
 //const appId = "f26e793582cb48359a4cb36dba3a9d3f";
@@ -101,7 +103,6 @@ class _RoomScreenState extends State<RoomScreen>
 
   final TextEditingController _messageController = TextEditingController();
   FocusNode focusNode = FocusNode();
-  String token = "";
   String channel = "";
   bool emojiShowing = false;
   String entery = "";
@@ -158,17 +159,18 @@ class _RoomScreenState extends State<RoomScreen>
   bool isNewCommer = false;
 
   final CountDownController _countDownController = CountDownController();
+
   final int _duration = 5;
+
   int luckyGiftId = 0;
 
   int luckyGiftCount = 0;
 
   int luckyGiftReciver = 0;
 
-  int appID = 1364585881;
+  int appID = 0;
 
-  String appSign =
-      'c65c2660926c15c386764de74a7330df068a35830a77bd059db1fb9dbbc99c24';
+  String appSign = '';
   TokenModel? zegoToken;
 
   List<ZegoUser> users = [];
@@ -182,14 +184,14 @@ class _RoomScreenState extends State<RoomScreen>
   List<RoomMember>? matchedMembers;
 
   final List<Map<String, dynamic>> queue = [];
+
   bool isPlaying = false;
 
   List<String> entryQueue = [];
+
   bool isShowingEntry = false;
 
-  String appId = '';
-
-  TokenModel? tokenModel ;
+  TokenModel? tokenModel;
 
   @override
   void initState() {
@@ -260,7 +262,7 @@ class _RoomScreenState extends State<RoomScreen>
       }
     });
     luckyCaseForNewComers();
-    Future.delayed(Duration(seconds: 5)).then((_){
+    Future.delayed(Duration(seconds: 5)).then((_) {
       refreshRoom(user!.id);
     });
   }
@@ -342,28 +344,22 @@ class _RoomScreenState extends State<RoomScreen>
       appSign,
       scenario: ZegoScenario.HighQualityChatroom,
     );
-    print('All Data');
-    print(user!.id);
-    print(user!.name);
-    await ZEGOSDKManager()
-        .connectUser(user!.id.toString(), user!.name , token: token.token);
+
+    await ZEGOSDKManager().connectUser(
+      user!.id.toString(),
+      user!.name,
+      token: token.token,
+    );
 
     final zimService = ZEGOSDKManager().zimService;
     final expressService = ZEGOSDKManager().expressService;
 
     createMediaPlayer();
 
-
-
     ZegoLiveAudioRoomManager().logoutRoom();
 
-
     await ZegoLiveAudioRoomManager()
-        .loginRoom(
-          room!.id.toString(),
-          ZegoLiveAudioRoomRole.audience,
-          token: token.token,
-        )
+        .loginRoom(room!.id.toString(), ZegoLiveAudioRoomRole.audience)
         .then((result) {
           setState(() {
             _localUserJoined = true;
@@ -624,9 +620,7 @@ class _RoomScreenState extends State<RoomScreen>
               });
             }
           }
-          await ZEGOSDKManager().zimService.deleteRoomAttributes([
-            'mic_event',
-          ]);
+          await ZEGOSDKManager().zimService.deleteRoomAttributes(['mic_event']);
         }
 
         if (attrs.containsKey("mic_leave_event")) {
@@ -1037,16 +1031,18 @@ class _RoomScreenState extends State<RoomScreen>
             final targetUserId = data['user_id'];
             final blockType = data['block_type'];
             final roomId = data['room_id'];
+            final myID = data['myID'];
             if (mounted) {
               setState(() {
                 print("🚨 kick event received for user: $targetUserId");
-
-                if (user!.id.toString() == targetUserId.toString()) {
+                print(myID);
+                print(user!.id);
+                if (user!.id.toString() == myID.toString()) {
                   ChatRoomService().blockRoomMember(
                     targetUserId,
                     roomId,
                     blockType,
-                    AppUserServices().userGetter()!.id,
+                    user!.id,
                   );
                 }
 
@@ -1576,7 +1572,7 @@ class _RoomScreenState extends State<RoomScreen>
     } else {
       kickout_period = 'kick_out_forever'.tr;
     }
-    if (room_id == room!.id) {
+    if (room_id.toString() == room!.id.toString()) {
       if (user_id == user!.id) {
         Fluttertoast.showToast(
           msg: 'kickout_msg'.tr + ' ' + kickout_period,
@@ -1594,15 +1590,17 @@ class _RoomScreenState extends State<RoomScreen>
   }
 
   exitRoom() async {
-    MicHelper(
+    print('start exit');
+    int index = room!.mics!.indexWhere((mic) => mic.user_id == user!.id);
+    await MicHelper(
+      user!,
       user_id: user!.id,
       room_id: room!.id,
-      mic: 0,
-      user!,
+      mic: index,
     ).sendMicLeaveEvent(audioPlayer, zegoEngine);
+    await ChatRoomService().leaveMic(user!.id, room!.id, index, 0);
     ExitRoomHelper(user!.id, room!.id);
-    await _engine.leaveChannel();
-    await _engine.release();
+    await unUnitZego();
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const TabsScreen()),
@@ -1880,9 +1878,9 @@ class _RoomScreenState extends State<RoomScreen>
         setState(() {
           messages = old;
         });
-          setState(() {
-            ChatRoomService().addMessage(message);
-          });
+        setState(() {
+          ChatRoomService().addMessage(message);
+        });
       }
     }
 
@@ -2474,7 +2472,7 @@ class _RoomScreenState extends State<RoomScreen>
       if (result.errorCode == 0) {
         ChatRoomService().addMessage(message);
         setState(() {
-          messages = ChatRoomService().messages ;
+          messages = ChatRoomService().messages;
         });
 
         _scrollController.animateTo(
@@ -2516,11 +2514,8 @@ class _RoomScreenState extends State<RoomScreen>
       final body = {
         "FromUserId": fromUserId,
         "MessageType": 1,
-        "MessageBody": {
-          "Message": messageBody,
-          "ExtendedData": "optional"
-        },
-        "SubMsgType": 0
+        "MessageBody": {"Message": messageBody, "ExtendedData": "optional"},
+        "SubMsgType": 0,
       };
 
       final response = await http.post(
@@ -3214,7 +3209,8 @@ class _RoomScreenState extends State<RoomScreen>
                                                     SizedBox(height: 5.0),
                                                     GestureDetector(
                                                       onTap: () {
-                                                        ChatRoomService().roomSetter(room!);
+                                                        ChatRoomService()
+                                                            .roomSetter(room!);
                                                         showModalBottomSheet(
                                                           context: context,
                                                           builder: (ctx) =>
@@ -3317,7 +3313,7 @@ class _RoomScreenState extends State<RoomScreen>
                                                 child: MaterialButton(
                                                   onPressed: () {
                                                     sendChatRoomMessage();
-                                                 //   sendGlobalMessage('fgbuif' , user!.id.toString());
+                                                    //   sendGlobalMessage('fgbuif' , user!.id.toString());
                                                   }, //sendMessage
                                                   child: Text(
                                                     'gift_send'.tr,
@@ -4007,7 +4003,7 @@ class _RoomScreenState extends State<RoomScreen>
                     room_id: room!.id,
                     mic: mic.order,
                     user!,
-                  ).kickOut('HOUR');
+                  ).kickOut('HOUR', user!.id);
                 },
               ),
             ),
@@ -4024,7 +4020,7 @@ class _RoomScreenState extends State<RoomScreen>
                     room_id: room!.id,
                     mic: mic.order,
                     user!,
-                  ).kickOut('DAY');
+                  ).kickOut('DAY', user!.id);
                 },
               ),
             ),
@@ -4041,7 +4037,7 @@ class _RoomScreenState extends State<RoomScreen>
                     room_id: room!.id,
                     mic: mic.order,
                     user!,
-                  ).kickOut('ALL');
+                  ).kickOut('ALL', user!.id);
                 },
               ),
             ),

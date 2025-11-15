@@ -4,6 +4,7 @@ import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Intro.dart';
 import 'package:LikLok/modules/BlockedScreen/blocked_screen.dart';
+import 'package:LikLok/modules/TestLogin/test_login.dart';
 import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/layout/tabs_screen.dart';
@@ -114,18 +115,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-   Widget startPage  = LoginScreen();
+   Widget? startPage;
    String local_lang  = 'en' ;
    var token ;
+   AppSettings? appSettings ;
   void initState() {
     super.initState();
       getAppSettings();
       getRandomIntro();
       getDeviceToken();
       intialize();
-
-
-
   }
   getRandomIntro() async{
     Intro? res = await IntroServices().getRandomIntro();
@@ -135,7 +134,9 @@ class _MyAppState extends State<MyApp> {
     AppSettings? res = await AppSettingsServices().getAppSettings();
     AppSettingsServices().appSettingSetter(res!);
     IntroServices().setFirstShow(1);
-
+    setState(() {
+      appSettings = res;
+    });
   }
   getDeviceToken() async {
     var res = await FirebaseMessaging.instance.getToken();
@@ -170,13 +171,13 @@ class _MyAppState extends State<MyApp> {
     if(id == null){
       FlutterNativeSplash.remove();
       setState(() {
-        startPage = LoginScreen();
+        startPage = appSettings?.isTest == 1 ? LoginScreen() : TestLogin();
       });
     } else {
       if(id == 0){
         FlutterNativeSplash.remove();
         setState(() {
-          startPage = LoginScreen();
+          startPage = appSettings?.isTest == 1 ? LoginScreen() : TestLogin();
         });
       } else {
         AppUser? user = await AppUserServices().getUser(id);
@@ -200,7 +201,7 @@ class _MyAppState extends State<MyApp> {
 
         } else {
           setState(() {
-            startPage = LoginScreen();
+            startPage = appSettings?.isTest == 1 ? LoginScreen() : TestLogin();
           });
           FlutterNativeSplash.remove();
         }
@@ -230,7 +231,6 @@ class _MyAppState extends State<MyApp> {
       ),
       debugShowCheckedModeBanner: false,
       home: startPage,
-      navigatorKey: ChatRoomService.navigatorKey,
       translations:  Translation(),
       locale:Locale(local_lang),
       builder: (context, child) {

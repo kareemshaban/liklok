@@ -103,7 +103,7 @@ class GiftHelper {
              'gift_event': jsonEncode(giftData),
            },
            isForce: true,
-           isUpdateOwner: false,
+           isUpdateOwner: true,
            isDeleteAfterOwnerLeft: false,
          );
          AppUserServices().userSetter(user);
@@ -122,42 +122,42 @@ class GiftHelper {
      }
   }
 
-
-  sendGiftMicUser() async{
-
-    int  reward = await ChatRoomService().sendGiftMicUsers(user_id  , room_owner , room_id ,  gift_id , sendGiftCount );
-
-
-      if(reward > -1){
-        AppUser? user = await AppUserServices().getUser(user_id);
-
-
-        Gift gift = gifts.where((element) => element.id == gift_id).toList()[0] ;
-        await FirebaseFirestore.instance.collection("gifts").add({
-          'room_id': room_id,
-          'sender_id': user_id ,
-          'sender_name': user!.name ,
-          'sender_img': '${ASSETSBASEURL}AppUsers/${user.img}'  ,
-          'receiver_id': receiver ,
-          'receiver_name': 'Mic Users' ,
-          'receiver_img': '',
-          'gift_name':  gift.name ,
-          'gift_audio': gift.audio_url != "" ? '${ASSETSBASEURL}Designs/Audio/${gift.audio_url}' : "" ,
-          'gift_img': '${gift.motion_icon}',
-          'giftImgSmall':'${ASSETSBASEURL}Designs/${gift.icon}',
-          'count' : sendGiftCount,
-          'sender_share_level': user!.share_level_icon,
-          'available_untill':DateTime.now().add(Duration(minutes: 1)) ,
-          'gift_category_id': gift.gift_category_id,
-          'reward': reward,
-          'gift_id': gift_id
-
-        });
-
-        AppUserServices().userSetter(user);
-
-      }
-
-  }
+  //
+  // sendGiftMicUser() async{
+  //
+  //   int  reward = await ChatRoomService().sendGiftMicUsers(user_id  , room_owner , room_id ,  gift_id , sendGiftCount );
+  //
+  //
+  //     if(reward > -1){
+  //       AppUser? user = await AppUserServices().getUser(user_id);
+  //
+  //
+  //       Gift gift = gifts.where((element) => element.id == gift_id).toList()[0] ;
+  //       await FirebaseFirestore.instance.collection("gifts").add({
+  //         'room_id': room_id,
+  //         'sender_id': user_id ,
+  //         'sender_name': user!.name ,
+  //         'sender_img': '${ASSETSBASEURL}AppUsers/${user.img}'  ,
+  //         'receiver_id': receiver ,
+  //         'receiver_name': 'Mic Users' ,
+  //         'receiver_img': '',
+  //         'gift_name':  gift.name ,
+  //         'gift_audio': gift.audio_url != "" ? '${ASSETSBASEURL}Designs/Audio/${gift.audio_url}' : "" ,
+  //         'gift_img': '${gift.motion_icon}',
+  //         'giftImgSmall':'${ASSETSBASEURL}Designs/${gift.icon}',
+  //         'count' : sendGiftCount,
+  //         'sender_share_level': user!.share_level_icon,
+  //         'available_untill':DateTime.now().add(Duration(minutes: 1)) ,
+  //         'gift_category_id': gift.gift_category_id,
+  //         'reward': reward,
+  //         'gift_id': gift_id
+  //
+  //       });
+  //
+  //       AppUserServices().userSetter(user);
+  //
+  //     }
+  //
+  // }
 
 }

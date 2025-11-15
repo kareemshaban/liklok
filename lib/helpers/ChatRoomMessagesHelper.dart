@@ -49,7 +49,7 @@ class ChatRoomMessagesHelper {
             'room_event': jsonEncode(eventData),
           },
           isForce: true,
-          isUpdateOwner: false,
+          isUpdateOwner: true,
           isDeleteAfterOwnerLeft: false,
         );
 

@@ -372,7 +372,7 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
     GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: receiver! , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftEvent();
   }
   sendGiftToAllMicUsers() async{
-    GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: 0 , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftMicUser();
+    GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: 0 , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftEvent();
 
     // bool res = await ChatRoomService().sendGiftMicUsers(user!.id  , room!.userId , room!.id ,  selectedGift , sendGiftCount );
       // if(res == true){
@@ -405,7 +405,7 @@ class _GiftModalState extends State<GiftModal> with TickerProviderStateMixin{
 
   }
   sendGiftToAllRoomMembers() async{
-    GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: 0 , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftMicUser();
+    GiftHelper(gift_id: selectedGift! , user_id: user!.id , room_id: room!.id , receiver: 0 , room_owner: room!.userId , sendGiftCount: sendGiftCount! , gifts: gifts).sendGiftEvent();
 
     // bool res = await ChatRoomService().sendGiftMembers(user!.id  , room!.userId , room!.id ,  selectedGift , sendGiftCount );
     // if(res == true){

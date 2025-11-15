@@ -43,7 +43,7 @@ class MicHelper {
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {'lock_event': jsonEncode(micData)},
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
     print("🔒 تم قفل المايك بنجاح");
@@ -60,7 +60,7 @@ class MicHelper {
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {'unlock_event': jsonEncode(micData)},
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
   }
@@ -98,7 +98,7 @@ class MicHelper {
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {'mic_event': jsonEncode(micData)},
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
 
@@ -128,7 +128,7 @@ class MicHelper {
     await ZEGOSDKManager().zimService.setRoomAttributes(
       {'mic_leave_event': jsonEncode(micLeaveData)},
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
     final state = await audioPlayer!.getCurrentState();
@@ -179,7 +179,7 @@ class MicHelper {
         'remove_event': jsonEncode(removeData),
       },
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
 
@@ -201,12 +201,13 @@ class MicHelper {
   //   });
   // }
 
-  kickOut(blockType) async {
+  kickOut(blockType , myID) async {
     final kickData = {
       'room_id': room_id,
       'block_type': blockType,
       'user_id': user_id,
       'mic': mic,
+      'myID': myID,
     };
 
     await ZEGOSDKManager().zimService.setRoomAttributes(
@@ -214,7 +215,7 @@ class MicHelper {
         'kick_event': jsonEncode(kickData),
       },
       isForce: true,
-      isUpdateOwner: false,
+      isUpdateOwner: true,
       isDeleteAfterOwnerLeft: false,
     );
 
@@ -236,7 +237,7 @@ class MicHelper {
       await ZEGOSDKManager().zimService.setRoomAttributes(
         {'emoji_event': jsonEncode(emojiData)},
         isForce: true,
-        isUpdateOwner: false,
+        isUpdateOwner: true,
         isDeleteAfterOwnerLeft: false,
       );
 

@@ -15,7 +15,7 @@ class AppSettingsServices {
 
   Future<AppSettings?> getAppSettings() async{
      AppSettings appSettings = AppSettings(id: 0, agora_id: "", enableGooglePayments: 0, enableStripePayments: 0  , game1: 0 , game7: 0 , game8: 0 ,
-     game10: 0 , game15: 0 ,game20: 0 , game25: 0 , game26: 0);
+     game10: 0 , game15: 0 ,game20: 0 , game25: 0 , game26: 0 , isTest:0 , zegoAppId: '' , zegoAppSign: '', );
      final response = await http.get(Uri.parse('${BASEURL}appSettings'));
      if (response.statusCode == 200){
        final Map jsonData = json.decode(response.body);

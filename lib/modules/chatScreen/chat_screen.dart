@@ -195,7 +195,6 @@ class _ChatScreenState extends State<ChatScreen> {
         .loginRoom(
           roomId,
           ZegoLiveAudioRoomRole.audience,
-          token: token.token,
         )
         .then((result) {
           if (result.errorCode == 0) {

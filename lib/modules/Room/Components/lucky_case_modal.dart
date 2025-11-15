@@ -480,7 +480,7 @@ class _LuckyCaseModalState extends State<LuckyCaseModal> with TickerProviderStat
           'lucky_event': jsonEncode(luckyData),
         },
         isForce: true,
-        isUpdateOwner: false,
+        isUpdateOwner: true,
         isDeleteAfterOwnerLeft: false,
       );
 
