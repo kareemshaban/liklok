@@ -45,7 +45,7 @@ class _InviteScreenState extends State<InviteScreen> {
               SizedBox(height: 25.0,),
               GestureDetector(
                 onTap: () async{
-                  await Clipboard.setData(ClipboardData(text: 'https://play.google.com/store/apps/details?id=com.chatScreen.apps.chatScreen.chatScreen' ));
+                  await Clipboard.setData(ClipboardData(text: 'https://play.google.com/store/apps/details?id=com.iklok.live.chatScreen.chatScreen' ));
                   Fluttertoast.showToast(
                       msg: 'invite_link_copied'.tr,
                       toastLength: Toast.LENGTH_SHORT,

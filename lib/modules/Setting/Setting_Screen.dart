@@ -12,6 +12,7 @@ import 'package:LikLok/modules/EditLanguage/Edit_Language_Screen.dart';
 import 'package:LikLok/modules/NetworkDiagnosis/Network_Diagnosis_screen.dart';
 import 'package:LikLok/modules/NotificationSetting/Notification_Setting_Screen.dart';
 import 'package:LikLok/modules/PrivacyPolicy/Privacy_Policy_Screen.dart';
+import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
 import 'package:LikLok/shared/styles/colors.dart';
 import 'package:flutter/material.dart';
@@ -414,7 +415,8 @@ class _SettingScreenState extends State<SettingScreen> {
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (ctx) => const JoinHostAgency()));
               },
-              child: Container(
+              child: AppSettingsServices().appSettingGetter()!.isTest == 0 ?
+              Container(
                 decoration: BoxDecoration(color:  Colors.white, borderRadius: BorderRadius.circular(15.0)),
                 padding: EdgeInsets.all(15.0) ,
                 margin: EdgeInsetsDirectional.only(bottom: 10.0 , start: 10.0 , end: 10.0),
@@ -432,7 +434,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ],
                 ),
-              ),
+              ) : Container(),
             ) : isLoaded ? GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: (){

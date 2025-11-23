@@ -2,7 +2,7 @@
 //production
 const  BASEURL = 'https://dashboard.liklok.live/api/' ;
 const  ASSETSBASEURL = 'https://dashboard.liklok.live/images/' ;
-const LOCALPATH ='/data/user/0/com.chatScreen.apps.chatScreen.chatScreen/app_flutter' ;
+const LOCALPATH ='/data/user/0/com.iklok.live.chatScreen.chatScreen/app_flutter' ;
 
 
 
@@ -10,7 +10,7 @@ const LOCALPATH ='/data/user/0/com.chatScreen.apps.chatScreen.chatScreen/app_flu
 //dev
 // const  BASEURL = 'https://dev.liklok.live/api/';
 // const  ASSETSBASEURL = 'https://dev.liklok.live/images/';
-// const LOCALPATH ='/data/user/0/com.chatScreen.apps.chatScreen.chatScreen/app_flutter';
+// const LOCALPATH ='/data/user/0/com.iklok.live.chatScreen.chatScreen/app_flutter';
 
 
 

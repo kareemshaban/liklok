@@ -170,6 +170,8 @@ class _RoomScreenState extends State<RoomScreen>
   int appID = 0;
 
   String appSign = '';
+
+  String appSecret = '' ;
   TokenModel? zegoToken;
 
   List<ZegoUser> users = [];
@@ -201,6 +203,7 @@ class _RoomScreenState extends State<RoomScreen>
     setState(() {
       appID = int.parse(res!.zegoAppId);
       appSign = res.zegoAppSign;
+      appSecret = res.zegoAppSecret ;
       });
     if (mounted) {
       _controller = SVGAAnimationController(vsync: this);
@@ -690,7 +693,7 @@ class _RoomScreenState extends State<RoomScreen>
             final data = jsonDecode(rawData);
 
             dynamic availableUntil = DateTime.parse(data['available_untill']);
-            if (checkGiftShow(availableUntil)) {
+            if (checkGiftShow(availableUntil) || true) {
               AppUser? sender = await AppUserServices().getUser(
                 data['sender_id'],
               );
@@ -1851,14 +1854,8 @@ class _RoomScreenState extends State<RoomScreen>
           }
         });
       }
-      print('giftImg');
-      print(giftImg);
 
-      await Future.delayed(Duration(seconds: 1));
-      if (gift_audio != "") {
-        // final duration = await player.setUrl(gift_audio);
-        // player.play();
-      }
+
       // show on tetx
       String pubble = "";
       if (member.pubble != "") {
@@ -2498,18 +2495,18 @@ class _RoomScreenState extends State<RoomScreen>
   }
 
   Future<void> sendGlobalMessage(String messageBody, String fromUserId) async {
-    const String appId = '1364585881';
-    const String serverSecret = 'f17120be21fb4342160ff49228c42475';
+ //   const int appId = appID;
+  //  const String serverSecret = 'f17120be21fb4342160ff49228c42475';
 
     try {
       final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
 
-      final plainText = '$appId$serverSecret$timestamp';
+      final plainText = '$appID$appSecret$timestamp';
       final signature = sha256.convert(utf8.encode(plainText)).toString();
 
       final uri = Uri.https('zim-api.zego.im', '/', {
         'Action': 'SendMessageToAllUsers',
-        'AppId': appId,
+        'AppId': appID,
         'Signature': signature,
         'Timestamp': timestamp.toString(),
         'SignatureVersion': '1',

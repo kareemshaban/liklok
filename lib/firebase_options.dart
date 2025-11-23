@@ -74,7 +74,7 @@ class DefaultFirebaseOptions {
     projectId: 'chatScreen-4286b',
     storageBucket: 'chatScreen-4286b.firebasestorage.app',
     iosClientId: '672957384118-v5ov3ls6mta264dhha6bhlier7kllm9i.apps.googleusercontent.com',
-    iosBundleId: 'com.chatScreen.apps.chatScreen.chatScreen',
+    iosBundleId: 'com.iklok.live.chatScreen.chatScreen',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

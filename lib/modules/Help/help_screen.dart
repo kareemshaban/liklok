@@ -54,7 +54,7 @@ class _HelpScreenState extends State<HelpScreen> {
                       SizedBox(height: 5.0,),
                       Text("LikLok Help Center",style: TextStyle(color: MyColors.whiteColor,fontSize: 18.0)),
                       SizedBox(height: 3.0,),
-                      Text("about_us_version".tr + "1.0.1",style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
+                      Text("about_us_version".tr + "1.0.4",style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
 
                     ],
                   ),
@@ -85,7 +85,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
                 GestureDetector(
                   onTap: () async{
-                    final Uri url = Uri.parse('https://chatScreen.apps/en');
+                    final Uri url = Uri.parse('https://iklok.live/en');
                     if (!await launchUrl(url)) {
                       throw Exception('Could not launch $url');
                     }
@@ -112,7 +112,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ),
                 GestureDetector(
                   onTap: () async{
-                    await launch('https://chatScreen.apps');
+                    await launch('https://iklok.live');
                   },
                   child: Container(
                     color: Colors.white,
@@ -126,7 +126,7 @@ class _HelpScreenState extends State<HelpScreen> {
                           children: [
                             Text("help_center_email".tr ,style:TextStyle(color: MyColors.unSelectedColor,fontSize: 16.0) ,),
                             SizedBox(height: 10.0,),
-                            Text("support@chatScreen.apps".tr ,style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
+                            Text("support@liklok.live".tr ,style: TextStyle(color: MyColors.unSelectedColor,fontSize: 14.0)),
 
                           ],
                         )

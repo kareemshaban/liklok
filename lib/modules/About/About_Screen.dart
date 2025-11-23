@@ -50,7 +50,7 @@ class _About_ScreenState extends State<About_Screen> {
                     SizedBox(height: 5.0,),
                     Text("LikLok",style: TextStyle(color: MyColors.whiteColor,fontSize: 18.0)),
                     SizedBox(height: 3.0,),
-                    Text("about_us_version".tr + "1.0.1",style: TextStyle(color: MyColors.whiteColor,fontSize: 14.0)),
+                    Text("about_us_version".tr + "1.0.4",style: TextStyle(color: MyColors.whiteColor,fontSize: 14.0)),
         
                   ],
                 ),
@@ -117,7 +117,7 @@ class _About_ScreenState extends State<About_Screen> {
       );
   }
   void openWebsite() async {
-    final Uri url = Uri.parse('https://chatScreen.apps/en');
+    final Uri url = Uri.parse('https://liklok.live/en');
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
     }

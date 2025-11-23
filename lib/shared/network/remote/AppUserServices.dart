@@ -861,4 +861,42 @@ class AppUserServices {
     }
   }
 
+
+  Future<AppUser?> testAccountLogin( email  ,  password ) async {
+    AppUser? user = null ;
+    String deviceId = await getId() ?? "";
+    var data = await getIpAddress() ;
+    var ipAddress = data['ip'] ?? "" ;
+    var mbody = jsonEncode(<String, String>{
+      'email': email ,
+      'password': password,
+      'ipAddress': ipAddress,
+      'macAddress': "2.0.0.0",
+      'deviceId': deviceId,
+      'token':"2161511wds1a51d5"
+    });
+    var response = await http.post(
+      Uri.parse('${BASEURL}Account/test-login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: mbody,
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      final Map jsonData = json.decode(response.body);
+      if(jsonData['state'] == "success"){
+        return mapUserData(jsonData);
+      } else {
+        return null ;
+      }
+
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
 }

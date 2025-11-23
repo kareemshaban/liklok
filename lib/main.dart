@@ -4,6 +4,7 @@ import 'package:LikLok/models/AppSettings.dart';
 import 'package:LikLok/models/AppUser.dart';
 import 'package:LikLok/models/Intro.dart';
 import 'package:LikLok/modules/BlockedScreen/blocked_screen.dart';
+import 'package:LikLok/modules/SplashScreen/Splash_Screen.dart';
 import 'package:LikLok/modules/TestLogin/test_login.dart';
 import 'package:LikLok/shared/network/remote/AppSettingsServices.dart';
 import 'package:LikLok/shared/network/remote/AppUserServices.dart';
@@ -45,8 +46,6 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     var token = await FirebaseMessaging.instance.getToken();
-
-
 
     FirebaseMessaging.onMessage.listen((event) {
       AwesomeNotifications().createNotification(
@@ -160,10 +159,7 @@ class _MyAppState extends State<MyApp> {
 
     if(l == null) l = 'en' ;
     if(l == '') l = 'en' ;
-    print('lang cashed');
-    print(l);
     setState(() {
-
       local_lang = l! ;
     });
     Get.updateLocale(Locale(local_lang));
@@ -171,13 +167,17 @@ class _MyAppState extends State<MyApp> {
     if(id == null){
       FlutterNativeSplash.remove();
       setState(() {
-        startPage = appSettings?.isTest == 1 ? LoginScreen() : TestLogin();
+        startPage = (appSettings == null || appSettings?.isTest == 0)
+            ? LoginScreen()
+            : TestLogin();
       });
     } else {
       if(id == 0){
         FlutterNativeSplash.remove();
         setState(() {
-          startPage = appSettings?.isTest == 1 ? LoginScreen() : TestLogin();
+          startPage = (appSettings == null || appSettings?.isTest == 0)
+              ? LoginScreen()
+              : TestLogin();
         });
       } else {
         AppUser? user = await AppUserServices().getUser(id);
@@ -201,7 +201,9 @@ class _MyAppState extends State<MyApp> {
 
         } else {
           setState(() {
-            startPage = appSettings?.isTest == 1 ? LoginScreen() : TestLogin();
+            startPage = (appSettings == null || appSettings?.isTest == 0)
+                ? LoginScreen()
+                : TestLogin();
           });
           FlutterNativeSplash.remove();
         }
@@ -216,7 +218,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   // FlutterNativeSplash.remove();
-  
+
   @override
   Widget build(BuildContext context) {
     return  GetMaterialApp(
@@ -230,7 +232,7 @@ class _MyAppState extends State<MyApp> {
 
       ),
       debugShowCheckedModeBanner: false,
-      home: startPage,
+      home: startPage ?? SplashScreen(),
       translations:  Translation(),
       locale:Locale(local_lang),
       builder: (context, child) {
@@ -274,7 +276,7 @@ class _MyAppState extends State<MyApp> {
       });
       FlutterNativeSplash.remove();
     }
-    
+
   }
 }
 

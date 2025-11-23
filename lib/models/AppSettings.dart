@@ -29,6 +29,8 @@ class AppSettings {
 
   final String zegoAppSign;
 
+  final String zegoAppSecret;
+
   AppSettings({
     required this.id,
     required this.agora_id,
@@ -45,6 +47,7 @@ class AppSettings {
     required this.isTest,
     required this.zegoAppId,
     required this.zegoAppSign,
+    required this.zegoAppSecret
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -65,6 +68,7 @@ class AppSettings {
         'isTest': int isTest,
         'zegoAppId': String zegoAppId,
         'zegoAppSign': String zegoAppSign,
+        'zegoAppSecret': String zegoAppSecret
       } =>
         AppSettings(
           id: id,
@@ -82,6 +86,7 @@ class AppSettings {
           isTest: isTest,
           zegoAppId: zegoAppId,
           zegoAppSign: zegoAppSign,
+          zegoAppSecret: zegoAppSecret
         ),
       _ => throw const FormatException('Failed to load album.'),
     };
